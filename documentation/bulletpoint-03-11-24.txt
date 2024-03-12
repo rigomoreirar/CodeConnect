@@ -11,14 +11,21 @@ Main conversation topics
  -> Freddy's forum
  -> Carlos' project
  -> Tree project
+
 - What are cons and cons for each project?
+
+-- AWAITING FOR COPNFIRMATION
  -> Freddy's forum:
    ~ PRO: Least amount of hours
    ~ CON: Not so useful, may be rejected
+
+-- LAST RESOURCE
  -> Carlos' project:
    ~ PRO: Innovation Faculty support
    ~ CON: Features not clear enough, many hours for dev
- -> Freddy's forum:
+
+-- NO LONGER INTO ACCOUNT
+ -> Tree project:
    ~ PRO: Architecture faculty support, clear set of features 
    ~ CON: Many hours for dev
 
@@ -41,16 +48,22 @@ Frontend
 
 Backend
 ==============================================================
-- Define endpoints, PUT, POST, GET, DELETE
-- Define endpoints and API services
-- Define controllers, models and shared modules
+1 - Define endpoints, PUT, POST, GET, DELETE
+2 - Define endpoints and API services
+3 - Define controllers, models and shared modules
 
 Deployment K3s
 ==============================================================
 - Generate Dockerfile for backend, mongo and frontend
 - Generate deployment and volumes yaml
 
+To not get lost
+=====================
+Added
 
+Modified
+
+Delete
 
 
 
