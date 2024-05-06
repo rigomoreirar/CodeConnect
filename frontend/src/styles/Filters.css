@@ -1,0 +1,18 @@
+.filterContainer {
+  width: 100%;
+  height: auto;
+  background-color: rgb(28, 28, 28);
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.filterContainer::-webkit-scrollbar {
+  /* WebKit */
+  display: none;
+}
+
+.hover {
+  cursor: pointer;
+}
