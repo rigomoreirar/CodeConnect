@@ -45,7 +45,7 @@ const Header = () => {
                      <Link className="nav-item nav-link" to="/profile">My Profile</Link>
                   </li>
                   <li className="nav-item">
-                     <button onClick={handleLogout} className="nav-link" type="button">Log out</button>
+                     <button onClick={handleLogout} className="button-logout" type="button">Log out</button>
                   </li>
                </ul>
             </div>
