@@ -1,111 +1,40 @@
-# name: Build and Deploy to Azure Container Instances
+name: Deploy to Droplet
 
-# on:
-#   workflow_dispatch:
+on:
+  workflow_dispatch:
 
-# jobs:
-#   build-and-deploy:
-#     runs-on: ubuntu-latest
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Check out the repo
-#         uses: actions/checkout@v2
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-#       - name: Log in to Docker Hub
-#         uses: docker/login-action@v1 
-#         with:
-#           username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      # Step 2: Set up SSH agent with the private key from secrets
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v1
+      # Step 3: Install rsync to copy files to the server
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
 
-#       - name: Build and push Docker backend image
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: ./backend
-#           push: true
-#           tags: rigomoreirar/code-connect-backend:latest
+      # Step 4: Copy files to the server
+      - name: Copy files to server
+        run: |
+          rsync -avz -e 'ssh -o StrictHostKeyChecking=no' . root@64.23.246.222:/root/code-connect
 
-#       - name: Build and push Docker frontend image
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: ./frontend
-#           push: true
-#           tags: rigomoreirar/code-connect-frontend:latest
-
-#       - name: Log in to Azure
-#         uses: azure/login@v1
-#         with:
-#           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-#         env:
-#           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-#           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-#           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-
-#       - name: Create container group definition
-#         run: |
-#           cat <<EOF > container-group.yaml
-#           {
-#             "apiVersion": "2021-03-01",
-#             "location": "eastus",
-#             "name": "app-instances",
-#             "properties": {
-#               "containers": [
-#                 {
-#                   "name": "backend",
-#                   "properties": {
-#                     "image": "rigomoreirar/code-connect-backend:latest",
-#                     "ports": [
-#                       {
-#                         "port": 8000
-#                       }
-#                     ],
-#                     "resources": {
-#                       "requests": {
-#                         "cpu": 1,
-#                         "memoryInGB": 1.5
-#                       }
-#                     }
-#                   }
-#                 },
-#                 {
-#                   "name": "frontend",
-#                   "properties": {
-#                     "image": "rigomoreirar/code-connect-frontend:latest",
-#                     "ports": [
-#                       {
-#                         "port": 5000
-#                       }
-#                     ],
-#                     "resources": {
-#                       "requests": {
-#                         "cpu": 1,
-#                         "memoryInGB": 1
-#                       }
-#                     }
-#                   }
-#                 }
-#               ],
-#               "osType": "Linux",
-#               "ipAddress": {
-#                 "type": "Public",
-#                 "ports": [
-#                   {
-#                     "protocol": "tcp",
-#                     "port": 8000
-#                   },
-#                   {
-#                     "protocol": "tcp",
-#                     "port": 5000
-#                   }
-#                 ]
-#               }
-#             }
-#           }
-#           EOF
-
-#       - name: Deploy to Azure Container Instances
-#         run: |
-#           az container create --resource-group instances --file container-group.yaml
+      # Step 5: SSH into the server, pull the latest changes, and restart Docker Compose services
+      - name: Deploy with Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no root@64.23.246.222 <<EOF
+            cd /root/code-connect
+            git pull origin main
+            docker-compose down
+            docker-compose up -d
+          EOF
