@@ -8,26 +8,23 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Copy project
+# Copy project files
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# Use an official lightweight Node.js runtime as a parent image for the runtime stage
-FROM node:14-alpine
-
-# Set work directory
-WORKDIR /app
-
-# Install serve to run the application
-RUN npm install -g serve
+# Use an official Nginx runtime as a parent image for the runtime stage
+FROM nginx:alpine
 
 # Copy build files from the build stage
-COPY --from=build /app/build .
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port
-EXPOSE 5000
+# Copy custom Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Run the application
-CMD ["serve", "-s", ".", "-l", "5000"]
+# Expose port 80
+EXPOSE 80
+
+# Command to run Nginx
+CMD ["nginx", "-g", "daemon off;"]

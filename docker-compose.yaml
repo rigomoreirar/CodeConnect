@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+    backend:
+        image: rigomoreirar/code-connect-backend:latest
+        ports:
+            - "8000:8000"
+        restart: unless-stopped
+        # environment:
+        # Add environment variables here
+        # - SOME_VARIABLE=some_value
+        volumes:
+            - ./data:/data
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:8000"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        networks:
+            - mynetwork
+
+    frontend:
+        build: .
+        ports:
+            - "80:80"
+        restart: unless-stopped
+        depends_on:
+            - backend
+        networks:
+            - mynetwork
+
+networks:
+    mynetwork:
