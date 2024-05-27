@@ -32,8 +32,9 @@ jobs:
       # Step 5: SSH into the server, pull the latest changes, and restart Docker Compose services
       - name: Deploy with Docker Compose
         run: |
-          ssh -o StrictHostKeyChecking=no root@64.23.246.222 <<EOF
+          ssh -o StrictHostKeyChecking=no -T root@64.23.246.222 <<EOF
             cd /root/code-connect
+            git config --global --add safe.directory /root/code-connect
             git pull origin main
             docker-compose down
             docker-compose up -d
