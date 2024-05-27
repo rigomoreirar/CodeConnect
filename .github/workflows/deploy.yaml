@@ -27,9 +27,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -T root@64.23.246.222 <<EOF
             cd /root/code-connect
-            git config --global --add safe.directory /root/code-connect
             git pull origin main
-            docker system prune -a -f
+            sleep 60
             docker-compose down
+            sleep 60
             docker-compose up -d
           EOF
