@@ -7,12 +7,6 @@ services:
         restart: unless-stopped
         volumes:
             - ./data:/data
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:8000"]
-            interval: 30s
-            timeout: 10s
-            retries: 5
-            start_period: 100s # Add an initial delay before health checks start
         networks:
             - mynetwork
 
