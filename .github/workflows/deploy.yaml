@@ -1,41 +1,35 @@
 name: Deploy to Droplet
-
 on:
   workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v2
-
       # Step 2: Set up SSH agent with the private key from secrets
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       # Step 3: Install rsync to copy files to the server
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y rsync
-
       # Step 4: Copy files to the server
       - name: Copy files to server
         run: |
           rsync -avz -e 'ssh -o StrictHostKeyChecking=no' . root@64.23.246.222:/root/code-connect
-
-      # Step 5: SSH into the server, pull the latest changes, and restart Docker Compose services
+      # Step 5: SSH into the server, prune Docker, pull the latest changes, and restart Docker Compose services
       - name: Deploy with Docker Compose
         run: |
           ssh -o StrictHostKeyChecking=no -T root@64.23.246.222 <<EOF
             cd /root/code-connect
             git config --global --add safe.directory /root/code-connect
             git pull origin main
+            docker system prune -a -f
             docker-compose down
             docker-compose up -d
           EOF
