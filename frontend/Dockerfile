@@ -24,7 +24,7 @@ COPY --from=build /app/build /usr/share/nginx/html
 RUN cat /etc/nginx/nginx.conf
 
 # Copy custom Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Debug step: Print the nginx.conf file again to ensure it's copied correctly
 RUN cat /etc/nginx/nginx.conf
