@@ -11,7 +11,7 @@ services:
             - mynetwork
 
     frontend:
-        container_name: code-code-frontend
+        container_name: frontend
         image: rigomoreirar/code-connect-frontend:latest
         expose:
             - "3000"
