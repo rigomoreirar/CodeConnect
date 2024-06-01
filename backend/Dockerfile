@@ -1,24 +1,27 @@
-# Use an official Node.js runtime as a parent image
-FROM node:14
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim-buster
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 # Set work directory
-WORKDIR /app
+WORKDIR /code
 
 # Install dependencies
-COPY package*.json ./
-RUN npm ci
+COPY requirements.txt /code/
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Copy project files
-COPY . .
+# Copy project
+COPY . /code/
 
-# Build the application
-RUN npm run build
+# Run migrations
+RUN python manage.py makemigrations
+RUN python manage.py migrate
 
-# Install serve
-RUN npm install -g serve
+# Expose port
+EXPOSE 8000
 
-# Expose port 3000
-EXPOSE 3000
-
-# Command to run the app
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Run the application:
+CMD ["gunicorn", "forum.wsgi:application", "--bind", "0.0.0.0:8000"]
