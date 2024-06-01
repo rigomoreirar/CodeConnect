@@ -11,12 +11,34 @@ services:
             - mynetwork
 
     frontend:
+        container_name: code-code-frontend
         image: rigomoreirar/code-connect-frontend:latest
-        ports:
-            - "80:80"
-        restart: unless-stopped
+        expose:
+            - "3000"
         depends_on:
             - backend
+        networks:
+            - mynetwork
+
+    nginx:
+        container_name: nginx
+        restart: unless-stopped
+        image: nginx:latest
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./frontend/nginx.conf:/etc/nginx/nginx.conf
+        networks:
+            - mynetwork
+
+    certbot:
+        image: certbot/certbot
+        container_name: certbot
+        volumes:
+            - ./certbot/conf:/etc/letsencrypt
+            - ./certbot/www:/var/www/certbot
+        command: certonly --webroot -w /var/www/certbot --force-renewal --email rigomoreirar@gmail.com -d codeconnect.lat --agree-tos
         networks:
             - mynetwork
 
