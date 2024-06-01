@@ -1,5 +1,5 @@
-# Use an official Node.js runtime as a parent image for the build stage
-FROM node:14 as build
+# Use an official Node.js runtime as a parent image
+FROM node:14
 # Set work directory
 WORKDIR /app
 # Install dependencies
@@ -9,13 +9,9 @@ RUN npm ci
 COPY . .
 # Build the application
 RUN npm run build
-# Use an official Nginx runtime as a parent image for the runtime stage
-FROM nginx:alpine
-# Copy build files from the build stage
-COPY --from=build /app/build /usr/share/nginx/html
-# Overwrite the entire Nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-# Expose port 80
-EXPOSE 80
-# Command to run Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Install serve
+RUN npm install -g serve
+# Expose port 3000
+EXPOSE 3000
+# Command to run the app
+CMD ["serve", "-s", "build", "-l", "3000"]
