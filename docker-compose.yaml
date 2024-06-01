@@ -7,18 +7,12 @@ services:
         restart: unless-stopped
         volumes:
             - ./data:/data
-        networks:
-            - mynetwork
 
     frontend:
         container_name: frontend
         image: rigomoreirar/code-connect-frontend:latest
         expose:
             - "3000"
-        depends_on:
-            - backend
-        networks:
-            - mynetwork
 
     nginx:
         container_name: nginx
@@ -29,8 +23,6 @@ services:
             - 443:443
         volumes:
             - ./frontend/nginx.conf:/etc/nginx/nginx.conf
-        networks:
-            - mynetwork
 
     certbot:
         image: certbot/certbot
@@ -39,8 +31,3 @@ services:
             - ./certbot/conf:/etc/letsencrypt
             - ./certbot/www:/var/www/certbot
         command: certonly --webroot -w /var/www/certbot --email rigomoreirar@gmail.com -d codeconnect.lat --agree-tos
-        networks:
-            - mynetwork
-
-networks:
-    mynetwork:
