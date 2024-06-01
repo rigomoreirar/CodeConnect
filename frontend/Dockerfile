@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Verify that package.json was copied correctly (for debugging)
-RUN ls -la /app
+# Debugging step to list contents of /app
+RUN echo "Listing contents of /app after copying package.json:" && ls -la /app
 
 # Install dependencies
 RUN npm ci
@@ -16,8 +16,8 @@ RUN npm ci
 # Copy project files
 COPY . .
 
-# Verify that project files are copied correctly (for debugging)
-RUN ls -la /app
+# Debugging step to list contents of /app
+RUN echo "Listing contents of /app after copying project files:" && ls -la /app
 
 # Build the application
 RUN npm run build
