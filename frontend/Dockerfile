@@ -4,8 +4,13 @@ FROM node:14
 # Set work directory
 WORKDIR /app
 
-# Install dependencies
+# Copy package.json and package-lock.json
 COPY package*.json ./
+
+# Verify that package.json was copied correctly (for debugging)
+RUN ls -la /app
+
+# Install dependencies
 RUN npm ci
 
 # Copy project files
