@@ -28,4 +28,9 @@ jobs:
           ssh -o StrictHostKeyChecking=no -T root@64.23.246.222 <<EOF
             cd /root/code-connect
             git pull origin main
+            sleep 30s
+            docker compose down
+            sleep 30s
+            docker compose up -d
+            sleep 30s
           EOF
