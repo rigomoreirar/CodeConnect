@@ -23,7 +23,7 @@ services:
             - "443:443"
         volumes:
             - ./frontend/nginx.conf:/etc/nginx/nginx.conf
-            - ./frontend/codeconnect.crt:/etc/ssl/codeconnect.crt
-            - ./frontend/codeconnect.key:/etc/ssl/codeconnect.key
+            - ./codeconnect.crt:/etc/ssl/codeconnect.crt
+            - ./codeconnect.key:/etc/ssl/codeconnect.key
         depends_on:
             - frontend
