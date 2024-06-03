@@ -30,7 +30,5 @@ jobs:
             git pull origin main
             sleep 30s
             docker compose down
-            sleep 30s
             docker compose up -d
-            sleep 30s
           EOF

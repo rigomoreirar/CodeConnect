@@ -26,7 +26,7 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get("http://backend:8000/user/", {
+                const response = await axios.get("backend/user/", {
                     headers: {
                         Authorization: token,
                     },
@@ -44,7 +44,7 @@ function App() {
             }
 
             try {
-                const response = await axios.get("http://backend:8000/all-categories");
+                const response = await axios.get("backend/all-categories");
                 setCategories(response.data);
             } catch (error) {
                 console.log(error);

@@ -20,12 +20,12 @@ const Feed = ({ currentUser, categories }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                Axios.get('http://backend:8000/all-posts/')
+                Axios.get('backend/all-posts/')
                     .then(function (response) {
                         const postArray = response.data
                         postArray.forEach((post) => {
                             let newPost = {}
-                            Axios.post('http://backend:8000/postData/', {
+                            Axios.post('backend/postData/', {
                                 post_id: post.id
                             }).then(function (response) {
                                 newPost = {
