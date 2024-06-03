@@ -21,7 +21,7 @@ const Comments = ({ currentPost, setShowComments, currentUser }) => {
             post:currentPost,
             content:e.target.elements.content.value
         }
-        axios.post('http://localhost:8000/addComment/', newComment).then(res=>{
+        axios.post('http://backend:8000/addComment/', newComment).then(res=>{
             setComments([...comments, renderComment])
             e.target.elements.content.value=''
         })

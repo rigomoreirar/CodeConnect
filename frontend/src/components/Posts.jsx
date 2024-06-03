@@ -21,7 +21,7 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
             if (dislikeFill) {
                 setDislikeCount(dislikeCount - 1)
                 setDislikeFill(false)
-                Axios.post('http://localhost:8000/dislike/', {
+                Axios.post('http://backend:8000/dislike/', {
                     undislike: true,
                     post: post,
                     user: currentUser
@@ -33,7 +33,7 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
             }
             setLikeCount(likeCount + 1)
             setLikeFill(true)
-            Axios.post('http://localhost:8000/like/', {
+            Axios.post('http://backend:8000/like/', {
                 unlike: false,
                 post: post,
                 user: currentUser
@@ -45,7 +45,7 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
         } else {
             setLikeCount(likeCount - 1)
             setLikeFill(false)
-            Axios.post('http://localhost:8000/like/', {
+            Axios.post('http://backend:8000/like/', {
                 unlike: true,
                 post: post,
                 user: currentUser
@@ -63,7 +63,7 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
             if (likeFill) {
                 setLikeCount(likeCount - 1)
                 setLikeFill(false)
-                Axios.post('http://localhost:8000/like/', {
+                Axios.post('http://backend:8000/like/', {
                     unlike: true,
                     post: post,
                     user: currentUser
@@ -75,7 +75,7 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
             }
             setDislikeCount(dislikeCount + 1)
             setDislikeFill(true)
-            Axios.post('http://localhost:8000/dislike/', {
+            Axios.post('http://backend:8000/dislike/', {
                 undislike: false,
                 post: post,
                 user: currentUser
@@ -87,7 +87,7 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
         } else {
             setDislikeCount(dislikeCount - 1)
             setDislikeFill(false)
-            Axios.post('http://localhost:8000/dislike/', {
+            Axios.post('http://backend:8000/dislike/', {
                 undislike: true,
                 post: post,
                 user: currentUser

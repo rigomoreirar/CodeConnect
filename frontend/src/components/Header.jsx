@@ -7,7 +7,7 @@ const Header = () => {
 
    const handleLogout = () => {
       const token = window.localStorage.getItem('token');
-      axios.post('http://localhost:8000/logout/', {}, {
+      axios.post('http://backend:8000/logout/', {}, {
          headers: {
             'Authorization': token
          }

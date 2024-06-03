@@ -21,7 +21,7 @@ const Register = () => {
          alert("passwords must match")
          return
       }
-      axios.post('http://localhost:8000/register/', {
+      axios.post('http://backend:8000/register/', {
          first_name: name,
          last_name: lastName,
          username: username,

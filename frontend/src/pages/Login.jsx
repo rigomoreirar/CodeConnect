@@ -17,7 +17,7 @@ const Login = () => {
          alert("No blanks!");
          return;
       }
-      Axios.post('http://localhost:8000/login/', {
+      Axios.post('http://backend:8000/login/', {
          username: username,
          password: password
       }).then(function (response) {
@@ -45,7 +45,7 @@ const Login = () => {
                               <div className="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4 d-flex align-items-center justify-content-center">Login |
                                  <div className="navbar-brand ml-1 mt-2" href="#">
                                     <FaWolfPackBattalion />
-                                    CODECONNECT!!!
+                                    CODECONNECT
                                  </div>
                               </div>
                               <form className="mx-1 mx-md-4">
