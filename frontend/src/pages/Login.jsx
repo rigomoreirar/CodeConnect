@@ -17,7 +17,7 @@ const Login = () => {
          alert("No blanks!");
          return;
       }
-      Axios.post('http://backend:8000/login/', {
+      Axios.post('backend/login/', {
          username: username,
          password: password
       }).then(function (response) {
