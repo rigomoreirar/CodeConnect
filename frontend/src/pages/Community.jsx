@@ -38,7 +38,7 @@ const Comunity = ({ currentUser, categories, catArray, setCatArray }) => {
                 alert("there's a limit of 1000 characters per description")
             } else {
                 e.preventDefault()
-                Axios.post('http://localhost:8000/new-post/', post)
+                Axios.post('http://backend:8000/new-post/', post)
                     .then(function (response) {
                         console.log(response);
                         window.location.reload()
@@ -56,13 +56,13 @@ const Comunity = ({ currentUser, categories, catArray, setCatArray }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                Axios.get('http://localhost:8000/all-posts/')
+                Axios.get('http://backend:8000/all-posts/')
                     .then(function (response) {
                         console.log(response.data)
                         const postArray = response.data
                         postArray.forEach((post) => {
                             let newPost = {}
-                            Axios.post('http://localhost:8000/postData/', {
+                            Axios.post('http://backend:8000/postData/', {
                                 post_id: post.id
                             }).then(function (response) {
                                 newPost = {
