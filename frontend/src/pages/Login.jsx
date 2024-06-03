@@ -1,10 +1,10 @@
 import Axios from "axios";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaWolfPackBattalion } from "react-icons/fa";
 
 const Login = () => {
-   const navigate = useNavigate();
+//    const navigate = useNavigate();
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
 

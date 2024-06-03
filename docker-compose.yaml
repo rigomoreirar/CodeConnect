@@ -7,12 +7,22 @@ services:
         restart: unless-stopped
         volumes:
             - ./data:/data
+        networks:
+            - code-connect-network
+        deploy:
+            update_config:
+                order: start-first
 
     frontend:
         container_name: frontend
         image: rigomoreirar/code-connect-frontend:latest
         expose:
             - "3000"
+        networks:
+            - code-connect-network
+        deploy:
+            update_config:
+                order: start-first
 
     nginx:
         container_name: nginx
@@ -27,3 +37,8 @@ services:
             - ./codeconnect.key:/etc/ssl/codeconnect.key
         depends_on:
             - frontend
+        networks:
+            - code-connect-network
+
+networks:
+    code-connect-network:
