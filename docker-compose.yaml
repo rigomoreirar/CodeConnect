@@ -1,9 +1,9 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:1.002
-        ports:
-            - "8000:8000"
+        image: rigomoreirar/code-connect-backend:1.003
+        expose:
+            - "8000"
         restart: unless-stopped
         volumes:
             - ./data:/data
@@ -15,7 +15,7 @@ services:
 
     frontend:
         container_name: frontend
-        image: rigomoreirar/code-connect-frontend:1.002
+        image: rigomoreirar/code-connect-frontend:1.003
         expose:
             - "3000"
         networks:
