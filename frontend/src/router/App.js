@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import Layout from "../pages/Layout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -10,6 +9,7 @@ import Redirect from "../pages/Redirect";
 import Profile from "../pages/Profile";
 import Community from "../pages/Community";
 import Feed from "../pages/Feed";
+import Landing from "../pages/Landing";
 
 function App() {
     const token = window.localStorage.getItem("token");
@@ -57,7 +57,7 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={isValid ? <Layout /> : <Navigate to="/login" />}>
+                <Route path="/" element={isValid ? <Landing /> : <Navigate to="/login" />}>
                     <Route index element={<Home categories={categories} currentUser={loggedUser} />} />
                     <Route path="/profile" element={<Profile categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
                     <Route path="/community" element={<Community categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
