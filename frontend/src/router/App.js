@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+import Layout from "../pages/Layout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -10,6 +11,7 @@ import Profile from "../pages/Profile";
 import Community from "../pages/Community";
 import Feed from "../pages/Feed";
 import Landing from "../pages/Landing";
+import NotFound from "../pages/NotFound";
 
 function App() {
     const token = window.localStorage.getItem("token");
@@ -26,7 +28,7 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get("backend/user/", {
+                const response = await axios.get("http://localhost:8000/user/", {
                     headers: {
                         Authorization: token,
                     },
@@ -44,7 +46,7 @@ function App() {
             }
 
             try {
-                const response = await axios.get("backend/all-categories");
+                const response = await axios.get("http://localhost:8000/all-categories");
                 setCategories(response.data);
             } catch (error) {
                 console.log(error);
@@ -57,15 +59,17 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={isValid ? <Landing /> : <Navigate to="/login" />}>
+                <Route path="/" element={isValid ? <Navigate to="/login" /> : <Landing />} />
+                <Route path="/app" element={isValid ? <Layout /> : <Navigate to="/login" />}>
                     <Route index element={<Home categories={categories} currentUser={loggedUser} />} />
-                    <Route path="/profile" element={<Profile categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
-                    <Route path="/community" element={<Community categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
-                    <Route path="/my-feed" element={<Feed categories={categories} currentUser={loggedUser} />} />
+                    <Route path="profile" element={<Profile categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
+                    <Route path="community" element={<Community categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
+                    <Route path="my-feed" element={<Feed categories={categories} currentUser={loggedUser} />} />
                 </Route>
                 <Route path="/register" element={!isValid ? <Register /> : <Navigate to="/redirect" />} />
-                <Route path="/login" element={!isValid ? <Login /> : <Navigate to="/" />} />
+                <Route path="/login" element={!isValid ? <Login /> : <Navigate to="/app" />} />
                 <Route path="/redirect" element={<Redirect />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
     );
