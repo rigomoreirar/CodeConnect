@@ -29,7 +29,7 @@ const Register = () => {
             return;
         }
         axios
-            .post("http://localhost:8000/register/", {
+            .post("backend/register/", {
                 first_name: name,
                 last_name: lastName,
                 username: username,
