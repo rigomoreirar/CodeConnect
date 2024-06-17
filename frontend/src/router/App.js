@@ -10,6 +10,7 @@ import Redirect from "../pages/Redirect";
 import Profile from "../pages/Profile";
 import Community from "../pages/Community";
 import Feed from "../pages/Feed";
+import NotFound from "../pages/NotFound";
 
 function App() {
     const token = window.localStorage.getItem("token");
@@ -26,11 +27,14 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get("backend/user/", {
-                    headers: {
-                        Authorization: token,
-                    },
-                });
+                const response = await axios.get(
+                    "backend/user/",
+                    {
+                        headers: {
+                            Authorization: token,
+                        },
+                    }
+                );
 
                 const user = response.data.user_info;
                 setLoggedUser(user);
@@ -44,7 +48,9 @@ function App() {
             }
 
             try {
-                const response = await axios.get("backend/all-categories");
+                const response = await axios.get(
+                    "backend/all-categories"
+                );
                 setCategories(response.data);
             } catch (error) {
                 console.log(error);
@@ -57,15 +63,63 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={isValid ? <Layout /> : <Navigate to="/login" />}>
-                    <Route index element={<Home categories={categories} currentUser={loggedUser} />} />
-                    <Route path="/profile" element={<Profile categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
-                    <Route path="/community" element={<Community categories={categories} currentUser={loggedUser} catArray={catArray} setCatArray={setCatArray} />} />
-                    <Route path="/my-feed" element={<Feed categories={categories} currentUser={loggedUser} />} />
+                <Route
+                    path="/"
+                    element={!isValid ? <Login /> : <Navigate to="/forum" />}
+                />
+                <Route
+                    path="/forum"
+                    element={isValid ? <Layout /> : <Navigate to="/" />}
+                >
+                    <Route
+                        index
+                        element={
+                            <Home
+                                categories={categories}
+                                currentUser={loggedUser}
+                            />
+                        }
+                    />
+                    <Route
+                        path="profile"
+                        element={
+                            <Profile
+                                categories={categories}
+                                currentUser={loggedUser}
+                                catArray={catArray}
+                                setCatArray={setCatArray}
+                            />
+                        }
+                    />
+                    <Route
+                        path="community"
+                        element={
+                            <Community
+                                categories={categories}
+                                currentUser={loggedUser}
+                                catArray={catArray}
+                                setCatArray={setCatArray}
+                            />
+                        }
+                    />
+                    <Route
+                        path="my-feed"
+                        element={
+                            <Feed
+                                categories={categories}
+                                currentUser={loggedUser}
+                            />
+                        }
+                    />
                 </Route>
-                <Route path="/register" element={!isValid ? <Register /> : <Navigate to="/redirect" />} />
-                <Route path="/login" element={!isValid ? <Login /> : <Navigate to="/" />} />
+                <Route
+                    path="/register"
+                    element={
+                        !isValid ? <Register /> : <Navigate to="/forum" />
+                    }
+                />
                 <Route path="/redirect" element={<Redirect />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
     );
