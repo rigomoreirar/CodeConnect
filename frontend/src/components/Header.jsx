@@ -10,7 +10,7 @@ const Header = () => {
         const token = window.localStorage.getItem("token");
         axios
             .post(
-                "backend/logout/",
+                "http://localhost:8000/logout/",
                 {},
                 {
                     headers: {

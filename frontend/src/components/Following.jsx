@@ -17,7 +17,10 @@ const Following = ({
         if (array.indexOf(category.name) !== -1) {
             setArray(array.filter((cat) => cat !== category.name));
             setLength(length - 1);
-            Axios.post("backend/unfollow/", { ...category, user: currentUser })
+            Axios.post("http://localhost:8000/unfollow/", {
+                ...category,
+                user: currentUser,
+            })
                 .then(function (response) {
                     console.log("removed");
                     console.log(response);
@@ -28,7 +31,10 @@ const Following = ({
         } else {
             setArray([...array, category.name]);
             setLength(length + 1);
-            Axios.post("backend/follow/", { ...category, user: currentUser })
+            Axios.post("http://localhost:8000/follow/", {
+                ...category,
+                user: currentUser,
+            })
                 .then(function (response) {
                     console.log("added");
                     console.log(response);

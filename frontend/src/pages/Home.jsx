@@ -19,12 +19,12 @@ const Home = ({ currentUser, categories }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                Axios.get("backend/all-posts/")
+                Axios.get("http://localhost:8000/all-posts/")
                     .then(function (response) {
                         const postArray = response.data;
                         postArray.forEach((post) => {
                             let newPost = {};
-                            Axios.post("backend/postData/", {
+                            Axios.post("http://localhost:8000/postData/", {
                                 post_id: post.id,
                             })
                                 .then(function (response) {

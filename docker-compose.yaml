@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:1.005
+        image: rigomoreirar/code-connect-backend:1.006
         expose:
             - "8000"
         restart: unless-stopped
@@ -15,7 +15,7 @@ services:
 
     frontend:
         container_name: frontend
-        image: rigomoreirar/code-connect-frontend:1.005
+        image: rigomoreirar/code-connect-frontend:1.006
         expose:
             - "3000"
         networks:
