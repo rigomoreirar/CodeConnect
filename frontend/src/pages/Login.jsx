@@ -5,7 +5,6 @@ import Logo from "../components/Logo";
 import "../styles/Layout.css";
 
 const Login = () => {
-    //    const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -26,7 +25,7 @@ const Login = () => {
                 const token = `Token ${response.data.token}`;
                 window.localStorage.setItem("token", token);
                 window.localStorage.setItem("isLoggedIn", "true");
-                window.location.href = "/"; // Redirect to home page after successful login
+                window.location.href = "/";
             })
             .catch(function (error) {
                 console.log(error);
@@ -44,18 +43,6 @@ const Login = () => {
             <div className="container h-100">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-lg-12 col-xl-11">
-                        {/* <p className="mt-5 mb-4 text-center text-secondary">
-                            Welcome to the CodeConnect's Community Forum! If
-                            you're new here, we encourage you to sign up for an
-                            account so you can fully participate in the
-                            discussions and take advantage of all the features
-                            our community has to offer. If you already have an
-                            account, please sign in so you can easily access all
-                            of your saved content and customized settings. We
-                            look forward to seeing you around the forum and
-                            hearing your thoughts on all of the latest tech
-                            trends!
-                        </p> */}
                         <div
                             className="mt-2 mb-5 card text-black"
                             style={{ borderRadius: "25px" }}
