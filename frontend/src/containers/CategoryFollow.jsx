@@ -14,21 +14,16 @@ const CategoryFollow = ({ categories, currentUser, setLength, length }) => {
         >
             <div className="card-body">
                 <p className="ml-1 mb-0">Available categories:</p>
-                {categories.map((category) => {
-                    return (
-                        <Following
-                            key={category.name}
-                            setLength={setLength}
-                            length={length}
-                            currentUser={currentUser}
-                            ctg_following={
-                                currentUser.profile_data.ctg_following
-                            }
-                            categories={categories}
-                            category={category}
-                        />
-                    );
-                })}
+                {categories.map((category) => (
+                    <Following
+                        key={category.name}
+                        setLength={setLength}
+                        length={length}
+                        currentUser={currentUser}
+                        ctg_following={currentUser.profile_data.ctg_following}
+                        category={category}
+                    />
+                ))}
             </div>
         </div>
     );

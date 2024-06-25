@@ -5,6 +5,10 @@ import ProfilePic from "../assets/no-profile-picture.webp";
 
 const Profile = ({ currentUser, categories }) => {
     const [modal, setModal] = useState(false);
+    const [ctgFollowingLength, setCtgFollowingLength] = useState(
+        currentUser.profile_data.ctg_following.length
+    );
+
     const {
         email,
         first_name,
@@ -17,12 +21,12 @@ const Profile = ({ currentUser, categories }) => {
     } = currentUser;
 
     useEffect(() => {
-        console.log(ctg_following);
+        setCtgFollowingLength(ctg_following.length);
     }, [ctg_following]);
 
     return (
         <div className="d-flex flex-column align-items-center">
-            <div className="container mb-5 ">
+            <div className="container mb-5">
                 <div className="row no-gutters">
                     <div className="col-md-4 col-lg-4">
                         <img src={ProfilePic} alt="profile" />
@@ -58,7 +62,7 @@ const Profile = ({ currentUser, categories }) => {
                                     onClick={() => setModal(!modal)}
                                     className="hover p-4 bg-dark text-center skill-block"
                                 >
-                                    <h4>{ctg_following.length}</h4>
+                                    <h4>{ctgFollowingLength}</h4>
                                     <h6>Categories</h6>
                                 </div>
                             </div>
@@ -68,8 +72,8 @@ const Profile = ({ currentUser, categories }) => {
             </div>
             {modal && (
                 <CategoryFollow
-                    setLength={() => {}}
-                    length={ctg_following.length}
+                    setLength={setCtgFollowingLength}
+                    length={ctgFollowingLength}
                     categories={categories}
                     currentUser={currentUser}
                 />
