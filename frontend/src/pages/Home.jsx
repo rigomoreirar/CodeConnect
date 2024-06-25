@@ -19,12 +19,12 @@ const Home = ({ currentUser, categories }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                Axios.get("backend/all-posts/")
+                Axios.get("http://localhost:8000/all-posts/")
                     .then(function (response) {
                         const postArray = response.data;
                         postArray.forEach((post) => {
                             let newPost = {};
-                            Axios.post("backend/postData/", {
+                            Axios.post("http://localhost:8000/postData/", {
                                 post_id: post.id,
                             })
                                 .then(function (response) {
@@ -115,10 +115,7 @@ const Home = ({ currentUser, categories }) => {
                             {sortedPosts.length === 0 && (
                                 <div className="ml-2 mt-5">
                                     <h1>Woops!</h1>
-                                    <h4>
-                                        Seems like there's no posts regarding
-                                        this topic ;(
-                                    </h4>
+                                    <h4>No posts found!</h4>
                                 </div>
                             )}
                         </div>

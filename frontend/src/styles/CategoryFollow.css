@@ -1,0 +1,9 @@
+.category-follow-card {
+    margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .category-follow-card {
+        margin-top: -12rem;
+    }
+}

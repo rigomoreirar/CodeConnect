@@ -293,29 +293,46 @@ def newPost(request):
 
 @api_view(["POST"])
 def follow(request):
-    category = request.data
-    dbcategory = Category.objects.get(pk=category["id"])
-    currentUser = category["user"]
+    category_data = request.data
+    dbcategory = Category.objects.get(pk=category_data["id"])
+    currentUser = category_data["user"]
     userId = currentUser["id"]
 
     user = User.objects.get(id=userId)
     profile = Profile.objects.get(user=user)
 
+    # Add to following and followers
     profile.ctg_following.add(dbcategory)
     dbcategory.followers.add(profile)
-    return Response(category)
 
+    # Ensure changes are saved and reflected
+    profile.save()
+    dbcategory.save()
+
+    # Fetch updated category info to return accurate response
+    updated_category = Category.objects.get(pk=dbcategory.pk)
+    serializer = CategorySerializer(updated_category)
+    return Response(serializer.data)
 
 @api_view(["POST"])
 def unfollow(request):
-    category = request.data
-    dbcategory = Category.objects.get(pk=category["id"])
-    currentUser = category["user"]
+    category_data = request.data
+    dbcategory = Category.objects.get(pk=category_data["id"])
+    currentUser = category_data["user"]
     userId = currentUser["id"]
 
     user = User.objects.get(id=userId)
     profile = Profile.objects.get(user=user)
 
+    # Remove from following and followers
     profile.ctg_following.remove(dbcategory)
     dbcategory.followers.remove(profile)
-    return Response(request.data)
+
+    # Ensure changes are saved and reflected
+    profile.save()
+    dbcategory.save()
+
+    # Fetch updated category info to return accurate response
+    updated_category = Category.objects.get(pk=dbcategory.pk)
+    serializer = CategorySerializer(updated_category)
+    return Response(serializer.data)

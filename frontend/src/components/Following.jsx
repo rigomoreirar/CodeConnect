@@ -1,52 +1,43 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import Axios from "axios";
 
-const Following = ({
-    category,
-    ctg_following,
-    currentUser,
-    setLength,
-    length,
-}) => {
+const Following = ({ category, ctg_following, currentUser, setLength }) => {
     const [array, setArray] = useState(ctg_following);
-    const [fill, setFill] = useState(false);
+    const [fill, setFill] = useState(array.includes(category.name));
 
-    const handleCat = (category) => {
-        if (array.indexOf(category.name) !== -1) {
-            setArray(array.filter((cat) => cat !== category.name));
-            setLength(length - 1);
-            Axios.post("backend/unfollow/", { ...category, user: currentUser })
-                .then(function (response) {
-                    console.log("removed");
-                    console.log(response);
-                })
-                .catch(function (error) {
-                    console.log(error);
+    const handleCat = async (category) => {
+        let newArray;
+        if (array.includes(category.name)) {
+            newArray = array.filter((cat) => cat !== category.name);
+            setLength((prevLength) => prevLength - 1);
+            try {
+                await Axios.post("http://localhost:8000/unfollow/", {
+                    ...category,
+                    user: currentUser,
                 });
+                console.log("removed");
+            } catch (error) {
+                console.log(error);
+            }
         } else {
-            setArray([...array, category.name]);
-            setLength(length + 1);
-            Axios.post("backend/follow/", { ...category, user: currentUser })
-                .then(function (response) {
-                    console.log("added");
-                    console.log(response);
-                })
-                .catch(function (error) {
-                    console.log(error);
+            newArray = [...array, category.name];
+            setLength((prevLength) => prevLength + 1);
+            try {
+                await Axios.post("http://localhost:8000/follow/", {
+                    ...category,
+                    user: currentUser,
                 });
+                console.log("added");
+            } catch (error) {
+                console.log(error);
+            }
         }
-        console.log(category);
+        setArray(newArray);
     };
 
     useEffect(() => {
-        if (array.indexOf(category.name) !== -1) {
-            setFill(true);
-        } else {
-            setFill(false);
-        }
-        console.log(array);
+        setFill(array.includes(category.name));
     }, [array, category.name]);
 
     return (
@@ -57,12 +48,10 @@ const Following = ({
             style={{ padding: "1em", border: "solid" }}
         >
             {category.name}
-            {
-                <AiFillCheckCircle
-                    className="ml-2"
-                    style={fill ? { fill: "green" } : { fill: "lightgrey" }}
-                />
-            }
+            <AiFillCheckCircle
+                className="ml-2"
+                style={fill ? { fill: "green" } : { fill: "lightgrey" }}
+            />
         </div>
     );
 };
