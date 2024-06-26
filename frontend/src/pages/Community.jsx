@@ -144,7 +144,7 @@ const Community = ({ currentUser, categories, catArray, setCatArray }) => {
                                     <div className="bottom">
                                         <div className="content">
                                             <input
-                                                className="btn btn-primary"
+                                                className="btn btn-primary btn-bg-modified"
                                                 value="Post"
                                                 type="submit"
                                             />

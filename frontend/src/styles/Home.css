@@ -17,3 +17,11 @@
 
     gap: 1rem;
 }
+
+.btn-bg-modified {
+    background-color: #6c757d !important;
+    border: none;
+}
+.btn-bg-modified:hover {
+    background-color: #007bff !important;
+}

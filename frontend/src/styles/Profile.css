@@ -37,3 +37,11 @@ body {
         margin-top: 6rem;
     }
 }
+
+.ctg-following {
+    background-color: #343a40;
+    transition: background 0.2s ease;
+}
+.ctg-following:hover {
+    background-color: #575757 !important;
+}

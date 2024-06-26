@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../styles/Layout.css";
+import { Hidden } from "@mui/material";
 
 const Login = () => {
     const [username, setUsername] = useState("");
@@ -38,9 +39,9 @@ const Login = () => {
     return (
         <section
             className="main-container vh-100"
-            style={{ backgroundColor: "#eee" }}
+            style={{ backgroundColor: "#eee", overflowY: "hidden" }}
         >
-            <div className="container h-100">
+            <div className="container h-100" style={{ marginTop: "2rem" }}>
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-lg-12 col-xl-11">
                         <div

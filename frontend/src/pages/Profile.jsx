@@ -60,7 +60,7 @@ const Profile = ({ currentUser, categories }) => {
                                 />
                                 <div
                                     onClick={() => setModal(!modal)}
-                                    className="hover p-4 bg-dark text-center skill-block"
+                                    className="hover p-4 bg-dark text-center skill-block ctg-following"
                                 >
                                     <h4>{ctgFollowingLength}</h4>
                                     <h6>Categories</h6>

@@ -3,7 +3,7 @@ import CategoryPost from "../components/CategoryPost";
 import "../styles/CategoryBox.css";
 const CategoryBox = ({ categories, catArray, setCatArray }) => {
     return (
-        <div className="category-box">
+        <div className="category-box" style={{ margin: "10px" }}>
             {categories.map((category) => {
                 return (
                     <CategoryPost
