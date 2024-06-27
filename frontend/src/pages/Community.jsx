@@ -19,13 +19,11 @@ const Community = ({ currentUser, categories, catArray, setCatArray }) => {
         const fetchPosts = async () => {
             setIsLoading(true);
             try {
-                const response = await Axios.get(
-                    "http://localhost:8000/all-posts/"
-                );
+                const response = await Axios.get("backend/all-posts/");
                 const fetchedPosts = response.data.map(async (post) => {
                     try {
                         const postDetailsResponse = await Axios.post(
-                            "http://localhost:8000/postData/",
+                            "backend/postData/",
                             { post_id: post.id }
                         );
                         return { ...post, ...postDetailsResponse.data };
@@ -95,7 +93,7 @@ const Community = ({ currentUser, categories, catArray, setCatArray }) => {
         }
 
         try {
-            await Axios.post("http://localhost:8000/new-post/", post);
+            await Axios.post("backend/new-post/", post);
             window.location.reload();
         } catch (error) {
             console.error("Error submitting the post:", error);
