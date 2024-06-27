@@ -94,6 +94,7 @@ const Home = ({ currentUser, categories }) => {
                             categories={categories}
                             activeFilter={activeFilter}
                             setActiveFilter={setActiveFilter}
+                            neededCategories={true}
                         ></Filters>
                         <div className="inner-main d-flex flex-column align-items-center">
                             <h1 className="ml-3 mt-3 display-4">
@@ -115,10 +116,7 @@ const Home = ({ currentUser, categories }) => {
                             {sortedPosts.length === 0 && (
                                 <div className="ml-2 mt-5">
                                     <h1>Woops!</h1>
-                                    <h4>
-                                        Seems like there's no posts regarding
-                                        this topic ;(
-                                    </h4>
+                                    <h4>No posts found!</h4>
                                 </div>
                             )}
                         </div>

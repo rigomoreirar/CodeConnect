@@ -1,0 +1,34 @@
+/* Hide navbar-toggler on screens wider than 768px */
+@media (min-width: 768px) {
+    .navbar-toggler {
+        display: none;
+    }
+}
+
+/* Adjust navbar for desktop screens */
+@media (min-width: 768px) {
+    .navbar-collapse {
+        display: flex;
+        justify-content: flex-end;
+    }
+    .navbar-nav {
+        display: flex;
+        flex-direction: row;
+    }
+    .nav-item {
+        margin-right: 20px; /* Adjust spacing as needed */
+    }
+    .nav-link {
+        display: inline-block;
+    }
+}
+
+/* Additional styling for the logout button */
+.btn-link {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+.btn-link:hover {
+    color: #ccc;
+}
