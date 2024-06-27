@@ -1,36 +1,36 @@
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import "../styles/Filters.css";
+
 const Category = ({ category, activeFilter, setActiveFilter }) => {
-    const [select, setSelect] = useState(false);
+    const [selected, setSelected] = useState(false);
 
     const handleSelect = () => {
-        if (activeFilter.length === 1) {
+        if (activeFilter.includes(category)) {
             setActiveFilter([]);
-        }
-        if (activeFilter.indexOf(category) === -1) {
+        } else {
             setActiveFilter([category]);
         }
     };
 
     useEffect(() => {
-        if (activeFilter.indexOf(category) !== -1) {
-            setSelect(true);
-        } else {
-            setSelect(false);
-        }
+        setSelected(activeFilter.includes(category));
     }, [activeFilter, category]);
+
     return (
-        <div onClick={handleSelect} className="ml-2 hover" key={category.id}>
-            <span
+        <div
+            onClick={handleSelect}
+            className={`category-item ml-2 hover ${selected ? "selected" : ""}`}
+            key={category.id}
+        >
+            <div
                 className={
-                    select
-                        ? "badge badge-primary mr-2 mb-1"
-                        : "badge badge-secondary mr-2 mb-1"
+                    selected
+                        ? "category-item-btn"
+                        : "category-item-btn-unselected"
                 }
             >
                 {category.name}
-            </span>
+            </div>
         </div>
     );
 };

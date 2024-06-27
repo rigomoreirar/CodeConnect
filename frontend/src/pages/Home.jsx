@@ -94,6 +94,7 @@ const Home = ({ currentUser, categories }) => {
                             categories={categories}
                             activeFilter={activeFilter}
                             setActiveFilter={setActiveFilter}
+                            neededCategories={true}
                         ></Filters>
                         <div className="inner-main d-flex flex-column align-items-center">
                             <h1 className="ml-3 mt-3 display-4">
