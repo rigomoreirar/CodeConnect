@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:1.006
+        image: rigomoreirar/code-connect-backend:2.000
         expose:
             - "8000"
         restart: unless-stopped
@@ -12,10 +12,12 @@ services:
         deploy:
             update_config:
                 order: start-first
+        env_file:
+            - ./.env
 
     frontend:
         container_name: frontend
-        image: rigomoreirar/code-connect-frontend:1.006
+        image: rigomoreirar/code-connect-frontend:2.000
         expose:
             - "3000"
         networks:
