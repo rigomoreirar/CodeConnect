@@ -11,10 +11,8 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
     const [post, setPost] = useState([]);
     const [activeFilter, setActiveFilter] = useState([]);
     const [allPosts, setAllPosts] = useState([]);
-    const [loading, setLoading] = useState(true); // Loading state
-
-    // Sort posts by id in descending order and limit to the latest 15
-    const sortedPosts = posts.sort((a, b) => b.id - a.id).slice(0, 15);
+    const [loading, setLoading] = useState(true);
+    const [visiblePostsCount, setVisiblePostsCount] = useState(15);
 
     const fetchData = async () => {
         try {
@@ -37,17 +35,17 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
                         };
                     } catch (error) {
                         console.error("Error fetching post data:", error);
-                        return post; // Fallback to original post if error
+                        return post;
                     }
                 })
             );
 
             setAllPosts(enrichedPosts);
             setPosts(enrichedPosts);
-            setLoading(false); // Set loading to false after data is fetched
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching posts:", error);
-            setLoading(false); // Set loading to false even if there's an error
+            setLoading(false);
         }
     };
 
@@ -65,6 +63,14 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
             setPosts(filteredPosts);
         }
     }, [activeFilter, allPosts]);
+
+    const handleLoadMore = () => {
+        setVisiblePostsCount((prevCount) => prevCount + 15);
+    };
+
+    const sortedPosts = posts
+        .sort((a, b) => b.id - a.id)
+        .slice(0, visiblePostsCount);
 
     return (
         <>
@@ -95,9 +101,20 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
                                     />
                                 ))
                             ) : (
-                                <div className="ml-2 mt-5">
+                                <div className="ml-2 mt-5 centered-items">
                                     <h1>Woops!</h1>
-                                    <h4>No posts found!</h4>
+                                    <h4>No posts found for this category!</h4>
+                                </div>
+                            )}
+                            <div className="post-counter">
+                                {sortedPosts.length}/{posts.length} posts shown
+                            </div>
+                            {sortedPosts.length < posts.length && (
+                                <div
+                                    className="load-more"
+                                    onClick={handleLoadMore}
+                                >
+                                    Load more...
                                 </div>
                             )}
                         </div>
@@ -119,6 +136,22 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
                     height: 100vh;
                     font-size: 24px;
                     font-weight: bold;
+                }
+                .post-counter {
+                    margin-top: 20px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    padding-bottom: 20px;
+                }
+                .load-more {
+                    cursor: pointer;
+                    color: blue;
+                    text-decoration: underline;
+                    font-weight: bold;
+                    padding-bottom: 40px;
+                }
+                .load-more:hover {
+                    color: darkblue;
                 }
             `}</style>
         </>

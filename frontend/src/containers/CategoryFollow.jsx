@@ -2,7 +2,13 @@ import React from "react";
 import Following from "../components/Following";
 import "../styles/CategoryFollow.css";
 
-const CategoryFollow = ({ categories, currentUser, setLength, length }) => {
+const CategoryFollow = ({
+    categories,
+    currentUser,
+    setLength,
+    length,
+    refreshUserData,
+}) => {
     return (
         <div
             className="category-follow-card card"
@@ -22,6 +28,7 @@ const CategoryFollow = ({ categories, currentUser, setLength, length }) => {
                         currentUser={currentUser}
                         ctg_following={currentUser.profile_data.ctg_following}
                         category={category}
+                        refreshUserData={refreshUserData}
                     />
                 ))}
             </div>

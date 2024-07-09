@@ -77,6 +77,7 @@ function App() {
                             <Home
                                 categories={categories}
                                 currentUser={loggedUser}
+                                setLoggedUser={setLoggedUser}
                             />
                         }
                     />
@@ -100,6 +101,7 @@ function App() {
                                 currentUser={loggedUser}
                                 catArray={catArray}
                                 setCatArray={setCatArray}
+                                setLoggedUser={setLoggedUser}
                             />
                         }
                     />
@@ -109,6 +111,7 @@ function App() {
                             <Feed
                                 categories={categories}
                                 currentUser={loggedUser}
+                                setLoggedUser={setLoggedUser}
                             />
                         }
                     />

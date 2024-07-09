@@ -12,9 +12,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
     const [activeFilter, setActiveFilter] = useState([]);
     const [allPosts, setAllPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Sort posts by id in descending order
-    const sortedPosts = posts.sort((a, b) => b.id - a.id);
+    const [visiblePostsCount, setVisiblePostsCount] = useState(15);
 
     const fetchData = async () => {
         try {
@@ -54,10 +52,10 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
 
             setPosts(newPosts);
             setAllPosts(newAllPosts);
-            setLoading(false); // Set loading to false after data is fetched
+            setLoading(false);
         } catch (error) {
             console.error(error);
-            setLoading(false); // Set loading to false even if there's an error
+            setLoading(false);
         }
     };
 
@@ -89,6 +87,14 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
             setPosts(filteredPosts);
         }
     }, [activeFilter, allPosts, currentUser]);
+
+    const handleLoadMore = () => {
+        setVisiblePostsCount((prevCount) => prevCount + 15);
+    };
+
+    const sortedPosts = posts
+        .sort((a, b) => b.id - a.id)
+        .slice(0, visiblePostsCount);
 
     return (
         <>
@@ -133,6 +139,17 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                                     </p>
                                 </div>
                             )}
+                            <div className="post-counter">
+                                {sortedPosts.length}/{posts.length} posts shown
+                            </div>
+                            {sortedPosts.length < posts.length && (
+                                <div
+                                    className="load-more"
+                                    onClick={handleLoadMore}
+                                >
+                                    Load more...
+                                </div>
+                            )}
                         </div>
                     </>
                 )}
@@ -152,6 +169,22 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                     height: 100vh;
                     font-size: 24px;
                     font-weight: bold;
+                }
+                .post-counter {
+                    margin-top: 20px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    padding-bottom: 20px;
+                }
+                .load-more {
+                    cursor: pointer;
+                    color: blue;
+                    text-decoration: underline;
+                    font-weight: bold;
+                    padding-bottom: 40px;
+                }
+                .load-more:hover {
+                    color: darkblue;
                 }
             `}</style>
         </>

@@ -20,6 +20,7 @@ const Community = ({
     const [showComments, setShowComments] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [activeFilter, setActiveFilter] = useState([]);
+    const [visiblePostsCount, setVisiblePostsCount] = useState(15);
 
     const fetchPosts = async () => {
         setIsLoading(true);
@@ -36,7 +37,7 @@ const Community = ({
                     return { ...post, ...postDetailsResponse.data };
                 } catch (error) {
                     console.error("Error fetching post details:", error);
-                    return post; // Return the post without details in case of error
+                    return post;
                 }
             });
             Promise.all(fetchedPosts).then((postsWithDetails) => {
@@ -69,6 +70,14 @@ const Community = ({
 
         filterPosts();
     }, [activeFilter, posts]);
+
+    const handleLoadMore = () => {
+        setVisiblePostsCount((prevCount) => prevCount + 15);
+    };
+
+    const sortedPosts = posts
+        .sort((a, b) => b.id - a.id)
+        .slice(0, visiblePostsCount);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -106,7 +115,7 @@ const Community = ({
                 post
             );
             console.log("New Post Response:", response.data);
-            fetchPosts(); // Fetch the latest posts after creating a new one
+            fetchPosts();
         } catch (error) {
             console.error("Error creating new post:", error);
         }
@@ -164,8 +173,8 @@ const Community = ({
                             </form>
                             {isLoading ? (
                                 <Loader />
-                            ) : posts.length > 0 ? (
-                                posts.map((post) => (
+                            ) : sortedPosts.length > 0 ? (
+                                sortedPosts.map((post) => (
                                     <Posts
                                         key={post.id}
                                         post={post}
@@ -180,6 +189,17 @@ const Community = ({
                                     <h4>No posts found!</h4>
                                 </div>
                             )}
+                            <div className="post-counter">
+                                {sortedPosts.length}/{posts.length} posts shown
+                            </div>
+                            {sortedPosts.length < posts.length && (
+                                <div
+                                    className="load-more"
+                                    onClick={handleLoadMore}
+                                >
+                                    Load more...
+                                </div>
+                            )}
                         </div>
                     </>
                 ) : (
@@ -190,6 +210,32 @@ const Community = ({
                     />
                 )}
             </div>
+            <style jsx>{`
+                .loading {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+                .post-counter {
+                    margin-top: 20px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    padding-bottom: 20px;
+                }
+                .load-more {
+                    cursor: pointer;
+                    color: blue;
+                    text-decoration: underline;
+                    font-weight: bold;
+                    padding-bottom: 40px;
+                }
+                .load-more:hover {
+                    color: darkblue;
+                }
+            `}</style>
         </>
     );
 };

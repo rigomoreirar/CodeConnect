@@ -25,3 +25,10 @@
 .btn-bg-modified:hover {
     background-color: #007bff !important;
 }
+
+.centered-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
