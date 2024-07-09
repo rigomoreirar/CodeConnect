@@ -3,87 +3,68 @@ import "../styles/Home.css";
 import Posts from "../components/Posts";
 import Comments from "./Comments";
 import Filters from "../containers/Filters";
-
 import Axios from "axios";
 
-const Home = ({ currentUser, categories }) => {
+const Home = ({ currentUser, categories, setLoggedUser }) => {
     const [posts, setPosts] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [post, setPost] = useState([]);
     const [activeFilter, setActiveFilter] = useState([]);
     const [allPosts, setAllPosts] = useState([]);
-    const [filteredPosts] = useState([]);
+    const [loading, setLoading] = useState(true); // Loading state
 
-    const sortedPosts = posts.sort((a, b) => b.likes - a.likes);
+    // Sort posts by id in descending order and limit to the latest 15
+    const sortedPosts = posts.sort((a, b) => b.id - a.id).slice(0, 15);
+
+    const fetchData = async () => {
+        try {
+            const response = await Axios.get(
+                "http://localhost:8000/all-posts/"
+            );
+            const postArray = response.data;
+            const enrichedPosts = await Promise.all(
+                postArray.map(async (post) => {
+                    try {
+                        const res = await Axios.post(
+                            "http://localhost:8000/postData/",
+                            { post_id: post.id }
+                        );
+                        return {
+                            ...post,
+                            likes: res.data.likes,
+                            dislikes: res.data.dislikes,
+                            comments: res.data.comments,
+                        };
+                    } catch (error) {
+                        console.error("Error fetching post data:", error);
+                        return post; // Fallback to original post if error
+                    }
+                })
+            );
+
+            setAllPosts(enrichedPosts);
+            setPosts(enrichedPosts);
+            setLoading(false); // Set loading to false after data is fetched
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            setLoading(false); // Set loading to false even if there's an error
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                Axios.get("backend/all-posts/")
-                    .then(function (response) {
-                        const postArray = response.data;
-                        postArray.forEach((post) => {
-                            let newPost = {};
-                            Axios.post("backend/postData/", {
-                                post_id: post.id,
-                            })
-                                .then(function (response) {
-                                    newPost = {
-                                        ...post,
-                                        likes: response.data.likes,
-                                        dislikes: response.data.dislikes,
-                                        comments: response.data.comments,
-                                    };
-                                    setPosts(
-                                        !post.isStudent
-                                            ? (posts) => [...posts, newPost]
-                                            : (posts) => [...posts]
-                                    );
-                                    setAllPosts(
-                                        !post.isStudent
-                                            ? (posts) => [...posts, newPost]
-                                            : (posts) => [...posts]
-                                    );
-                                })
-                                .catch(function (error) {
-                                    console.log(error);
-                                });
-                        });
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            } catch (error) {
-                console.error(error);
-            }
-        };
         fetchData();
     }, [currentUser]);
 
     useEffect(() => {
         if (activeFilter.length === 0) {
             setPosts(allPosts);
+        } else if (activeFilter.length === 1) {
+            const filteredPosts = allPosts.filter((post) =>
+                post.categories.includes(activeFilter[0].name)
+            );
+            setPosts(filteredPosts);
         }
-        activeFilter.length === 0
-            ? setPosts(allPosts)
-            : console.log(activeFilter[0].name);
-        if (activeFilter.length === 1) {
-            let array = [];
-            setPosts(allPosts);
-            allPosts.forEach((post) => {
-                const categories = post.categories;
-                activeFilter.forEach((category) => {
-                    if (categories.indexOf(category.name) !== -1) {
-                        console.log(post);
-                        array.unshift(post);
-                    }
-                });
-            });
-            setPosts(array);
-        }
-    }, [activeFilter, allPosts, filteredPosts]);
-
-    useEffect(() => {}, [posts]);
+    }, [activeFilter, allPosts]);
 
     return (
         <>
@@ -95,25 +76,25 @@ const Home = ({ currentUser, categories }) => {
                             activeFilter={activeFilter}
                             setActiveFilter={setActiveFilter}
                             neededCategories={true}
-                        ></Filters>
+                        />
                         <div className="inner-main d-flex flex-column align-items-center">
                             <h1 className="ml-3 mt-3 display-4">
                                 Here's what's new!
                             </h1>
-                            {sortedPosts.length > 0 &&
-                                posts.map((post) => {
-                                    return (
-                                        <Posts
-                                            setPost={setPost}
-                                            showCommets={showComments}
-                                            setShowComments={setShowComments}
-                                            currentUser={currentUser}
-                                            key={post.id}
-                                            post={post}
-                                        />
-                                    );
-                                })}
-                            {sortedPosts.length === 0 && (
+                            {loading ? (
+                                <div className="loading">Loading...</div>
+                            ) : sortedPosts.length > 0 ? (
+                                sortedPosts.map((post) => (
+                                    <Posts
+                                        setPost={setPost}
+                                        showCommets={showComments}
+                                        setShowComments={setShowComments}
+                                        currentUser={currentUser}
+                                        key={post.id}
+                                        post={post}
+                                    />
+                                ))
+                            ) : (
                                 <div className="ml-2 mt-5">
                                     <h1>Woops!</h1>
                                     <h4>No posts found!</h4>
@@ -130,6 +111,16 @@ const Home = ({ currentUser, categories }) => {
                     />
                 )}
             </div>
+            <style jsx>{`
+                .loading {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+            `}</style>
         </>
     );
 };

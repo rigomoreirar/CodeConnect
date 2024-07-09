@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import CategoryFollow from "../containers/CategoryFollow";
 import "../styles/Profile.css";
 import ProfilePic from "../assets/no-profile-picture.webp";
 import Filters from "../containers/Filters";
 
-const Profile = ({ currentUser, categories }) => {
+const Profile = ({ currentUser, categories, setLoggedUser }) => {
     const [modal, setModal] = useState(false);
     const [ctgFollowingLength, setCtgFollowingLength] = useState(
         currentUser.profile_data.ctg_following.length
@@ -24,6 +25,31 @@ const Profile = ({ currentUser, categories }) => {
     useEffect(() => {
         setCtgFollowingLength(ctg_following.length);
     }, [ctg_following]);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = window.localStorage.getItem("token");
+                if (!token) return;
+
+                const response = await axios.get(
+                    "http://localhost:8000/user/",
+                    {
+                        headers: {
+                            Authorization: token,
+                        },
+                    }
+                );
+
+                const user = response.data.user_info;
+                setLoggedUser(user);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, [setLoggedUser]);
 
     return (
         <>

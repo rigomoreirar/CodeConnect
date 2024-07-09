@@ -266,15 +266,15 @@ def addComment(request):
 
 @api_view(["POST"])
 def newPost(request):
-    data = request.data  # done
-    content = data["content"]  # done
-    title = data["question"]  # done
+    data = request.data
+    content = data["content"]
+    title = data["question"]
     currentUser = data["creator"]
     userId = currentUser["id"]
-    isStudent = data["isStudent"]  # done
-    postCat = data["categories"]  # done
+    isStudent = data["isStudent"]
+    postCat = data["categories"]
 
-    user = User.objects.get(id=userId)  # done
+    user = User.objects.get(id=userId)
     profile = Profile.objects.get(user=user)
 
     newPost = Post.objects.create(
@@ -283,12 +283,16 @@ def newPost(request):
         title=title,
         content=content
     )
-    # done
+
     for category in postCat:
         dbcategory = Category.objects.get(pk=category["id"])
         newPost.categories.add(dbcategory)
+    
+    # Add logging
+    print("New post created:", newPost)
 
     return Response(data)
+
 
 
 @api_view(["POST"])

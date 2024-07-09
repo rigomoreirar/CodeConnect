@@ -8,40 +8,48 @@ import Filters from "../containers/Filters";
 import CategoryBox from "../containers/CategoryBox";
 import Loader from "../components/Loader";
 
-const Community = ({ currentUser, categories, catArray, setCatArray }) => {
+const Community = ({
+    currentUser,
+    categories,
+    catArray,
+    setCatArray,
+    setLoggedUser,
+}) => {
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [activeFilter, setActiveFilter] = useState([]);
 
-    useEffect(() => {
-        const fetchPosts = async () => {
-            setIsLoading(true);
-            try {
-                const response = await Axios.get("backend/all-posts/");
-                const fetchedPosts = response.data.map(async (post) => {
-                    try {
-                        const postDetailsResponse = await Axios.post(
-                            "backend/postData/",
-                            { post_id: post.id }
-                        );
-                        return { ...post, ...postDetailsResponse.data };
-                    } catch (error) {
-                        console.error("Error fetching post details:", error);
-                        return post; // Return the post without details in case of error
-                    }
-                });
-                Promise.all(fetchedPosts).then((postsWithDetails) => {
-                    setPosts(postsWithDetails.filter((post) => post.isStudent));
-                    setIsLoading(false);
-                });
-            } catch (error) {
-                console.error("Error fetching posts:", error);
+    const fetchPosts = async () => {
+        setIsLoading(true);
+        try {
+            const response = await Axios.get(
+                "http://localhost:8000/all-posts/"
+            );
+            const fetchedPosts = response.data.map(async (post) => {
+                try {
+                    const postDetailsResponse = await Axios.post(
+                        "http://localhost:8000/postData/",
+                        { post_id: post.id }
+                    );
+                    return { ...post, ...postDetailsResponse.data };
+                } catch (error) {
+                    console.error("Error fetching post details:", error);
+                    return post; // Return the post without details in case of error
+                }
+            });
+            Promise.all(fetchedPosts).then((postsWithDetails) => {
+                setPosts(postsWithDetails.filter((post) => post.isStudent));
                 setIsLoading(false);
-            }
-        };
+            });
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchPosts();
     }, [currentUser]);
 
@@ -93,10 +101,14 @@ const Community = ({ currentUser, categories, catArray, setCatArray }) => {
         }
 
         try {
-            await Axios.post("backend/new-post/", post);
-            window.location.reload();
+            const response = await Axios.post(
+                "http://localhost:8000/new-post/",
+                post
+            );
+            console.log("New Post Response:", response.data);
+            fetchPosts(); // Fetch the latest posts after creating a new one
         } catch (error) {
-            console.error("Error submitting the post:", error);
+            console.error("Error creating new post:", error);
         }
     };
 

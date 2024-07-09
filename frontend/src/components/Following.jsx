@@ -12,7 +12,7 @@ const Following = ({ category, ctg_following, currentUser, setLength }) => {
             newArray = array.filter((cat) => cat !== category.name);
             setLength((prevLength) => prevLength - 1);
             try {
-                await Axios.post("backend/unfollow/", {
+                await Axios.post("http://localhost:8000/unfollow/", {
                     ...category,
                     user: currentUser,
                 });
@@ -24,7 +24,7 @@ const Following = ({ category, ctg_following, currentUser, setLength }) => {
             newArray = [...array, category.name];
             setLength((prevLength) => prevLength + 1);
             try {
-                await Axios.post("backend/follow/", {
+                await Axios.post("http://localhost:8000/follow/", {
                     ...category,
                     user: currentUser,
                 });
