@@ -125,18 +125,29 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                             ) : (
                                 <div className="ml-2 mt-5 text-holder-no-categories">
                                     <h1>Woops!</h1>
-                                    <h4>You haven't followed any category!</h4>
-                                    <p>
-                                        To follow a category go to{" "}
-                                        <em>
-                                            <b>My Profile</b>
-                                        </em>
-                                        , then click on{" "}
-                                        <em>
-                                            <b>Categories</b>
-                                        </em>{" "}
-                                        tab and select your favorite topics.
-                                    </p>
+                                    <h4>There are no posts for your feed!</h4>
+                                    <div className="text-holder-no-categories-second">
+                                        <p>
+                                            Check{" "}
+                                            <em>
+                                                <b>Home</b>
+                                            </em>{" "}
+                                            page, then go to{" "}
+                                            <em>
+                                                <b>My Profile</b>
+                                            </em>
+                                            ,
+                                        </p>
+
+                                        <p>
+                                            {" "}
+                                            and click on{" "}
+                                            <em>
+                                                <b>Categories</b>
+                                            </em>{" "}
+                                            tab and select your favorite topics.
+                                        </p>
+                                    </div>
                                 </div>
                             )}
                             <div className="post-counter">

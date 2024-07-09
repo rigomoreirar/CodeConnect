@@ -40,7 +40,7 @@ const Following = ({
             }
         }
         setArray(newArray);
-        refreshUserData(); // Refresh user data after follow/unfollow
+        refreshUserData();
     };
 
     useEffect(() => {
