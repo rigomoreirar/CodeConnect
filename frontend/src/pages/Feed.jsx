@@ -7,8 +7,7 @@ import Axios from "axios";
 
 const Feed = ({ currentUser, categories, setLoggedUser }) => {
     const [posts, setPosts] = useState([]);
-    const [showComments, setShowComments] = useState(false);
-    const [post, setPost] = useState([]);
+    const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [activeFilter, setActiveFilter] = useState([]);
     const [allPosts, setAllPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -99,80 +98,78 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
     return (
         <>
             <div className="home-container">
-                {!showComments && (
-                    <>
-                        <Filters
-                            categories={categories}
-                            activeFilter={activeFilter}
-                            setActiveFilter={setActiveFilter}
-                        />
-                        <div className="inner-main d-flex flex-column align-items-center">
-                            <h1 className="mt-2 ml-3 display-4">My Feed</h1>
+                <Filters
+                    categories={categories}
+                    activeFilter={activeFilter}
+                    setActiveFilter={setActiveFilter}
+                />
+                <div className="inner-main d-flex flex-column align-items-center">
+                    <h1 className="mt-2 ml-3 display-4">My Feed</h1>
 
-                            {loading ? (
-                                <div className="loading">Loading...</div>
-                            ) : sortedPosts.length > 0 ? (
-                                sortedPosts.map((post) => (
-                                    <Posts
-                                        setPost={setPost}
-                                        showCommets={showComments}
-                                        setShowComments={setShowComments}
+                    {loading ? (
+                        <div className="loading">Loading...</div>
+                    ) : sortedPosts.length > 0 ? (
+                        sortedPosts.map((post) => (
+                            <div key={post.id} className="centered-items">
+                                <Posts
+                                    setPost={posts}
+                                    showCommets={showCommentsPostId === post.id}
+                                    setShowComments={() =>
+                                        setShowCommentsPostId(post.id)
+                                    }
+                                    currentUser={currentUser}
+                                    post={post}
+                                />
+                                {showCommentsPostId === post.id && (
+                                    <Comments
                                         currentUser={currentUser}
-                                        key={post.id}
-                                        post={post}
+                                        currentPost={post}
+                                        setShowComments={() =>
+                                            setShowCommentsPostId(null)
+                                        }
                                     />
-                                ))
-                            ) : (
-                                <div className="ml-2 mt-5 text-holder-no-categories">
-                                    <h1>Woops!</h1>
-                                    <h4>There are no posts for your feed!</h4>
-                                    <div className="text-holder-no-categories-second">
-                                        <p>
-                                            Check{" "}
-                                            <em>
-                                                <b>Home</b>
-                                            </em>{" "}
-                                            page, then go to{" "}
-                                            <em>
-                                                <b>My Profile</b>
-                                            </em>
-                                            ,
-                                        </p>
-
-                                        <p>
-                                            {" "}
-                                            and click on{" "}
-                                            <em>
-                                                <b>Categories</b>
-                                            </em>{" "}
-                                            tab and select your favorite topics.
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="post-counter">
-                                {sortedPosts.length}/{posts.length} posts shown
+                                )}
                             </div>
-                            {sortedPosts.length < posts.length && (
-                                <div
-                                    className="load-more"
-                                    onClick={handleLoadMore}
-                                >
-                                    Load more...
-                                </div>
-                            )}
+                        ))
+                    ) : (
+                        <div className="ml-2 mt-5 text-holder-no-categories">
+                            <h1>Woops!</h1>
+                            <h4>There are no posts for your feed!</h4>
+                            <div className="text-holder-no-categories-second">
+                                <p>
+                                    Check{" "}
+                                    <em>
+                                        <b>Home</b>
+                                    </em>{" "}
+                                    page, then go to{" "}
+                                    <em>
+                                        <b>My Profile</b>
+                                    </em>
+                                    ,
+                                </p>
+
+                                <p>
+                                    {" "}
+                                    and click on{" "}
+                                    <em>
+                                        <b>Categories</b>
+                                    </em>{" "}
+                                    tab and select your favorite topics.
+                                </p>
+                            </div>
                         </div>
-                    </>
-                )}
-                {showComments && (
-                    <Comments
-                        currentUser={currentUser}
-                        currentPost={post}
-                        setShowComments={setShowComments}
-                    />
-                )}
+                    )}
+                    <div className="post-counter">
+                        {sortedPosts.length}/{posts.length} posts shown
+                    </div>
+                    {sortedPosts.length < posts.length && (
+                        <div className="load-more" onClick={handleLoadMore}>
+                            Load more...
+                        </div>
+                    )}
+                </div>
             </div>
-            <style jsx>{`
+            <style>{`
                 .loading {
                     display: flex;
                     justify-content: center;

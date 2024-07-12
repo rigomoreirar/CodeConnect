@@ -1,11 +1,17 @@
 import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaThumbsDown, FaThumbsUp, FaTrashAlt } from "react-icons/fa"; // Import FaTrashAlt for delete icon
 import "../styles/Posts.css";
 import Axios from "axios";
 
-const Posts = ({ post, currentUser, setShowComments, setPost }) => {
+const Posts = ({
+    post,
+    currentUser,
+    setShowComments,
+    setPost,
+    deleteOption = false,
+    onDelete, // Add onDelete prop
+}) => {
     const { content, title, likes, dislikes, comments, categories } = post;
     const [likeFill, setLikeFill] = useState(false);
     const [likeCount, setLikeCount] = useState(likes.length);
@@ -16,7 +22,6 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
 
     const likeHandler = (likes) => {
         if (!likeFill) {
-            /*likes.indexOf(currentUser.id) === -1*/
             if (dislikeFill) {
                 setDislikeCount(dislikeCount - 1);
                 setDislikeFill(false);
@@ -117,6 +122,19 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
         setPost(post);
     };
 
+    const deleteHandler = () => {
+        Axios.post("http://localhost:8000/delete-user-post/", {
+            post: post,
+            user: currentUser,
+        })
+            .then(function (response) {
+                console.log("Post deleted");
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    };
+
     useEffect(() => {
         likes.forEach((like) => {
             if (like.profile === currentUser.username) {
@@ -139,6 +157,17 @@ const Posts = ({ post, currentUser, setShowComments, setPost }) => {
             <div className="card mb-2" style={{ maxWidth: "40rem" }}>
                 <div className="card-body p-2 p-sm-3">
                     <div className="d-flex flex-column">
+                        {deleteOption && (
+                            <FaTrashAlt
+                                className="delete-icon"
+                                onClick={deleteHandler}
+                                style={{
+                                    alignSelf: "flex-end",
+                                    cursor: "pointer",
+                                    color: "red",
+                                }}
+                            />
+                        )}
                         <div className="media-body">
                             <div className="">
                                 <h6 className="text-body">{title}</h6>

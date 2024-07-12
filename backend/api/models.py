@@ -48,7 +48,6 @@ class Post(models.Model):
     def __str__(self):
         return f"post by {self.creator}: {self.title}"
 
-
 # Create likes, dislikes, comments and
 
 class Like(models.Model):

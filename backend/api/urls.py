@@ -24,6 +24,7 @@ urlpatterns = [
     path('addComment/', views.addComment, name="addComment"),
     path('new-post/', views.newPost, name="newPost"),
     path('follow/', views.follow, name="follow"),
-    path('unfollow/', views.unfollow, name="unfollow")
+    path('unfollow/', views.unfollow, name="unfollow"),
+    path('delete-user-post/', views.delete_user_post, name='deleteUserPost'),
 
 ]

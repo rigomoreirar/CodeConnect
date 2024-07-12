@@ -7,7 +7,7 @@ import Axios from "axios";
 
 const Home = ({ currentUser, categories, setLoggedUser }) => {
     const [posts, setPosts] = useState([]);
-    const [showComments, setShowComments] = useState(false);
+    const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [post, setPost] = useState([]);
     const [activeFilter, setActiveFilter] = useState([]);
     const [allPosts, setAllPosts] = useState([]);
@@ -75,60 +75,56 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
     return (
         <>
             <div className="home-container">
-                {!showComments && (
-                    <>
-                        <Filters
-                            categories={categories}
-                            activeFilter={activeFilter}
-                            setActiveFilter={setActiveFilter}
-                            neededCategories={true}
-                        />
-                        <div className="inner-main d-flex flex-column align-items-center">
-                            <h1 className="ml-3 mt-3 display-4">
-                                Here's what's new!
-                            </h1>
-                            {loading ? (
-                                <div className="loading">Loading...</div>
-                            ) : sortedPosts.length > 0 ? (
-                                sortedPosts.map((post) => (
-                                    <Posts
-                                        setPost={setPost}
-                                        showCommets={showComments}
-                                        setShowComments={setShowComments}
+                <Filters
+                    categories={categories}
+                    activeFilter={activeFilter}
+                    setActiveFilter={setActiveFilter}
+                    neededCategories={true}
+                />
+                <div className="inner-main d-flex flex-column align-items-center">
+                    <h1 className="ml-3 mt-3 display-4">Here's what's new!</h1>
+                    {loading ? (
+                        <div className="loading">Loading...</div>
+                    ) : sortedPosts.length > 0 ? (
+                        sortedPosts.map((post) => (
+                            <div key={post.id} className="centered-items">
+                                <Posts
+                                    setPost={setPost}
+                                    showCommets={showCommentsPostId === post.id}
+                                    setShowComments={() =>
+                                        setShowCommentsPostId(post.id)
+                                    }
+                                    currentUser={currentUser}
+                                    post={post}
+                                />
+                                {showCommentsPostId === post.id && (
+                                    <Comments
                                         currentUser={currentUser}
-                                        key={post.id}
-                                        post={post}
+                                        currentPost={post}
+                                        setShowComments={() =>
+                                            setShowCommentsPostId(null)
+                                        }
                                     />
-                                ))
-                            ) : (
-                                <div className="ml-2 mt-5 centered-items">
-                                    <h1>Woops!</h1>
-                                    <h4>No posts found for this category!</h4>
-                                </div>
-                            )}
-                            <div className="post-counter">
-                                {sortedPosts.length}/{posts.length} posts shown
+                                )}
                             </div>
-                            {sortedPosts.length < posts.length && (
-                                <div
-                                    className="load-more"
-                                    onClick={handleLoadMore}
-                                >
-                                    Load more...
-                                </div>
-                            )}
+                        ))
+                    ) : (
+                        <div className="ml-2 mt-5 centered-items">
+                            <h1>Woops!</h1>
+                            <h4>No posts found for this category!</h4>
                         </div>
-                    </>
-                )}
-                {showComments && (
-                    <Comments
-                        currentUser={currentUser}
-                        currentPost={post}
-                        setShowComments={setShowComments}
-                    />
-                )}
+                    )}
+                    <div className="post-counter">
+                        {sortedPosts.length}/{posts.length} posts shown
+                    </div>
+                    {sortedPosts.length < posts.length && (
+                        <div className="load-more" onClick={handleLoadMore}>
+                            Load more...
+                        </div>
+                    )}
+                </div>
             </div>
-            <style jsx>{`
+            <style>{`
                 .loading {
                     display: flex;
                     justify-content: center;

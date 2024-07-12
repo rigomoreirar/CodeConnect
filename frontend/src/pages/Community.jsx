@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Axios from "axios";
 import "../styles/Home.css";
 import "../styles/Create.css";
+import "../styles/Comments-legacy.css";
 import Posts from "../components/Posts";
 import Comments from "./Comments";
 import Filters from "../containers/Filters";
@@ -17,8 +18,7 @@ const Community = ({
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    const [showComments, setShowComments] = useState(false);
-    const [selectedPost, setSelectedPost] = useState(null);
+    const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [activeFilter, setActiveFilter] = useState([]);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
 
@@ -121,96 +121,104 @@ const Community = ({
         }
     };
 
+    const handlePostDelete = (postId) => {
+        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    };
+
     return (
         <>
             <div className="home-container">
-                {!showComments ? (
-                    <>
-                        <Filters
-                            categories={categories}
-                            activeFilter={activeFilter}
-                            setActiveFilter={setActiveFilter}
-                        />
-                        <div className="inner-main d-flex flex-column align-items-center">
-                            <h1 className="ml-3 mt-3 display-4">
-                                Welcome back, {currentUser.first_name}
-                            </h1>
-                            <form onSubmit={handleSubmit} id="tweet-form">
-                                <div id="tweetbox" className="wrapper mb-5">
-                                    <div className="input-box">
-                                        <h6>What's your question?</h6>
-                                        <input
-                                            className="question mb-2"
-                                            type="text"
-                                            name="question"
-                                        />
-                                        <CategoryBox
-                                            catArray={catArray}
-                                            setCatArray={setCatArray}
-                                            categories={categories}
-                                        />
-                                        <h6>Detail your question!</h6>
-                                        <div className="tweet-area">
-                                            <textarea
-                                                id="content"
-                                                required
-                                                name="content"
-                                                cols="30"
-                                                rows="10"
-                                            ></textarea>
-                                        </div>
-                                    </div>
-                                    <div className="bottom">
-                                        <div className="content">
-                                            <input
-                                                className="btn btn-primary btn-bg-modified"
-                                                value="Post"
-                                                type="submit"
-                                            />
-                                        </div>
-                                    </div>
+                <Filters
+                    categories={categories}
+                    activeFilter={activeFilter}
+                    setActiveFilter={setActiveFilter}
+                />
+                <div className="inner-main d-flex flex-column align-items-center">
+                    <h1 className="mb-4 ml-3 mt-3 display-4">
+                        Welcome back, {currentUser.first_name}
+                    </h1>
+                    <form onSubmit={handleSubmit} id="tweet-form">
+                        <div id="tweetbox" className="wrapper mb-5">
+                            <div className="input-box">
+                                <h6>What's your question?</h6>
+                                <input
+                                    className="question mb-2"
+                                    type="text"
+                                    name="question"
+                                />
+                                <CategoryBox
+                                    catArray={catArray}
+                                    setCatArray={setCatArray}
+                                    categories={categories}
+                                />
+                                <h6>Detail your question!</h6>
+                                <div className="tweet-area">
+                                    <textarea
+                                        id="content"
+                                        required
+                                        name="content"
+                                        cols="30"
+                                        rows="10"
+                                    ></textarea>
                                 </div>
-                            </form>
-                            {isLoading ? (
-                                <Loader />
-                            ) : sortedPosts.length > 0 ? (
-                                sortedPosts.map((post) => (
-                                    <Posts
-                                        key={post.id}
-                                        post={post}
-                                        currentUser={currentUser}
-                                        setShowComments={setShowComments}
-                                        setSelectedPost={setSelectedPost}
-                                    />
-                                ))
-                            ) : (
-                                <div className="ml-2 mt-5">
-                                    <h1>Woops!</h1>
-                                    <h4>No posts found!</h4>
-                                </div>
-                            )}
-                            <div className="post-counter">
-                                {sortedPosts.length}/{posts.length} posts shown
                             </div>
-                            {sortedPosts.length < posts.length && (
-                                <div
-                                    className="load-more"
-                                    onClick={handleLoadMore}
-                                >
-                                    Load more...
+                            <div className="bottom">
+                                <div className="content">
+                                    <input
+                                        className="btn btn-primary btn-bg-modified"
+                                        value="Post"
+                                        type="submit"
+                                    />
                                 </div>
-                            )}
+                            </div>
                         </div>
-                    </>
-                ) : (
-                    <Comments
-                        currentUser={currentUser}
-                        currentPost={selectedPost}
-                        setShowComments={setShowComments}
-                    />
-                )}
+                    </form>
+
+                    <h1 className="mb-3 display-4">My posts</h1>
+
+                    {isLoading ? (
+                        <Loader />
+                    ) : sortedPosts.length > 0 ? (
+                        sortedPosts.map((post) => (
+                            <div key={post.id} className="centered-items">
+                                <Posts
+                                    post={post}
+                                    currentUser={currentUser}
+                                    setShowComments={() =>
+                                        setShowCommentsPostId(post.id)
+                                    }
+                                    setSelectedPost={posts}
+                                    deleteOption={true}
+                                    onDelete={handlePostDelete} // Pass the callback
+                                />
+                                {showCommentsPostId === post.id && (
+                                    <Comments
+                                        currentUser={currentUser}
+                                        currentPost={post}
+                                        setShowComments={() =>
+                                            setShowCommentsPostId(null)
+                                        }
+                                    />
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="ml-2 mt-5">
+                            <h1>Woops!</h1>
+                            <h4>No posts found!</h4>
+                        </div>
+                    )}
+                    <div className="post-counter">
+                        {sortedPosts.length}/{posts.length} posts shown
+                    </div>
+                    {sortedPosts.length < posts.length && (
+                        <div className="load-more" onClick={handleLoadMore}>
+                            Load more...
+                        </div>
+                    )}
+                </div>
             </div>
-            <style jsx>{`
+            <style>{`
                 .loading {
                     display: flex;
                     justify-content: center;

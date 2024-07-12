@@ -7,7 +7,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.auth import AuthToken
-
+from rest_framework import status
+import logging
+from rest_framework import status
 from .models import Post, Profile, Like, Dislike, Comment, User, Category
 from .serializers import PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer
 
@@ -294,7 +296,6 @@ def newPost(request):
     return Response(data)
 
 
-
 @api_view(["POST"])
 def follow(request):
     category_data = request.data
@@ -340,3 +341,40 @@ def unfollow(request):
     updated_category = Category.objects.get(pk=dbcategory.pk)
     serializer = CategorySerializer(updated_category)
     return Response(serializer.data)
+
+logger = logging.getLogger(__name__)
+
+@api_view(["POST"])
+def delete_user_post(request):
+    data = request.data
+    post_data = data["post"]
+    current_user_data = data["user"]
+    post_id = post_data["id"]
+    user_id = current_user_data["id"]
+
+    try:
+        post = Post.objects.get(id=post_id)
+        user = User.objects.get(id=user_id)
+
+        # Check if the user is the creator of the post
+        if post.creator.user.id == user.id:
+            # Delete related likes, dislikes, and comments
+            Like.objects.filter(post=post).delete()
+            Dislike.objects.filter(post=post).delete()
+            Comment.objects.filter(post=post).delete()
+
+            # Now delete the post
+            post.delete()
+            return Response({"message": "Post deleted successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "You are not authorized to delete this post"}, status=status.HTTP_403_FORBIDDEN)
+
+    except Post.DoesNotExist:
+        logger.error(f"Post with id {post_id} does not exist.")
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+    except User.DoesNotExist:
+        logger.error(f"User with id {user_id} does not exist.")
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        logger.error(f"Error deleting post: {str(e)}")
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

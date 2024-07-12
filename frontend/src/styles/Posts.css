@@ -1,9 +1,16 @@
-#post-container{
+#post-container {
     width: 90vw;
 }
 
-#cats{
+#cats {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+.delete-icon {
+    align-self: flex-end;
+    cursor: pointer;
+    color: red;
+    margin-bottom: 10px;
 }
