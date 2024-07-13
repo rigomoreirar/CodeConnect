@@ -2,7 +2,6 @@ from django.urls import path
 from knox import views as knox_views
 from . import views
 
-# This goes to vault
 urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
@@ -17,7 +16,7 @@ urlpatterns = [
     path('all-likes/', views.allLikes, name="allLikes"),
     path('all-dislikes/', views.allDislikes, name="allDislikes"),
     path('all-comments/', views.allComments, name="allComments"),
-    path('all-categories', views.allCategories, name="allCategories"),
+    path('all-categories/', views.allCategories, name="allCategories"),
     path('postData/', views.postData, name="postData"),
     path('like/', views.like, name="like"),
     path('dislike/', views.dislike, name="dislike"),
@@ -26,5 +25,8 @@ urlpatterns = [
     path('follow/', views.follow, name="follow"),
     path('unfollow/', views.unfollow, name="unfollow"),
     path('delete-user-post/', views.delete_user_post, name='deleteUserPost'),
-
+    # New routes for categories
+    path('user-categories/', views.get_user_categories, name='getUserCategories'),
+    path('create-category/', views.create_category, name='createCategory'),
+    path('delete-category/', views.delete_category, name='deleteCategory'),
 ]

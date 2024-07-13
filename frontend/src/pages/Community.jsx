@@ -12,15 +12,21 @@ import Loader from "../components/Loader";
 const Community = ({
     currentUser,
     categories,
+    setCategories,
     catArray,
     setCatArray,
     setLoggedUser,
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
+    const [userCategories, setUserCategories] = useState([]);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [activeFilter, setActiveFilter] = useState([]);
-    const [visiblePostsCount, setVisiblePostsCount] = useState(15);
+    const [visiblePostsCount, setVisiblePostsCount] = useState(3);
+
+    useEffect(() => {
+        console.log("Current user:", currentUser);
+    }, [currentUser]);
 
     const fetchPosts = async () => {
         setIsLoading(true);
@@ -50,8 +56,25 @@ const Community = ({
         }
     };
 
+    const fetchCategories = async () => {
+        const userId = currentUser.id;
+        try {
+            const response = await Axios.get(
+                `http://localhost:8000/user-categories/?user_id=${userId}`
+            );
+            setUserCategories(response.data);
+            const allCategoriesResponse = await Axios.get(
+                "http://localhost:8000/all-categories/"
+            );
+            setCategories(allCategoriesResponse.data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
+
     useEffect(() => {
         fetchPosts();
+        fetchCategories();
     }, [currentUser]);
 
     useEffect(() => {
@@ -72,7 +95,7 @@ const Community = ({
     }, [activeFilter, posts]);
 
     const handleLoadMore = () => {
-        setVisiblePostsCount((prevCount) => prevCount + 15);
+        setVisiblePostsCount((prevCount) => prevCount + 3);
     };
 
     const sortedPosts = posts
@@ -123,6 +146,33 @@ const Community = ({
 
     const handlePostDelete = (postId) => {
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    };
+
+    const handleCategorySubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const categoryName = formData.get("category");
+
+        try {
+            await Axios.post("http://localhost:8000/create-category/", {
+                name: categoryName,
+                user_id: currentUser.id,
+            });
+            fetchCategories(); // Refresh categories after creation
+        } catch (error) {
+            console.error("Error creating category:", error);
+        }
+    };
+
+    const handleCategoryDelete = async (categoryId) => {
+        try {
+            await Axios.post("http://localhost:8000/delete-category/", {
+                id: categoryId,
+            });
+            fetchCategories(); // Refresh categories after deletion
+        } catch (error) {
+            console.error("Error deleting category:", error);
+        }
     };
 
     return (
@@ -216,6 +266,56 @@ const Community = ({
                             Load more...
                         </div>
                     )}
+
+                    <div className="categories-section">
+                        <h1 className="mb-3 display-4">My Categories</h1>
+                        <table className="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Category Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {userCategories.map((category) => (
+                                    <tr key={category.id}>
+                                        <td>{category.name}</td>
+                                        <td>
+                                            <button
+                                                className="btn btn-danger"
+                                                onClick={() =>
+                                                    handleCategoryDelete(
+                                                        category.id
+                                                    )
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <form onSubmit={handleCategorySubmit}>
+                            <div className="input-group mb-3">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="category"
+                                    placeholder="New Category"
+                                    required
+                                />
+                                <div className="input-group-append">
+                                    <button
+                                        className="btn btn-primary"
+                                        type="submit"
+                                    >
+                                        Add Category
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             <style>{`
@@ -242,6 +342,17 @@ const Community = ({
                 }
                 .load-more:hover {
                     color: darkblue;
+                }
+                .categories-section {
+                    margin-top: 40px;
+                    width: 80%;
+                }
+                .categories-section .table {
+                    width: 100%;
+                    margin-bottom: 20px;
+                }
+                .categories-section .input-group {
+                    width: 100%;
                 }
             `}</style>
         </>

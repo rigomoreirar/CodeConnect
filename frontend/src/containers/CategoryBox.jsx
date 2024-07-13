@@ -1,6 +1,7 @@
 import React from "react";
 import CategoryPost from "../components/CategoryPost";
 import "../styles/CategoryBox.css";
+
 const CategoryBox = ({ categories, catArray, setCatArray }) => {
     return (
         <div className="category-box" style={{ margin: "10px" }}>

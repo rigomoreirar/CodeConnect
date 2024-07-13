@@ -98,6 +98,7 @@ function App() {
                         element={
                             <Community
                                 categories={categories}
+                                setCategories={setCategories} // Pass setCategories here
                                 currentUser={loggedUser}
                                 catArray={catArray}
                                 setCatArray={setCatArray}

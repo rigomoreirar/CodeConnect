@@ -1,22 +1,14 @@
-# from django.contrib.auth import authenticate, login, logout
-# from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-
-# from django.urls import reverse
-# from django.core.serializers import serialize
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.auth import AuthToken
 from rest_framework import status
 import logging
-from rest_framework import status
 from .models import Post, Profile, Like, Dislike, Comment, User, Category
 from .serializers import PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer
 
 
 # Register API
-
-
 @api_view(["POST"])
 def register(request):
     serializer = RegisterSerializers(data=request.data)
@@ -24,9 +16,7 @@ def register(request):
     user = serializer.save()
     _, token = AuthToken.objects.create(user)
 
-    profile = Profile(
-        user=user
-    )
+    profile = Profile(user=user)
     profile.save()
 
     return Response({
@@ -64,32 +54,14 @@ def get_user_data(request):
         profile_raw = Profile.objects.get(user=user)
         profile = ProfileSerializer(profile_raw)
 
-        # Get the Dislikes
-        try:
-            dislikes_raw = Dislike.objects.get(profile=profile_raw)
-            one_dislike = DislikeSerializer(dislikes_raw).data
-            dislikes = [one_dislike]
-        except:
-            dislikes_raw = Dislike.objects.filter(profile=profile_raw)
-            dislikes = DislikeSerializer(dislikes_raw, many=True).data
+        dislikes = Dislike.objects.filter(profile=profile_raw)
+        dislikes = DislikeSerializer(dislikes, many=True).data
 
-        # Get the likes
-        try:
-            likes_raw = Like.objects.get(profile=profile_raw)
-            one_like = LikeSerializer(likes_raw).data
-            likes = [one_like]
-        except:
-            likes_raw = Like.objects.filter(profile=profile_raw)
-            likes = LikeSerializer(likes_raw, many=True).data
+        likes = Like.objects.filter(profile=profile_raw)
+        likes = LikeSerializer(likes, many=True).data
 
-        # get the comments
-        try:
-            comments_raw = Comment.objects.get(profile=profile_raw)
-            one_comment = CommentSerializer(comments_raw).data
-            comments = [one_comment]
-        except:
-            comments_raw = Comment.objects.filter(profile=profile_raw)
-            comments = CommentSerializer(comments_raw, many=True).data
+        comments = Comment.objects.filter(profile=profile_raw)
+        comments = CommentSerializer(comments, many=True).data
 
         return Response({
             'user_info': {
@@ -97,16 +69,14 @@ def get_user_data(request):
                 'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
-                "last_name": user.last_name,
-                "profile_data": profile.data,
-                "likes": likes,
-                "dislikes": dislikes,
-                "comments": comments,
+                'last_name': user.last_name,
+                'profile_data': profile.data,
+                'likes': likes,
+                'dislikes': dislikes,
+                'comments': comments,
             },
         })
-    return Response({
-        'error': "not authenticated"
-    }, status=400)
+    return Response({'error': "not authenticated"}, status=400)
 
 
 @api_view(['GET'])
@@ -131,30 +101,15 @@ def allCategories(request):
 @api_view(['POST'])
 def postData(request):
     data = request.data
-    try:
-        likes_raw = Like.objects.get(post=data["post_id"])
-        one_like = LikeSerializer(likes_raw).data
-        likes = [one_like]
-    except:
-        likes_raw = Like.objects.filter(post=data["post_id"])
-        likes = LikeSerializer(likes_raw, many=True).data
+    likes = Like.objects.filter(post=data["post_id"])
+    likes = LikeSerializer(likes, many=True).data
 
-    try:
-        dislikes_raw = Dislike.objects.get(post=data["post_id"])
-        one_dislike = DislikeSerializer(dislikes_raw).data
-        dislikes = [one_dislike]
-    except:
-        dislikes_raw = Dislike.objects.filter(post=data["post_id"])
-        dislikes = DislikeSerializer(dislikes_raw, many=True).data
+    dislikes = Dislike.objects.filter(post=data["post_id"])
+    dislikes = DislikeSerializer(dislikes, many=True).data
 
-    try:
-        comments_raw = Comment.objects.get(post=data["post_id"])
-        one_comment = CommentSerializer(comments_raw).data
-        comments = [one_comment]
-    except:
-        comments_raw = Comment.objects.filter(post=data["post_id"])
-        comments = CommentSerializer(comments_raw, many=True).data
-    # comments = Comment.objects.get()
+    comments = Comment.objects.filter(post=data["post_id"])
+    comments = CommentSerializer(comments, many=True).data
+
     return Response({
         "likes": likes,
         "dislikes": dislikes,
@@ -194,26 +149,15 @@ def allComments(request):
 def like(request):
     data = request.data
     unlike = data["unlike"]
-    postIm = data["post"]
-    postId = postIm["id"]
-    currentUser = data["user"]
-    userId = currentUser["id"]
-
-    user = User.objects.get(id=userId)
-    post = Post.objects.get(id=postId)
+    post = Post.objects.get(id=data["post"]["id"])
+    user = User.objects.get(id=data["user"]["id"])
     profile = Profile.objects.get(user=user)
 
     if unlike:
-        # Look for the like
         like = Like.objects.get(post=post, profile=profile)
-        # delete it
         like.delete()
     else:
-        like = Like(
-            profile=profile,
-            post=post
-        )
-        like.save()
+        Like.objects.create(profile=profile, post=post)
     return Response(request.data)
 
 
@@ -221,149 +165,104 @@ def like(request):
 def dislike(request):
     data = request.data
     undislike = data["undislike"]
-    postIm = data["post"]
-    postId = postIm["id"]
-    currentUser = data["user"]
-    userId = currentUser["id"]
-
-    user = User.objects.get(id=userId)
-    post = Post.objects.get(id=postId)
+    post = Post.objects.get(id=data["post"]["id"])
+    user = User.objects.get(id=data["user"]["id"])
     profile = Profile.objects.get(user=user)
 
     if undislike:
-        # Look for the dislike
         dislike = Dislike.objects.get(post=post, profile=profile)
-        # delete it
         dislike.delete()
     else:
-        dislike = Dislike(
-            profile=profile,
-            post=post
-        )
-        dislike.save()
+        Dislike.objects.create(profile=profile, post=post)
     return Response(request.data)
 
 
 @api_view(["POST"])
 def addComment(request):
     data = request.data
-    postIm = data["post"]
-    postId = postIm["id"]
-    currentUser = data["profile"]
-    userId = currentUser["id"]
-    content = data["content"]
-
-    user = User.objects.get(id=userId)
-    post = Post.objects.get(id=postId)
+    post = Post.objects.get(id=data["post"]["id"])
+    user = User.objects.get(id=data["profile"]["id"])
     profile = Profile.objects.get(user=user)
 
-    comment = Comment(
-        profile=profile,
-        post=post,
-        content=content
-    )
-    comment.save()
+    Comment.objects.create(profile=profile, post=post, content=data["content"])
     return Response(request.data)
 
 
 @api_view(["POST"])
 def newPost(request):
     data = request.data
-    content = data["content"]
-    title = data["question"]
-    currentUser = data["creator"]
-    userId = currentUser["id"]
-    isStudent = data["isStudent"]
-    postCat = data["categories"]
-
-    user = User.objects.get(id=userId)
+    user = User.objects.get(id=data["creator"]["id"])
     profile = Profile.objects.get(user=user)
 
-    newPost = Post.objects.create(
-        isStudent=isStudent,
+    new_post = Post.objects.create(
+        isStudent=data["isStudent"],
         creator=profile,
-        title=title,
-        content=content
+        title=data["question"],
+        content=data["content"]
     )
 
-    for category in postCat:
-        dbcategory = Category.objects.get(pk=category["id"])
-        newPost.categories.add(dbcategory)
-    
-    # Add logging
-    print("New post created:", newPost)
+    for category in data["categories"]:
+        db_category = Category.objects.get(pk=category["id"])
+        new_post.categories.add(db_category)
 
+    print("New post created:", new_post)
     return Response(data)
 
 
 @api_view(["POST"])
 def follow(request):
-    category_data = request.data
-    dbcategory = Category.objects.get(pk=category_data["id"])
-    currentUser = category_data["user"]
-    userId = currentUser["id"]
-
-    user = User.objects.get(id=userId)
+    data = request.data
+    db_category = Category.objects.get(pk=data["id"])
+    user = User.objects.get(id=data["user"]["id"])
     profile = Profile.objects.get(user=user)
 
-    # Add to following and followers
-    profile.ctg_following.add(dbcategory)
-    dbcategory.followers.add(profile)
+    profile.ctg_following.add(db_category)
+    db_category.followers.add(profile)
 
-    # Ensure changes are saved and reflected
     profile.save()
-    dbcategory.save()
+    db_category.save()
 
-    # Fetch updated category info to return accurate response
-    updated_category = Category.objects.get(pk=dbcategory.pk)
+    updated_category = Category.objects.get(pk=db_category.pk)
     serializer = CategorySerializer(updated_category)
     return Response(serializer.data)
+
 
 @api_view(["POST"])
 def unfollow(request):
-    category_data = request.data
-    dbcategory = Category.objects.get(pk=category_data["id"])
-    currentUser = category_data["user"]
-    userId = currentUser["id"]
-
-    user = User.objects.get(id=userId)
+    data = request.data
+    db_category = Category.objects.get(pk=data["id"])
+    user = User.objects.get(id=data["user"]["id"])
     profile = Profile.objects.get(user=user)
 
-    # Remove from following and followers
-    profile.ctg_following.remove(dbcategory)
-    dbcategory.followers.remove(profile)
+    profile.ctg_following.remove(db_category)
+    db_category.followers.remove(profile)
 
-    # Ensure changes are saved and reflected
     profile.save()
-    dbcategory.save()
+    db_category.save()
 
-    # Fetch updated category info to return accurate response
-    updated_category = Category.objects.get(pk=dbcategory.pk)
+    updated_category = Category.objects.get(pk=db_category.pk)
     serializer = CategorySerializer(updated_category)
     return Response(serializer.data)
 
+
 logger = logging.getLogger(__name__)
+
 
 @api_view(["POST"])
 def delete_user_post(request):
     data = request.data
-    post_data = data["post"]
-    current_user_data = data["user"]
-    post_id = post_data["id"]
-    user_id = current_user_data["id"]
+    post_id = data["post"]["id"]
+    user_id = data["user"]["id"]
 
     try:
         post = Post.objects.get(id=post_id)
         user = User.objects.get(id=user_id)
 
-        # Check if the user is the creator of the post
         if post.creator.user.id == user.id:
-            # Delete related likes, dislikes, and comments
             Like.objects.filter(post=post).delete()
             Dislike.objects.filter(post=post).delete()
             Comment.objects.filter(post=post).delete()
 
-            # Now delete the post
             post.delete()
             return Response({"message": "Post deleted successfully"}, status=status.HTTP_200_OK)
         else:
@@ -378,3 +277,47 @@ def delete_user_post(request):
     except Exception as e:
         logger.error(f"Error deleting post: {str(e)}")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+@api_view(['POST'])
+def create_category(request):
+    user_id = request.data.get('user_id')
+    name = request.data.get('name')
+    if not name:
+        return Response({'error': 'Category name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    category = Category(name=name, creator=user)
+    category.save()
+
+    return Response({'message': 'Category created successfully'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def delete_category(request):
+    category_id = request.data.get('id')
+    try:
+        category = Category.objects.get(id=category_id)
+        category.delete()
+        return Response({'message': 'Category deleted successfully'}, status=status.HTTP_200_OK)
+    except Category.DoesNotExist:
+        return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def get_user_categories(request):
+    user_id = request.query_params.get('user_id')
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    categories = Category.objects.filter(creator=user)
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
