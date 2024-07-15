@@ -32,7 +32,7 @@ const Community = ({
         setIsLoading(true);
         try {
             const response = await Axios.get(
-                "http://localhost:8000/all-posts/"
+                `http://localhost:8000/posts-by-user-categories/?user_id=${currentUser.id}`
             );
             const fetchedPosts = response.data.map(async (post) => {
                 try {

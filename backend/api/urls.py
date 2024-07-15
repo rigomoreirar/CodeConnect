@@ -7,8 +7,6 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('user/', views.get_user_data, name="user"),
     path('logout/', knox_views.LogoutView.as_view(), name="user"),
-    # This route will work to log out the users from any device
-    # path('logout-all/', knox_views.LogoutAllView.as_view(), name="user"),
     # API's
     path('', views.index, name="index"),
     path('all-posts/', views.allPosts, name="allPosts"),
@@ -25,8 +23,9 @@ urlpatterns = [
     path('follow/', views.follow, name="follow"),
     path('unfollow/', views.unfollow, name="unfollow"),
     path('delete-user-post/', views.delete_user_post, name='deleteUserPost'),
-    # New routes for categories
     path('user-categories/', views.get_user_categories, name='getUserCategories'),
     path('create-category/', views.create_category, name='createCategory'),
     path('delete-category/', views.delete_category, name='deleteCategory'),
+    # New route for fetching posts by user categories
+    path('posts-by-user-categories/', views.posts_by_user_categories, name='postsByUserCategories'),
 ]

@@ -321,3 +321,19 @@ def get_user_categories(request):
     categories = Category.objects.filter(creator=user)
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def posts_by_user_categories(request):
+    user_id = request.query_params.get('user_id')
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    categories = Category.objects.filter(creator=user)
+    category_ids = categories.values_list('id', flat=True)
+    posts = Post.objects.filter(categories__id__in=category_ids).distinct()
+    serializer = PostSerializer(posts, many=True)
+    
+    return Response(serializer.data, status=status.HTTP_200_OK)

@@ -155,7 +155,7 @@ const Register = () => {
                                                 Already have an account?
                                             </div>
                                             <div className="d-flex justify-content-center mb-3 mb-lg-4">
-                                                <Link to="/login">
+                                                <Link to="/">
                                                     <button
                                                         type="button"
                                                         className="btn btn-dark btn-lg"
