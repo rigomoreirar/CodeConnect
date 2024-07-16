@@ -1,7 +1,6 @@
 from rest_framework import serializers, validators
 from .models import Post, Profile, Like, Dislike, Comment, User, Category
 
-
 class RegisterSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -36,7 +35,6 @@ class RegisterSerializers(serializers.ModelSerializer):
 
         return user
 
-
 class PostSerializer(serializers.ModelSerializer):
     creator = serializers.PrimaryKeyRelatedField(queryset=Profile.objects.all())
     categories = serializers.StringRelatedField(many=True)
@@ -46,47 +44,35 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ('id', 'isStudent', 'creator', 'categories', 'title',
                   'content', 'timestamp', 'isActive')
 
-
-
 class ProfileSerializer(serializers.ModelSerializer):
-    # user = serializers.ReadOnlyField(source='user.username')
     ctg_following = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Profile
         fields = ('id', 'user', 'ctg_following', 'isTeacher')
 
-
 class LikeSerializer(serializers.ModelSerializer):
-    # user = serializers.ReadOnlyField(source='user.username')
     profile = serializers.ReadOnlyField(source='profile.user.username')
-    # ctg_following = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Like
         fields = ('id', 'timestamp', 'profile', 'post')
 
-
 class DislikeSerializer(serializers.ModelSerializer):
     profile = serializers.ReadOnlyField(source='profile.user.username')
-    # ctg_following = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Dislike
         fields = ('id', 'timestamp', 'profile', 'post')
 
-
 class CommentSerializer(serializers.ModelSerializer):
     profile = serializers.ReadOnlyField(source='profile.user.username')
-    # ctg_following = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Comment
         fields = ('id', 'timestamp', 'profile', 'post', 'content')
 
-
 class CategorySerializer(serializers.ModelSerializer):
-    # profile = serializers.ReadOnlyField(source='profile.user.username')
     followers = serializers.StringRelatedField(many=True)
 
     class Meta:

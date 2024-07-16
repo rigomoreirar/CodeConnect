@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import CategoryFollow from "../containers/CategoryFollow";
 import "../styles/Profile.css";
-import ProfilePic from "../assets/no-profile-picture.webp";
+import ProfilePicture from "../components/ProfilePicture";
 import Filters from "../containers/Filters";
 
 const Profile = ({ currentUser, categories, setLoggedUser }) => {
@@ -72,7 +72,7 @@ const Profile = ({ currentUser, categories, setLoggedUser }) => {
                     <div className="container mb-5">
                         <div className="row no-gutters">
                             <div className="col-md-4 col-lg-4">
-                                <img src={ProfilePic} alt="profile" />
+                                <ProfilePicture userId={currentUser.id} />
                             </div>
                             <div className="col-md-8 col-lg-8">
                                 <div className="d-flex flex-column">
@@ -124,7 +124,7 @@ const Profile = ({ currentUser, categories, setLoggedUser }) => {
                     />
                 )}
             </div>
-            <style jsx>{`
+            <style>{`
                 .loading {
                     display: flex;
                     justify-content: center;

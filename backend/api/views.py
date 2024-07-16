@@ -1,3 +1,5 @@
+import os
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -6,7 +8,23 @@ from rest_framework import status
 import logging
 from .models import Post, Profile, Like, Dislike, Comment, User, Category
 from .serializers import PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer
+import mimetypes
+from django.http import HttpResponse, Http404
 
+# Define the directory for profile pictures
+PROFILE_PICTURE_DIR = os.path.join(settings.BASE_DIR, 'assets', 'profile-pictures')
+
+# Ensure the directory exists
+os.makedirs(PROFILE_PICTURE_DIR, exist_ok=True)
+
+# Define the directory for profile pictures
+PROFILE_PICTURE_DIR = os.path.join(settings.BASE_DIR, 'assets', 'profile-pictures')
+
+# Ensure the directory exists
+os.makedirs(PROFILE_PICTURE_DIR, exist_ok=True)
+
+# Define a logger
+logger = logging.getLogger(__name__)
 
 # Register API
 @api_view(["POST"])
@@ -19,6 +37,20 @@ def register(request):
     profile = Profile(user=user)
     profile.save()
 
+    # Handle profile picture upload
+    if 'profile_picture' in request.FILES:
+        profile_picture = request.FILES['profile_picture']
+        file_ext = profile_picture.name.split('.')[-1].lower()
+
+        if file_ext not in ['png', 'jpg', 'jpeg']:
+            return Response({'error': 'Invalid file extension. Only png, jpg, and jpeg are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{file_ext}")
+
+        with open(profile_picture_path, 'wb') as f:
+            for chunk in profile_picture.chunks():
+                f.write(chunk)
+
     return Response({
         'user_info': {
             'id': user.id,
@@ -28,6 +60,8 @@ def register(request):
         'token': token
     })
 
+
+# Other views remain unchanged...
 
 @api_view(["POST"])
 def login(request):
@@ -44,7 +78,6 @@ def login(request):
         },
         'token': token
     })
-
 
 @api_view(['GET'])
 def get_user_data(request):
@@ -78,11 +111,9 @@ def get_user_data(request):
         })
     return Response({'error': "not authenticated"}, status=400)
 
-
 @api_view(['GET'])
 def index(request):
     return Response({"Hello": "World!"})
-
 
 @api_view(['GET'])
 def allPosts(request):
@@ -90,13 +121,11 @@ def allPosts(request):
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
-
 @api_view(['GET'])
 def allCategories(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data)
-
 
 @api_view(['POST'])
 def postData(request):
@@ -116,13 +145,11 @@ def postData(request):
         "comments": comments
     })
 
-
 @api_view(['GET'])
 def allProfiles(request):
     profiles = Profile.objects.all()
     serializer = ProfileSerializer(profiles, many=True)
     return Response(serializer.data)
-
 
 @api_view(['GET'])
 def allLikes(request):
@@ -130,20 +157,17 @@ def allLikes(request):
     serializer = LikeSerializer(likes, many=True)
     return Response(serializer.data)
 
-
 @api_view(['GET'])
 def allDislikes(request):
     dislikes = Dislike.objects.all()
     serializer = DislikeSerializer(dislikes, many=True)
     return Response(serializer.data)
 
-
 @api_view(['GET'])
 def allComments(request):
     comments = Comment.objects.all()
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)
-
 
 @api_view(["POST"])
 def like(request):
@@ -160,7 +184,6 @@ def like(request):
         Like.objects.create(profile=profile, post=post)
     return Response(request.data)
 
-
 @api_view(["POST"])
 def dislike(request):
     data = request.data
@@ -176,7 +199,6 @@ def dislike(request):
         Dislike.objects.create(profile=profile, post=post)
     return Response(request.data)
 
-
 @api_view(["POST"])
 def addComment(request):
     data = request.data
@@ -186,7 +208,6 @@ def addComment(request):
 
     Comment.objects.create(profile=profile, post=post, content=data["content"])
     return Response(request.data)
-
 
 @api_view(["POST"])
 def newPost(request):
@@ -208,7 +229,6 @@ def newPost(request):
     print("New post created:", new_post)
     return Response(data)
 
-
 @api_view(["POST"])
 def follow(request):
     data = request.data
@@ -225,7 +245,6 @@ def follow(request):
     updated_category = Category.objects.get(pk=db_category.pk)
     serializer = CategorySerializer(updated_category)
     return Response(serializer.data)
-
 
 @api_view(["POST"])
 def unfollow(request):
@@ -244,9 +263,7 @@ def unfollow(request):
     serializer = CategorySerializer(updated_category)
     return Response(serializer.data)
 
-
 logger = logging.getLogger(__name__)
-
 
 @api_view(["POST"])
 def delete_user_post(request):
@@ -278,9 +295,6 @@ def delete_user_post(request):
         logger.error(f"Error deleting post: {str(e)}")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
-
 @api_view(['POST'])
 def create_category(request):
     user_id = request.data.get('user_id')
@@ -298,7 +312,6 @@ def create_category(request):
 
     return Response({'message': 'Category created successfully'}, status=status.HTTP_201_CREATED)
 
-
 @api_view(['POST'])
 def delete_category(request):
     category_id = request.data.get('id')
@@ -308,7 +321,6 @@ def delete_category(request):
         return Response({'message': 'Category deleted successfully'}, status=status.HTTP_200_OK)
     except Category.DoesNotExist:
         return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
-
 
 @api_view(['GET'])
 def get_user_categories(request):
@@ -321,7 +333,6 @@ def get_user_categories(request):
     categories = Category.objects.filter(creator=user)
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 @api_view(['GET'])
 def posts_by_user_categories(request):
@@ -337,3 +348,32 @@ def posts_by_user_categories(request):
     serializer = PostSerializer(posts, many=True)
     
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Define the directory for profile pictures
+PROFILE_PICTURE_DIR = os.path.join(settings.BASE_DIR, 'assets', 'profile-pictures')
+
+# Ensure the directory exists
+os.makedirs(PROFILE_PICTURE_DIR, exist_ok=True)
+
+# Define a logger
+logger = logging.getLogger(__name__)
+
+@api_view(['GET'])
+def get_profile_picture(request, user_id):
+    logger.info(f"Received request for user ID: {user_id}")
+    possible_extensions = ['jpg', 'jpeg', 'png']
+    for ext in possible_extensions:
+        profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user_id}.{ext}")
+        if os.path.exists(profile_picture_path):
+            logger.info(f"Serving profile picture for user ID: {user_id}")
+            mime_type, _ = mimetypes.guess_type(profile_picture_path)
+            with open(profile_picture_path, 'rb') as f:
+                return HttpResponse(f.read(), content_type=mime_type)
+    
+    # Serve default profile picture if no specific one exists
+    default_picture_path = os.path.join(PROFILE_PICTURE_DIR, 'no-profile-picture.png')
+    logger.info(f"Serving default profile picture for user ID: {user_id}")
+    mime_type, _ = mimetypes.guess_type(default_picture_path)
+    with open(default_picture_path, 'rb') as f:
+        return HttpResponse(f.read(), content_type=mime_type)

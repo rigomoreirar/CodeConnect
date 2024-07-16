@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from knox import views as knox_views
 from . import views
 
@@ -7,7 +9,6 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('user/', views.get_user_data, name="user"),
     path('logout/', knox_views.LogoutView.as_view(), name="user"),
-    # API's
     path('', views.index, name="index"),
     path('all-posts/', views.allPosts, name="allPosts"),
     path('all-profiles/', views.allProfiles, name="allProfiles"),
@@ -26,6 +27,6 @@ urlpatterns = [
     path('user-categories/', views.get_user_categories, name='getUserCategories'),
     path('create-category/', views.create_category, name='createCategory'),
     path('delete-category/', views.delete_category, name='deleteCategory'),
-    # New route for fetching posts by user categories
     path('posts-by-user-categories/', views.posts_by_user_categories, name='postsByUserCategories'),
-]
+    path('profile-picture/<int:user_id>/', views.get_profile_picture, name='getProfilePicture'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

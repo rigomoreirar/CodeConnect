@@ -1,0 +1,33 @@
+/* ../styles/Register.module.css */
+.vh100 {
+    height: 100vh;
+}
+
+.card {
+    border-radius: 25px;
+    margin-top: 170px;
+    margin-bottom: 50px;
+}
+
+@media (max-width: 768px) {
+    .card {
+        margin-top: -30px;
+    }
+}
+
+.formLabel {
+    margin-bottom: 0.5rem;
+}
+
+.iconContainer i {
+    font-size: 1.5rem;
+}
+
+.btnDark {
+    background-color: #343a40;
+    border: none;
+}
+
+.btnDark:hover {
+    background-color: #23272b;
+}
