@@ -377,3 +377,34 @@ def get_profile_picture(request, user_id):
     mime_type, _ = mimetypes.guess_type(default_picture_path)
     with open(default_picture_path, 'rb') as f:
         return HttpResponse(f.read(), content_type=mime_type)
+
+@api_view(["POST"])
+def change_profile_picture(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if 'profile_picture' not in request.FILES:
+        return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+    profile_picture = request.FILES['profile_picture']
+    file_ext = profile_picture.name.split('.')[-1].lower()
+
+    if file_ext not in ['png', 'jpg', 'jpeg']:
+        return Response({'error': 'Invalid file extension. Only png, jpg, and jpeg are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Delete existing profile picture
+    possible_extensions = ['jpg', 'jpeg', 'png']
+    for ext in possible_extensions:
+        existing_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{ext}")
+        if os.path.exists(existing_picture_path):
+            os.remove(existing_picture_path)
+
+    # Save new profile picture
+    profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{file_ext}")
+    with open(profile_picture_path, 'wb') as f:
+        for chunk in profile_picture.chunks():
+            f.write(chunk)
+
+    return Response({'message': 'Profile picture updated successfully'}, status=status.HTTP_200_OK)

@@ -18,6 +18,7 @@ function App() {
     const [loggedUser, setLoggedUser] = useState({});
     const [categories, setCategories] = useState([]);
     const [catArray, setCatArray] = useState([]);
+    const [profilePictureUrl, setProfilePictureUrl] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,17 +28,15 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get(
-                    "http://localhost:8000/user/",
-                    {
-                        headers: {
-                            Authorization: token,
-                        },
-                    }
-                );
+                const response = await axios.get("http://localhost:8000/user/", {
+                    headers: {
+                        Authorization: token,
+                    },
+                });
 
                 const user = response.data.user_info;
                 setLoggedUser(user);
+                setProfilePictureUrl(`http://localhost:8000/profile-picture/${user.id}/`);
                 setIsValid(true);
             } catch (error) {
                 console.log(error);
@@ -48,9 +47,7 @@ function App() {
             }
 
             try {
-                const response = await axios.get(
-                    "http://localhost:8000/all-categories"
-                );
+                const response = await axios.get("http://localhost:8000/all-categories");
                 setCategories(response.data);
             } catch (error) {
                 console.log(error);
@@ -90,6 +87,8 @@ function App() {
                                 catArray={catArray}
                                 setCatArray={setCatArray}
                                 setLoggedUser={setLoggedUser}
+                                profilePictureUrl={profilePictureUrl}
+                                setProfilePictureUrl={setProfilePictureUrl}
                             />
                         }
                     />
@@ -98,7 +97,7 @@ function App() {
                         element={
                             <Community
                                 categories={categories}
-                                setCategories={setCategories} // Pass setCategories here
+                                setCategories={setCategories}
                                 currentUser={loggedUser}
                                 catArray={catArray}
                                 setCatArray={setCatArray}
@@ -119,9 +118,7 @@ function App() {
                 </Route>
                 <Route
                     path="/register"
-                    element={
-                        !isValid ? <Register /> : <Navigate to="/forum" />
-                    }
+                    element={!isValid ? <Register /> : <Navigate to="/forum" />}
                 />
                 <Route path="/redirect" element={<Redirect />} />
                 <Route path="*" element={<NotFound />} />

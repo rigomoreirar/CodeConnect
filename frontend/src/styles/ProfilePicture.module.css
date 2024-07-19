@@ -1,5 +1,69 @@
-.profile-img {
+.profile-picture-container {
+    text-align: center;
+}
+
+/* Smallest big screen */
+.profile-picture {
+    position: relative;
+    width: 14.3rem;
+    height: 19.3rem;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+/* Medium big screen */
+@media (min-width: 991px) and (max-width: 1200px) {
+    .profile-picture {
+        width: 16.3rem;
+        height: 20.3rem;
+    }
+}
+
+/* Big big screen */
+@media (min-width: 1200px) {
+    .profile-picture {
+        width: 23.3rem;
+        height: 23.3rem;
+    }
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+    .profile-picture {
+        width: 33.3rem;
+        height: 23.3rem;
+    }
+}
+
+.profile-picture img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.upload-button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.upload-button input {
+    display: none;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
 }

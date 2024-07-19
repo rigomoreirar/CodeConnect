@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/RegisterProfilePicture.css";
+import "../styles/RegisterProfilePicture.module.css";
 import noProfilePicture from "../assets/no-profile-picture.webp";
 
 const RegisterProfilePicture = ({ setProfilePicture }) => {

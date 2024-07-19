@@ -5,7 +5,13 @@ import "../styles/Profile.css";
 import ProfilePicture from "../components/ProfilePicture";
 import Filters from "../containers/Filters";
 
-const Profile = ({ currentUser, categories, setLoggedUser }) => {
+const Profile = ({
+    currentUser,
+    categories,
+    setLoggedUser,
+    profilePictureUrl,
+    setProfilePictureUrl,
+}) => {
     const [modal, setModal] = useState(false);
     const [ctgFollowingLength, setCtgFollowingLength] = useState(
         currentUser.profile_data.ctg_following.length
@@ -71,8 +77,13 @@ const Profile = ({ currentUser, categories, setLoggedUser }) => {
                 ) : (
                     <div className="container mb-5">
                         <div className="row no-gutters">
-                            <div className="col-md-4 col-lg-4">
-                                <ProfilePicture userId={currentUser.id} />
+                            <div className="col-md-4 col-lg-4 d-flex justify-content-center align-items-center">
+                                <ProfilePicture
+                                    userId={currentUser.id}
+                                    imageUrl={profilePictureUrl}
+                                    setImageUrl={setProfilePictureUrl}
+                                    refreshProfile={fetchUserData}
+                                />
                             </div>
                             <div className="col-md-8 col-lg-8">
                                 <div className="d-flex flex-column">

@@ -254,8 +254,7 @@ const Community = ({
                         ))
                     ) : (
                         <div className="ml-2 mt-5">
-                            <h1>Woops!</h1>
-                            <h4>No posts found!</h4>
+                            <h4>You have no posts.</h4>
                         </div>
                     )}
                     <div className="post-counter">
