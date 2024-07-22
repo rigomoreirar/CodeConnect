@@ -14,6 +14,10 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
     const [loading, setLoading] = useState(true);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
 
+    useEffect(() => {
+        console.log("Categories:", categories);
+    }, [categories]);
+
     const fetchData = async () => {
         try {
             const response = await Axios.get("backend/all-posts/");
@@ -37,6 +41,7 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
                 })
             );
 
+            console.log("Enriched Posts:", enrichedPosts);
             setAllPosts(enrichedPosts);
             setPosts(enrichedPosts);
             setLoading(false);

@@ -25,7 +25,7 @@ jobs:
               with:
                   context: ./backend
                   push: true
-                  tags: rigomoreirar/code-connect-backend:2.003
+                  tags: rigomoreirar/code-connect-backend:2.004
                   build-args: |
                       SECRET_KEY=${{ secrets.SECRET_KEY }}
               env:
@@ -36,6 +36,6 @@ jobs:
               with:
                   context: ./frontend
                   push: true
-                  tags: rigomoreirar/code-connect-frontend:2.003
+                  tags: rigomoreirar/code-connect-frontend:2.004
               env:
                   DOCKER_BUILDKIT: 1
