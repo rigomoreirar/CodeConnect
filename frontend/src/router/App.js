@@ -29,7 +29,7 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8000/user/", {
+                const response = await axios.get("backend/user/", {
                     headers: {
                         Authorization: token,
                     },
@@ -37,7 +37,7 @@ function App() {
 
                 const user = response.data.user_info;
                 setLoggedUser(user);
-                setProfilePictureUrl(`http://localhost:8000/profile-picture/${user.id}/`);
+                setProfilePictureUrl(`backend/profile-picture/${user.id}/`);
                 setIsValid(true);
             } catch (error) {
                 console.log(error);
@@ -48,7 +48,7 @@ function App() {
             }
 
             try {
-                const response = await axios.get("http://localhost:8000/all-categories");
+                const response = await axios.get("backend/all-categories");
                 setCategories(response.data);
             } catch (error) {
                 console.log(error);

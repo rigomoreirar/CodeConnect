@@ -68,7 +68,7 @@ const Register = () => {
         }
 
         axios
-            .post("http://localhost:8000/register/", formData, {
+            .post("backend/register/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
