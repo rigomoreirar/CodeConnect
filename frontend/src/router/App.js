@@ -11,6 +11,7 @@ import Profile from "../pages/Profile";
 import Community from "../pages/Community";
 import Feed from "../pages/Feed";
 import NotFound from "../pages/NotFound";
+import ResetPassword from "../pages/ResetPassword";
 
 function App() {
     const token = window.localStorage.getItem("token");
@@ -18,6 +19,7 @@ function App() {
     const [loggedUser, setLoggedUser] = useState({});
     const [categories, setCategories] = useState([]);
     const [catArray, setCatArray] = useState([]);
+    const [profilePictureUrl, setProfilePictureUrl] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,17 +29,15 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get(
-                    "backend/user/",
-                    {
-                        headers: {
-                            Authorization: token,
-                        },
-                    }
-                );
+                const response = await axios.get("backend/user/", {
+                    headers: {
+                        Authorization: token,
+                    },
+                });
 
                 const user = response.data.user_info;
                 setLoggedUser(user);
+                setProfilePictureUrl(`backend/profile-picture/${user.id}/`);
                 setIsValid(true);
             } catch (error) {
                 console.log(error);
@@ -48,9 +48,7 @@ function App() {
             }
 
             try {
-                const response = await axios.get(
-                    "backend/all-categories"
-                );
+                const response = await axios.get("backend/all-categories");
                 setCategories(response.data);
             } catch (error) {
                 console.log(error);
@@ -77,6 +75,7 @@ function App() {
                             <Home
                                 categories={categories}
                                 currentUser={loggedUser}
+                                setLoggedUser={setLoggedUser}
                             />
                         }
                     />
@@ -88,6 +87,9 @@ function App() {
                                 currentUser={loggedUser}
                                 catArray={catArray}
                                 setCatArray={setCatArray}
+                                setLoggedUser={setLoggedUser}
+                                profilePictureUrl={profilePictureUrl}
+                                setProfilePictureUrl={setProfilePictureUrl}
                             />
                         }
                     />
@@ -96,9 +98,11 @@ function App() {
                         element={
                             <Community
                                 categories={categories}
+                                setCategories={setCategories}
                                 currentUser={loggedUser}
                                 catArray={catArray}
                                 setCatArray={setCatArray}
+                                setLoggedUser={setLoggedUser}
                             />
                         }
                     />
@@ -108,15 +112,18 @@ function App() {
                             <Feed
                                 categories={categories}
                                 currentUser={loggedUser}
+                                setLoggedUser={setLoggedUser}
                             />
                         }
                     />
                 </Route>
                 <Route
                     path="/register"
-                    element={
-                        !isValid ? <Register /> : <Navigate to="/forum" />
-                    }
+                    element={!isValid ? <Register /> : <Navigate to="/forum" />}
+                />
+                <Route
+                    path="/reset-password"
+                    element={!isValid ? <ResetPassword /> : <Navigate to="/forum" />}
                 />
                 <Route path="/redirect" element={<Redirect />} />
                 <Route path="*" element={<NotFound />} />

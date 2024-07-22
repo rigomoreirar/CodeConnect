@@ -1,29 +1,35 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from knox import views as knox_views
 from . import views
 
-# This goes to vault
 urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('user/', views.get_user_data, name="user"),
     path('logout/', knox_views.LogoutView.as_view(), name="user"),
-    # This route will work to log out the users from any device
-    # path('logout-all/', knox_views.LogoutAllView.as_view(), name="user"),
-    # API's
     path('', views.index, name="index"),
     path('all-posts/', views.allPosts, name="allPosts"),
     path('all-profiles/', views.allProfiles, name="allProfiles"),
     path('all-likes/', views.allLikes, name="allLikes"),
     path('all-dislikes/', views.allDislikes, name="allDislikes"),
     path('all-comments/', views.allComments, name="allComments"),
-    path('all-categories', views.allCategories, name="allCategories"),
+    path('all-categories/', views.allCategories, name="allCategories"),
     path('postData/', views.postData, name="postData"),
     path('like/', views.like, name="like"),
     path('dislike/', views.dislike, name="dislike"),
     path('addComment/', views.addComment, name="addComment"),
     path('new-post/', views.newPost, name="newPost"),
     path('follow/', views.follow, name="follow"),
-    path('unfollow/', views.unfollow, name="unfollow")
-
-]
+    path('unfollow/', views.unfollow, name="unfollow"),
+    path('delete-user-post/', views.delete_user_post, name='deleteUserPost'),
+    path('user-categories/', views.get_user_categories, name='getUserCategories'),
+    path('create-category/', views.create_category, name='createCategory'),
+    path('delete-category/', views.delete_category, name='deleteCategory'),
+    path('posts-by-user-categories/', views.posts_by_user_categories, name='postsByUserCategories'),
+    path('profile-picture/<int:user_id>/', views.get_profile_picture, name='getProfilePicture'),
+    path('change-profile-picture/', views.change_profile_picture, name='changeProfilePicture'),
+    path('send-test-email/', views.send_test_email, name='sendTestEmail'),
+    path('reset-user-password/', views.reset_user_password, name='resetUserPassword'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

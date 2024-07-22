@@ -8,16 +8,19 @@ img {
     background: #000;
 }
 
+/* Smallest big screen */
 .skill-block {
     width: 30%;
 }
 
+/* Medium big screen */
 @media (min-width: 991px) and (max-width: 1200px) {
     .skill-block {
         padding: 32px !important;
     }
 }
 
+/* Big big screen */
 @media (min-width: 1200px) {
     .skill-block {
         padding: 56px !important;
@@ -31,10 +34,10 @@ body {
 .container {
     margin-top: -8rem;
 }
-
+/* Small screens */
 @media (max-width: 768px) {
     body .container {
-        margin-top: 6rem;
+        margin-top: 70px !important;
     }
 }
 
@@ -42,6 +45,7 @@ body {
     background-color: #343a40;
     transition: background 0.2s ease;
 }
+
 .ctg-following:hover {
     background-color: #575757 !important;
 }

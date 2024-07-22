@@ -1,7 +1,6 @@
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-const Category = ({ category, catArray, setCatArray }) => {
+import React, { useEffect, useState } from "react";
+
+const CategoryPost = ({ category, catArray, setCatArray }) => {
     const [select, setSelect] = useState(false);
 
     const handleSelect = () => {
@@ -19,6 +18,7 @@ const Category = ({ category, catArray, setCatArray }) => {
             setSelect(false);
         }
     }, [catArray, category]);
+
     return (
         <div onClick={handleSelect} className="ml-2 hover" key={category.name}>
             <span
@@ -35,4 +35,4 @@ const Category = ({ category, catArray, setCatArray }) => {
     );
 };
 
-export default Category;
+export default CategoryPost;

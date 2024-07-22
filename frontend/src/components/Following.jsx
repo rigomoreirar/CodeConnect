@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import Axios from "axios";
 
-const Following = ({ category, ctg_following, currentUser, setLength }) => {
+const Following = ({
+    category,
+    ctg_following,
+    currentUser,
+    setLength,
+    refreshUserData,
+}) => {
     const [array, setArray] = useState(ctg_following);
     const [fill, setFill] = useState(array.includes(category.name));
 
@@ -34,6 +40,7 @@ const Following = ({ category, ctg_following, currentUser, setLength }) => {
             }
         }
         setArray(newArray);
+        refreshUserData();
     };
 
     useEffect(() => {

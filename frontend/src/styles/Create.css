@@ -148,3 +148,22 @@ textarea {
 .bottom button:hover {
     background: #0d8bd9;
 }
+
+.categories-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 10%;
+}
+.categories-section form {
+    width: 70%;
+}
+
+.input-group-append button {
+    background-color: #6c757d;
+    border: none;
+}
+.input-group-append button:hover {
+    background-color: #007bff;
+}

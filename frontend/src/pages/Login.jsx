@@ -39,7 +39,7 @@ const Login = () => {
     return (
         <section
             className="main-container vh-100"
-            style={{ backgroundColor: "#eee", overflowY: "hidden" }}
+            style={{ backgroundColor: "#eee" }}
         >
             <div className="container h-100" style={{ marginTop: "2rem" }}>
                 <div className="row d-flex justify-content-center align-items-center h-100">
@@ -63,7 +63,7 @@ const Login = () => {
                                         </div>
                                         <form className="mx-1 mx-md-4">
                                             <div className="d-flex flex-row align-items-center mb-4">
-                                                <i className="fas fa-user fa-lg me-3 fa-fw"></i>
+                                                <i className="fas fa-user fa-lg me-3 fa-fw mb-4"></i>
                                                 <div className="form-outline flex-fill mb-0">
                                                     <input
                                                         onChange={(e) =>
@@ -76,16 +76,18 @@ const Login = () => {
                                                         value={username}
                                                         className="form-control"
                                                     />
-                                                    <label
-                                                        className="form-label"
-                                                        htmlFor="form3Example1c"
-                                                    >
-                                                        Username
-                                                    </label>
+                                                    <strong>
+                                                        <label
+                                                            className="form-label"
+                                                            htmlFor="form3Example1c"
+                                                        >
+                                                            Username
+                                                        </label>
+                                                    </strong>
                                                 </div>
                                             </div>
                                             <div className="d-flex flex-row align-items-center mb-4">
-                                                <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
+                                                <i className="fas fa-lock fa-lg me-3 fa-fw  mb-4"></i>
                                                 <div className="form-outline flex-fill mb-0">
                                                     <input
                                                         onChange={(e) =>
@@ -98,15 +100,24 @@ const Login = () => {
                                                         value={password}
                                                         className="form-control"
                                                     />
-                                                    <label
-                                                        className="form-label"
-                                                        htmlFor="form3Example4c"
-                                                    >
-                                                        Password
-                                                    </label>
+                                                    <strong>
+                                                        <label
+                                                            className="form-label"
+                                                            htmlFor="form3Example4c"
+                                                        >
+                                                            Password
+                                                        </label>
+                                                    </strong>
                                                 </div>
                                             </div>
-                                            <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                                            <div className="d-flex justify-content-center  mb-1 mb-lg-1">
+                                                <Link to="/reset-password">
+                                                    <p className="reset-password-p-u">
+                                                        Reset password
+                                                    </p>
+                                                </Link>
+                                            </div>
+                                            <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-3">
                                                 <button
                                                     onClick={handleLogin}
                                                     type="button"
@@ -115,8 +126,10 @@ const Login = () => {
                                                     Login
                                                 </button>
                                             </div>
-                                            <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                                Don't have an account yet?
+                                            <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-2">
+                                                <strong>
+                                                    Don't have an account yet?
+                                                </strong>
                                             </div>
                                             <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                                                 <Link to="/register">

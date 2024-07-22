@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -54,6 +54,33 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware'
 ]
 
+# settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+    },
+}
+
+
 ROOT_URLCONF = 'forum.urls'
 
 TEMPLATES = [
@@ -83,6 +110,10 @@ DATABASES = {
         'NAME': BASE_DIR / os.getenv('DB_NAME', 'db.sqlite3'),
     }
 }
+# SMTP server
+ENV_SMTP_SERVER = os.getenv('SMTP_SERVER')
+ENV_SMTP_USER = os.getenv('SMTP_USER')
+ENV_SMTP_PASS = os.getenv('SMTP_PASS')
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -117,3 +148,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', )
 }
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'assets')]
