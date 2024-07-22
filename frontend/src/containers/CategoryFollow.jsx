@@ -9,6 +9,8 @@ const CategoryFollow = ({
     length,
     refreshUserData,
 }) => {
+    const categoryArray = Array.isArray(categories) ? categories : [];
+
     return (
         <div
             className="category-follow-card card"
@@ -20,7 +22,7 @@ const CategoryFollow = ({
         >
             <div className="card-body">
                 <p className="ml-1 mb-0">Available categories:</p>
-                {categories.map((category) => (
+                {categoryArray.map((category) => (
                     <Following
                         key={category.name}
                         setLength={setLength}
