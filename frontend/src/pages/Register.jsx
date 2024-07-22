@@ -68,7 +68,7 @@ const Register = () => {
         }
 
         axios
-            .post("http://localhost:8000/register/", formData, {
+            .post("backend/register/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -96,12 +96,14 @@ const Register = () => {
                     <div className="col-lg-12 col-xl-11">
                         <div className={`card ${styles.card}`}>
                             <div className="card-body p-md-5">
+                                <div className="text-center h1 fw-bold mb-5 mx-md-4 mt-4">
+                                    <Logo size="50px" />
+                                    &nbsp;Register
+                                </div>
                                 <div className="row justify-content-center">
-                                    <div className="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
-                                        <div className="text-center h1 fw-bold mb-5 mx-md-4 mt-4">
-                                            <Logo size="50px" />
-                                            &nbsp;Register
-                                        </div>
+                                    <div
+                                        className={`col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1 ${styles.formContainer}`}
+                                    >
                                         <form className="mx-1 mx-md-4">
                                             <FormField
                                                 icon="fas fa-user fa-lg fa-fw"
@@ -151,7 +153,7 @@ const Register = () => {
                                                 setValue={setConfirmation}
                                                 id="confirmation"
                                             />
-                                            <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                                            <div className="d-flex justify-content-center mx-4 mb-1 mb-lg-1">
                                                 <button
                                                     onClick={handleRegister}
                                                     type="button"
@@ -160,8 +162,8 @@ const Register = () => {
                                                     Register
                                                 </button>
                                             </div>
-                                            <div className="d-flex justify-content-center mx-4 mb-1 mb-lg-4">
-                                                Already have an account?
+                                            <div className="d-flex justify-content-center mx-1 mb-1 mb-lg-1">
+                                                <strong>Or...</strong>
                                             </div>
                                             <div className="d-flex justify-content-center mb-3 mb-lg-4">
                                                 <Link to="/">
@@ -169,13 +171,15 @@ const Register = () => {
                                                         type="button"
                                                         className={`btn btn-dark btn-lg ${styles.btnDark}`}
                                                     >
-                                                        Login
+                                                        Back
                                                     </button>
                                                 </Link>
                                             </div>
                                         </form>
                                     </div>
-                                    <div className="col-md-10 col-lg-6 col-xl-6 d-flex align-items-center flex-column order-1 order-lg-2">
+                                    <div
+                                        className={`col-md-10 col-lg-6 col-xl-6 d-flex align-items-center flex-column order-1 order-lg-2 ${styles.profilePictureContainer}`}
+                                    >
                                         <RegisterProfilePicture
                                             setProfilePicture={
                                                 setProfilePicture

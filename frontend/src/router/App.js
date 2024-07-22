@@ -11,6 +11,7 @@ import Profile from "../pages/Profile";
 import Community from "../pages/Community";
 import Feed from "../pages/Feed";
 import NotFound from "../pages/NotFound";
+import ResetPassword from "../pages/ResetPassword";
 
 function App() {
     const token = window.localStorage.getItem("token");
@@ -28,7 +29,7 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8000/user/", {
+                const response = await axios.get("backend/user/", {
                     headers: {
                         Authorization: token,
                     },
@@ -36,7 +37,7 @@ function App() {
 
                 const user = response.data.user_info;
                 setLoggedUser(user);
-                setProfilePictureUrl(`http://localhost:8000/profile-picture/${user.id}/`);
+                setProfilePictureUrl(`backend/profile-picture/${user.id}/`);
                 setIsValid(true);
             } catch (error) {
                 console.log(error);
@@ -47,7 +48,7 @@ function App() {
             }
 
             try {
-                const response = await axios.get("http://localhost:8000/all-categories");
+                const response = await axios.get("backend/all-categories");
                 setCategories(response.data);
             } catch (error) {
                 console.log(error);
@@ -119,6 +120,10 @@ function App() {
                 <Route
                     path="/register"
                     element={!isValid ? <Register /> : <Navigate to="/forum" />}
+                />
+                <Route
+                    path="/reset-password"
+                    element={!isValid ? <ResetPassword /> : <Navigate to="/forum" />}
                 />
                 <Route path="/redirect" element={<Redirect />} />
                 <Route path="*" element={<NotFound />} />

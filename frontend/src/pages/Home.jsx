@@ -16,17 +16,14 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get(
-                "http://localhost:8000/all-posts/"
-            );
+            const response = await Axios.get("backend/all-posts/");
             const postArray = response.data;
             const enrichedPosts = await Promise.all(
                 postArray.map(async (post) => {
                     try {
-                        const res = await Axios.post(
-                            "http://localhost:8000/postData/",
-                            { post_id: post.id }
-                        );
+                        const res = await Axios.post("backend/postData/", {
+                            post_id: post.id,
+                        });
                         return {
                             ...post,
                             likes: res.data.likes,

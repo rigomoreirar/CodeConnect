@@ -30,4 +30,6 @@ urlpatterns = [
     path('posts-by-user-categories/', views.posts_by_user_categories, name='postsByUserCategories'),
     path('profile-picture/<int:user_id>/', views.get_profile_picture, name='getProfilePicture'),
     path('change-profile-picture/', views.change_profile_picture, name='changeProfilePicture'),
+    path('send-test-email/', views.send_test_email, name='sendTestEmail'),
+    path('reset-user-password/', views.reset_user_password, name='resetUserPassword'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

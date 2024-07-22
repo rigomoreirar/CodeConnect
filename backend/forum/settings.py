@@ -110,6 +110,10 @@ DATABASES = {
         'NAME': BASE_DIR / os.getenv('DB_NAME', 'db.sqlite3'),
     }
 }
+# SMTP server
+ENV_SMTP_SERVER = os.getenv('SMTP_SERVER')
+ENV_SMTP_USER = os.getenv('SMTP_USER')
+ENV_SMTP_PASS = os.getenv('SMTP_PASS')
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

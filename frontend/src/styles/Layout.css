@@ -3,8 +3,34 @@
 }
 
 .main-container {
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+}
+
+.btn-sm {
+    margin-top: -5rem;
+}
+
+@media (max-width: 768px) {
+    .btn-sm {
+        margin-top: -5rem;
+        margin-left: -8rem;
+    }
+
+    .resetingcard {
+        height: 35rem !important;
+    }
+}
+
+.resetingcard {
+    margin-top: 5rem;
+    height: 23rem;
+    width: 50rem;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 25px;
 }
