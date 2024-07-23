@@ -15,9 +15,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get(
-                "http://localhost:8000/all-posts/"
-            );
+            const response = await Axios.get("/backend/all-posts/");
             const postArray = Array.isArray(response.data) ? response.data : [];
 
             const newPosts = [];
@@ -25,7 +23,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
 
             for (const post of postArray) {
                 const postDataResponse = await Axios.post(
-                    "http://localhost:8000/postData/",
+                    "/backend/postData/",
                     {
                         post_id: post.id,
                     }

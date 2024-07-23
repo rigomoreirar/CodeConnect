@@ -21,20 +21,15 @@ const Home = ({ currentUser, setLoggedUser }) => {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get(
-                "http://localhost:8000/all-posts/"
-            );
+            const response = await Axios.get("/backend/all-posts/");
             const postArray = Array.isArray(response.data) ? response.data : [];
 
             const enrichedPosts = await Promise.all(
                 postArray.map(async (post) => {
                     try {
-                        const res = await Axios.post(
-                            "http://localhost:8000/postData/",
-                            {
-                                post_id: post.id,
-                            }
-                        );
+                        const res = await Axios.post("/backend/postData/", {
+                            post_id: post.id,
+                        });
                         return {
                             ...post,
                             likes: Array.isArray(res.data.likes)
@@ -66,9 +61,7 @@ const Home = ({ currentUser, setLoggedUser }) => {
 
     const fetchCategories = async () => {
         try {
-            const response = await Axios.get(
-                "http://localhost:8000/all-categories/"
-            );
+            const response = await Axios.get("/backend/all-categories/");
             const categoriesArray = Array.isArray(response.data)
                 ? response.data
                 : [];
