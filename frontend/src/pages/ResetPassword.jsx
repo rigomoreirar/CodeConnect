@@ -11,7 +11,7 @@ const ResetPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("backend/reset-user-password/", {
+            const response = await fetch("/backend/reset-user-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
