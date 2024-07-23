@@ -16,7 +16,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
     const fetchData = async () => {
         try {
             const response = await Axios.get("backend/all-posts/");
-            const postArray = response.data;
+            const postArray = Array.isArray(response.data) ? response.data : [];
 
             const newPosts = [];
             const newAllPosts = [];
@@ -28,9 +28,15 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
 
                 let newPost = {
                     ...post,
-                    likes: postDataResponse.data.likes,
-                    dislikes: postDataResponse.data.dislikes,
-                    comments: postDataResponse.data.comments,
+                    likes: Array.isArray(postDataResponse.data.likes)
+                        ? postDataResponse.data.likes
+                        : [],
+                    dislikes: Array.isArray(postDataResponse.data.dislikes)
+                        ? postDataResponse.data.dislikes
+                        : [],
+                    comments: Array.isArray(postDataResponse.data.comments)
+                        ? postDataResponse.data.comments
+                        : [],
                 };
 
                 if (
@@ -96,7 +102,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
         <>
             <div className="home-container">
                 <Filters
-                    categories={categories}
+                    categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                 />

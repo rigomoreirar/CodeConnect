@@ -110,16 +110,19 @@ const Posts = ({
     };
 
     useEffect(() => {
-        likes.forEach((like) => {
-            if (like.profile === currentUser.username) {
-                setLikeFill(true);
-            }
-        });
-        dislikes.forEach((dislike) => {
-            if (dislike.profile === currentUser.username) {
-                setDislikeFill(true);
-            }
-        });
+        Array.isArray(likes) &&
+            likes.forEach((like) => {
+                if (like.profile === currentUser.username) {
+                    setLikeFill(true);
+                }
+            });
+
+        Array.isArray(dislikes) &&
+            dislikes.forEach((dislike) => {
+                if (dislike.profile === currentUser.username) {
+                    setDislikeFill(true);
+                }
+            });
     }, [currentPost, currentUser, likes, dislikes]);
 
     return (
@@ -149,13 +152,14 @@ const Posts = ({
                             <div className="">
                                 <h6 className="text-body">{title}</h6>
                                 <section id="cats">
-                                    {categories.map((category) => (
-                                        <div key={category}>
-                                            <span className="badge badge-secondary mr-2">
-                                                {category}
-                                            </span>
-                                        </div>
-                                    ))}
+                                    {Array.isArray(categories) &&
+                                        categories.map((category) => (
+                                            <div key={category}>
+                                                <span className="badge badge-secondary mr-2">
+                                                    {category}
+                                                </span>
+                                            </div>
+                                        ))}
                                 </section>
                             </div>
                             <p>{content}</p>

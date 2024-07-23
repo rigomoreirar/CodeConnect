@@ -34,7 +34,8 @@ const Community = ({
             const response = await Axios.get(
                 `backend/posts-by-user-categories/?user_id=${currentUser.id}`
             );
-            const fetchedPosts = response.data.map(async (post) => {
+            const postArray = Array.isArray(response.data) ? response.data : [];
+            const fetchedPosts = postArray.map(async (post) => {
                 try {
                     const postDetailsResponse = await Axios.post(
                         "backend/postData/",
@@ -62,11 +63,17 @@ const Community = ({
             const response = await Axios.get(
                 `backend/user-categories/?user_id=${userId}`
             );
-            setUserCategories(response.data);
+            setUserCategories(
+                Array.isArray(response.data) ? response.data : []
+            );
             const allCategoriesResponse = await Axios.get(
                 "backend/all-categories/"
             );
-            setCategories(allCategoriesResponse.data);
+            setCategories(
+                Array.isArray(allCategoriesResponse.data)
+                    ? allCategoriesResponse.data
+                    : []
+            );
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
@@ -176,7 +183,7 @@ const Community = ({
         <>
             <div className="home-container">
                 <Filters
-                    categories={categories}
+                    categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                 />
