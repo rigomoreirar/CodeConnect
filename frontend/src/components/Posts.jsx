@@ -23,7 +23,7 @@ const Posts = ({
             if (dislikeFill) {
                 setDislikeCount(dislikeCount - 1);
                 setDislikeFill(false);
-                Axios.post("/backend/dislike/", {
+                Axios.post("http://localhost:8000/dislike/", {
                     undislike: true,
                     post: post,
                     user: currentUser,
@@ -33,7 +33,7 @@ const Posts = ({
             }
             setLikeCount(likeCount + 1);
             setLikeFill(true);
-            Axios.post("/backend/like/", {
+            Axios.post("http://localhost:8000/like/", {
                 unlike: false,
                 post: post,
                 user: currentUser,
@@ -43,7 +43,7 @@ const Posts = ({
         } else {
             setLikeCount(likeCount - 1);
             setLikeFill(false);
-            Axios.post("/backend/like/", {
+            Axios.post("http://localhost:8000/like/", {
                 unlike: true,
                 post: post,
                 user: currentUser,
@@ -59,7 +59,7 @@ const Posts = ({
             if (likeFill) {
                 setLikeCount(likeCount - 1);
                 setLikeFill(false);
-                Axios.post("/backend/like/", {
+                Axios.post("http://localhost:8000/like/", {
                     unlike: true,
                     post: post,
                     user: currentUser,
@@ -69,7 +69,7 @@ const Posts = ({
             }
             setDislikeCount(dislikeCount + 1);
             setDislikeFill(true);
-            Axios.post("/backend/dislike/", {
+            Axios.post("http://localhost:8000/dislike/", {
                 undislike: false,
                 post: post,
                 user: currentUser,
@@ -79,7 +79,7 @@ const Posts = ({
         } else {
             setDislikeCount(dislikeCount - 1);
             setDislikeFill(false);
-            Axios.post("/backend/dislike/", {
+            Axios.post("http://localhost:8000/dislike/", {
                 undislike: true,
                 post: post,
                 user: currentUser,
@@ -98,10 +98,13 @@ const Posts = ({
 
     const deleteHandler = async () => {
         try {
-            const response = await Axios.post("/backend/delete-user-post/", {
-                post: { id: post.id },
-                user: { id: currentUser.id },
-            });
+            const response = await Axios.post(
+                "http://localhost:8000/delete-user-post/",
+                {
+                    post: { id: post.id },
+                    user: { id: currentUser.id },
+                }
+            );
             console.log("Post deleted");
             onDelete(post.id); // Call the onDelete callback to update Community component
         } catch (error) {

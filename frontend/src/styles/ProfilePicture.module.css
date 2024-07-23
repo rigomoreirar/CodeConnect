@@ -5,8 +5,8 @@
 /* Smallest big screen */
 .profile-picture {
     position: relative;
-    width: 14.3rem;
-    height: 19.3rem;
+    width: 14.5rem;
+    height: 23.5rem;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -17,8 +17,8 @@
 /* Medium big screen */
 @media (min-width: 991px) and (max-width: 1200px) {
     .profile-picture {
-        width: 16.3rem;
-        height: 20.3rem;
+        width: 20.3rem;
+        height: 22.4rem;
     }
 }
 
