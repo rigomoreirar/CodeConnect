@@ -18,7 +18,7 @@ const Login = () => {
             alert("No blanks!");
             return;
         }
-        Axios.post("backend/login/", {
+        Axios.post("/backend/login/", {
             username: username,
             password: password,
         })

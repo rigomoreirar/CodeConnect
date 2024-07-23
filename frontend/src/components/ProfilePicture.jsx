@@ -24,7 +24,7 @@ const ProfilePicture = ({ userId, imageUrl, setImageUrl, refreshProfile }) => {
                 const token = window.localStorage.getItem("token");
                 if (!token) return;
 
-                await axios.post("backend/change-profile-picture/", formData, {
+                await axios.post("/backend/change-profile-picture/", formData, {
                     headers: {
                         Authorization: token,
                         "Content-Type": "multipart/form-data",
