@@ -4,18 +4,20 @@ import { useState } from "react";
 import "../styles/Comments.css";
 
 const Comments = ({ currentPost, setShowComments, currentUser }) => {
-    const [comments, setComments] = useState(currentPost.comments);
+    const [comments, setComments] = useState(
+        Array.isArray(currentPost.comments) ? currentPost.comments : []
+    );
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const renderComment = {
-            id: new Date().getDate().toString(),
+            id: new Date().getTime().toString(),
             profile: currentUser.username,
             post: currentPost,
             content: e.target.elements.content.value,
         };
         const newComment = {
-            id: new Date().getDate().toString(),
+            id: new Date().getTime().toString(),
             profile: currentUser,
             post: currentPost,
             content: e.target.elements.content.value,

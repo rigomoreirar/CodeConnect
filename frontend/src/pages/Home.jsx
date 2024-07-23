@@ -21,7 +21,8 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
     const fetchData = async () => {
         try {
             const response = await Axios.get("backend/all-posts/");
-            const postArray = response.data;
+            const postArray = Array.isArray(response.data) ? response.data : [];
+
             const enrichedPosts = await Promise.all(
                 postArray.map(async (post) => {
                     try {
@@ -30,9 +31,15 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
                         });
                         return {
                             ...post,
-                            likes: res.data.likes,
-                            dislikes: res.data.dislikes,
-                            comments: res.data.comments,
+                            likes: Array.isArray(res.data.likes)
+                                ? res.data.likes
+                                : [],
+                            dislikes: Array.isArray(res.data.dislikes)
+                                ? res.data.dislikes
+                                : [],
+                            comments: Array.isArray(res.data.comments)
+                                ? res.data.comments
+                                : [],
                         };
                     } catch (error) {
                         console.error("Error fetching post data:", error);
@@ -78,7 +85,7 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
         <>
             <div className="home-container">
                 <Filters
-                    categories={categories}
+                    categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     neededCategories={true}
