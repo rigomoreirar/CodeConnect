@@ -5,7 +5,7 @@ import Comments from "./Comments";
 import Filters from "../containers/Filters";
 import Axios from "axios";
 
-const Home = ({ currentUser, categories, setLoggedUser }) => {
+const Home = ({ currentUser, setLoggedUser }) => {
     const [posts, setPosts] = useState([]);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [post, setPost] = useState([]);
@@ -13,6 +13,7 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
     const [allPosts, setAllPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
+    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
         console.log("Categories:", categories);
@@ -20,15 +21,20 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get("/backend/all-posts/");
+            const response = await Axios.get(
+                "http://localhost:8000/all-posts/"
+            );
             const postArray = Array.isArray(response.data) ? response.data : [];
 
             const enrichedPosts = await Promise.all(
                 postArray.map(async (post) => {
                     try {
-                        const res = await Axios.post("/backend/postData/", {
-                            post_id: post.id,
-                        });
+                        const res = await Axios.post(
+                            "http://localhost:8000/postData/",
+                            {
+                                post_id: post.id,
+                            }
+                        );
                         return {
                             ...post,
                             likes: Array.isArray(res.data.likes)
@@ -58,8 +64,23 @@ const Home = ({ currentUser, categories, setLoggedUser }) => {
         }
     };
 
+    const fetchCategories = async () => {
+        try {
+            const response = await Axios.get(
+                "http://localhost:8000/all-categories/"
+            );
+            const categoriesArray = Array.isArray(response.data)
+                ? response.data
+                : [];
+            setCategories(categoriesArray);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
+
     useEffect(() => {
         fetchData();
+        fetchCategories();
     }, [currentUser]);
 
     useEffect(() => {

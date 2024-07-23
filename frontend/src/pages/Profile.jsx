@@ -21,7 +21,7 @@ const Profile = ({
             const token = window.localStorage.getItem("token");
             if (!token) return;
 
-            const response = await axios.get("/backend/user/", {
+            const response = await axios.get("http://localhost:8000/user/", {
                 headers: {
                     Authorization: token,
                 },
