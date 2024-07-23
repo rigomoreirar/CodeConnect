@@ -167,7 +167,7 @@ const Home = ({ currentUser, setLoggedUser }) => {
                     margin-top: 20px;
                     font-size: 20px;
                     font-weight: bold;
-                    padding-bottom: 20px;
+                    padding-bottom: 8rem;
                 }
                 .load-more {
                     cursor: pointer;

@@ -167,3 +167,13 @@ textarea {
 .input-group-append button:hover {
     background-color: #007bff;
 }
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .input-group {
+        margin-bottom: 8rem;
+    }
+}

@@ -32,4 +32,5 @@ urlpatterns = [
     path('change-profile-picture/', views.change_profile_picture, name='changeProfilePicture'),
     path('send-test-email/', views.send_test_email, name='sendTestEmail'),
     path('reset-user-password/', views.reset_user_password, name='resetUserPassword'),
+    path('get_last_update_time/', views.get_last_update_time, name='getLastUpdateTime'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

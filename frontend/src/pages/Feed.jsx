@@ -191,6 +191,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                     font-size: 20px;
                     font-weight: bold;
                     padding-bottom: 20px;
+                    margin-bottom: 8rem;
                 }
                 .load-more {
                     cursor: pointer;

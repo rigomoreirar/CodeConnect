@@ -33,7 +33,7 @@
 /* Small screens */
 @media (max-width: 768px) {
     .profile-picture {
-        width: 33.3rem;
+        width: 26.8rem;
         height: 23.3rem;
     }
 }

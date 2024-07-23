@@ -2,6 +2,7 @@ import os
 import smtplib
 import random
 import string
+import json
 from email.mime.text import MIMEText
 from django.conf import settings
 from rest_framework.response import Response
@@ -17,6 +18,7 @@ from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
+from datetime import datetime
 
 
 # Define the directory for profile pictures
@@ -25,18 +27,33 @@ PROFILE_PICTURE_DIR = os.path.join(settings.BASE_DIR, 'assets', 'profile-picture
 # Ensure the directory exists
 os.makedirs(PROFILE_PICTURE_DIR, exist_ok=True)
 
-# Define the directory for profile pictures
-PROFILE_PICTURE_DIR = os.path.join(settings.BASE_DIR, 'assets', 'profile-pictures')
+# Define the path for the last update file
+LAST_UPDATE_FILE = os.path.join(settings.BASE_DIR, 'last-update.json')
 
 # Ensure the directory exists
-os.makedirs(PROFILE_PICTURE_DIR, exist_ok=True)
+os.makedirs(os.path.dirname(LAST_UPDATE_FILE), exist_ok=True)
 
 # Define a logger
 logger = logging.getLogger(__name__)
 
+# Function to update the last-update.json file
+def update_last_update():
+    now = datetime.utcnow().isoformat() + 'Z'
+    with open(LAST_UPDATE_FILE, 'w') as f:
+        json.dump({"lastUpdate": now}, f)
+
+# Function to get the last update time
+def get_last_update():
+    if not os.path.exists(LAST_UPDATE_FILE):
+        return None
+    with open(LAST_UPDATE_FILE, 'r') as f:
+        data = json.load(f)
+    return data.get("lastUpdate")
+
 # Register API
 @api_view(["POST"])
 def register(request):
+    update_last_update()
     serializer = RegisterSerializers(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
@@ -68,9 +85,9 @@ def register(request):
         'token': token
     })
 
-
 @api_view(["POST"])
 def login(request):
+    update_last_update()
     serializer = AuthTokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.validated_data['user']
@@ -88,9 +105,9 @@ def login(request):
     else:
         return Response({'error': 'Invalid login details'}, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['GET'])
 def get_user_data(request):
+    update_last_update()
     user = request.user
 
     if user.is_authenticated:
@@ -123,22 +140,26 @@ def get_user_data(request):
 
 @api_view(['GET'])
 def index(request):
+    update_last_update()
     return Response({"Hello": "World!"})
 
 @api_view(['GET'])
 def allPosts(request):
+    update_last_update()
     posts = Post.objects.all()
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def allCategories(request):
+    update_last_update()
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
 def postData(request):
+    update_last_update()
     data = request.data
     likes = Like.objects.filter(post=data["post_id"])
     likes = LikeSerializer(likes, many=True).data
@@ -157,30 +178,35 @@ def postData(request):
 
 @api_view(['GET'])
 def allProfiles(request):
+    update_last_update()
     profiles = Profile.objects.all()
     serializer = ProfileSerializer(profiles, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def allLikes(request):
+    update_last_update()
     likes = Like.objects.all()
     serializer = LikeSerializer(likes, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def allDislikes(request):
+    update_last_update()
     dislikes = Dislike.objects.all()
     serializer = DislikeSerializer(dislikes, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def allComments(request):
+    update_last_update()
     comments = Comment.objects.all()
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)
 
 @api_view(["POST"])
 def like(request):
+    update_last_update()
     data = request.data
     unlike = data["unlike"]
     post = Post.objects.get(id=data["post"]["id"])
@@ -196,6 +222,7 @@ def like(request):
 
 @api_view(["POST"])
 def dislike(request):
+    update_last_update()
     data = request.data
     undislike = data["undislike"]
     post = Post.objects.get(id=data["post"]["id"])
@@ -211,6 +238,7 @@ def dislike(request):
 
 @api_view(["POST"])
 def addComment(request):
+    update_last_update()
     data = request.data
     post = Post.objects.get(id=data["post"]["id"])
     user = User.objects.get(id=data["profile"]["id"])
@@ -221,6 +249,7 @@ def addComment(request):
 
 @api_view(["POST"])
 def newPost(request):
+    update_last_update()
     data = request.data
     user = User.objects.get(id=data["creator"]["id"])
     profile = Profile.objects.get(user=user)
@@ -241,8 +270,9 @@ def newPost(request):
 
 @api_view(["POST"])
 def follow(request):
+    update_last_update()
     data = request.data
-    db_category = Category.objects.get(pk=data["id"])
+    db_category = Category.objects.get(pk(data["id"]))
     user = User.objects.get(id=data["user"]["id"])
     profile = Profile.objects.get(user=user)
 
@@ -258,6 +288,7 @@ def follow(request):
 
 @api_view(["POST"])
 def unfollow(request):
+    update_last_update()
     data = request.data
     db_category = Category.objects.get(pk=data["id"])
     user = User.objects.get(id=data["user"]["id"])
@@ -273,10 +304,9 @@ def unfollow(request):
     serializer = CategorySerializer(updated_category)
     return Response(serializer.data)
 
-logger = logging.getLogger(__name__)
-
 @api_view(["POST"])
 def delete_user_post(request):
+    update_last_update()
     data = request.data
     post_id = data["post"]["id"]
     user_id = data["user"]["id"]
@@ -307,6 +337,7 @@ def delete_user_post(request):
 
 @api_view(['POST'])
 def create_category(request):
+    update_last_update()
     user_id = request.data.get('user_id')
     name = request.data.get('name')
     if not name:
@@ -324,6 +355,7 @@ def create_category(request):
 
 @api_view(['POST'])
 def delete_category(request):
+    update_last_update()
     category_id = request.data.get('id')
     try:
         category = Category.objects.get(id=category_id)
@@ -334,6 +366,7 @@ def delete_category(request):
 
 @api_view(['GET'])
 def get_user_categories(request):
+    update_last_update()
     user_id = request.query_params.get('user_id')
     try:
         user = User.objects.get(id=user_id)
@@ -346,6 +379,7 @@ def get_user_categories(request):
 
 @api_view(['GET'])
 def posts_by_user_categories(request):
+    update_last_update()
     user_id = request.query_params.get('user_id')
     try:
         user = User.objects.get(id=user_id)
@@ -371,6 +405,7 @@ logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 def get_profile_picture(request, user_id):
+    update_last_update()
     logger.info(f"Received request for user ID: {user_id}")
     possible_extensions = ['jpg', 'jpeg', 'png']
     for ext in possible_extensions:
@@ -390,6 +425,7 @@ def get_profile_picture(request, user_id):
 
 @api_view(["POST"])
 def change_profile_picture(request):
+    update_last_update()
     user = request.user
 
     if not user.is_authenticated:
@@ -421,6 +457,7 @@ def change_profile_picture(request):
 
 @api_view(['POST'])
 def send_test_email(request):
+    update_last_update()
     user_email = request.data.get('email')
     if not user_email:
         return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -458,10 +495,9 @@ def send_test_email(request):
         logger.error(f"Error sending email: {str(e)}")
         return Response({'error': 'Error sending email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
 @api_view(['POST'])
 def reset_user_password(request):
+    update_last_update()
     email = request.data.get('email')
     if not email:
         return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -513,3 +549,11 @@ def reset_user_password(request):
     except Exception as e:
         logger.error(f"Error sending email: {str(e)}")
         return Response({'error': 'Error sending email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def get_last_update_time(request):
+    last_update = get_last_update()
+    if last_update:
+        return Response({'lastUpdate': last_update}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'No update record found'}, status=status.HTTP_404_NOT_FOUND)

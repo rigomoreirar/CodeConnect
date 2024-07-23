@@ -88,16 +88,20 @@ const Profile = ({
                             </div>
                             <div className="col-md-8 col-lg-8">
                                 <div className="d-flex flex-column">
-                                    <div className="d-flex flex-row justify-content-between align-items-center p-5 bg-dark text-white">
-                                        <h3 className="display-5">
-                                            {first_name} {last_name}
-                                        </h3>
-                                        <h5>@{username}</h5>
+                                    <div className="d-flex justify-content-center">
+                                        <div className="d-flex flex-row justify-content-between align-items-center p-5 bg-dark text-white name-username-container">
+                                            <h3 className="display-5">
+                                                {first_name} {last_name}
+                                            </h3>
+                                            <h5>@{username}</h5>
+                                        </div>
                                     </div>
-                                    <div className="p-3 bg-black text-white">
-                                        <h6>{email}</h6>
+                                    <div className="d-flex justify-content-center">
+                                        <div className="p-3 bg-black text-white email-container-profile">
+                                            <h6>{email}</h6>
+                                        </div>
                                     </div>
-                                    <div className="d-flex flex-row text-white">
+                                    <div className="skill-block-container">
                                         <InfoBlock
                                             color="bg-success"
                                             title="Likes"
