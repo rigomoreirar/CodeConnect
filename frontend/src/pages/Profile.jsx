@@ -13,21 +13,8 @@ const Profile = ({
     setProfilePictureUrl,
 }) => {
     const [modal, setModal] = useState(false);
-    const [ctgFollowingLength, setCtgFollowingLength] = useState(
-        currentUser.profile_data.ctg_following.length
-    );
+    const [ctgFollowingLength, setCtgFollowingLength] = useState(0);
     const [loading, setLoading] = useState(true);
-
-    const {
-        email,
-        first_name,
-        last_name,
-        likes,
-        dislikes,
-        comments,
-        profile_data: { ctg_following },
-        username,
-    } = currentUser;
 
     const fetchUserData = async () => {
         try {
@@ -50,8 +37,12 @@ const Profile = ({
     };
 
     useEffect(() => {
-        setCtgFollowingLength(ctg_following.length);
-    }, [ctg_following]);
+        if (currentUser && currentUser.profile_data) {
+            setCtgFollowingLength(
+                currentUser.profile_data.ctg_following.length
+            );
+        }
+    }, [currentUser]);
 
     useEffect(() => {
         fetchUserData();
@@ -62,6 +53,16 @@ const Profile = ({
             fetchUserData();
         }
     }, [modal]);
+
+    // Default values to avoid destructuring errors
+    const email = currentUser?.email || "";
+    const first_name = currentUser?.first_name || "";
+    const last_name = currentUser?.last_name || "";
+    const likes = currentUser?.likes || [];
+    const dislikes = currentUser?.dislikes || [];
+    const comments = currentUser?.comments || [];
+    const ctg_following = currentUser?.profile_data?.ctg_following || [];
+    const username = currentUser?.username || "";
 
     return (
         <>
