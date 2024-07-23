@@ -74,6 +74,7 @@ const Community = ({
                     ? allCategoriesResponse.data
                     : []
             );
+            console.log("All categories in community:", allCategoriesResponse);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
