@@ -32,13 +32,13 @@ const Community = ({
         setIsLoading(true);
         try {
             const response = await Axios.get(
-                `/backend/posts-by-user-categories/?user_id=${currentUser.id}`
+                `http://localhost:8000/posts-by-user-categories/?user_id=${currentUser.id}`
             );
             const postArray = Array.isArray(response.data) ? response.data : [];
             const fetchedPosts = postArray.map(async (post) => {
                 try {
                     const postDetailsResponse = await Axios.post(
-                        "/backend/postData/",
+                        "http://localhost:8000/postData/",
                         { post_id: post.id }
                     );
                     return { ...post, ...postDetailsResponse.data };
@@ -61,13 +61,13 @@ const Community = ({
         const userId = currentUser.id;
         try {
             const response = await Axios.get(
-                `/backend/user-categories/?user_id=${userId}`
+                `http://localhost:8000/user-categories/?user_id=${userId}`
             );
             setUserCategories(
                 Array.isArray(response.data) ? response.data : []
             );
             const allCategoriesResponse = await Axios.get(
-                "/backend/all-categories/"
+                "http://localhost:8000/all-categories/"
             );
             setCategories(
                 Array.isArray(allCategoriesResponse.data)
@@ -141,7 +141,10 @@ const Community = ({
         }
 
         try {
-            const response = await Axios.post("/backend/new-post/", post);
+            const response = await Axios.post(
+                "http://localhost:8000/new-post/",
+                post
+            );
             console.log("New Post Response:", response.data);
             fetchPosts();
         } catch (error) {
@@ -159,7 +162,7 @@ const Community = ({
         const categoryName = formData.get("category");
 
         try {
-            await Axios.post("/backend/create-category/", {
+            await Axios.post("http://localhost:8000/create-category/", {
                 name: categoryName,
                 user_id: currentUser.id,
             });
@@ -171,7 +174,7 @@ const Community = ({
 
     const handleCategoryDelete = async (categoryId) => {
         try {
-            await Axios.post("/backend/delete-category/", {
+            await Axios.post("http://localhost:8000/delete-category/", {
                 id: categoryId,
             });
             fetchCategories(); // Refresh categories after deletion
