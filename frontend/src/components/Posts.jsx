@@ -9,85 +9,104 @@ const Posts = ({
     setShowComments,
     setPost,
     deleteOption = false,
-    onDelete, // Add onDelete prop
+    onDelete,
+    onCommentAdded,
 }) => {
-    const { content, title, likes, dislikes, comments, categories } = post;
+    const {
+        content,
+        title,
+        likes = [],
+        dislikes = [],
+        comments = [],
+        categories = [],
+    } = post;
     const [likeFill, setLikeFill] = useState(false);
     const [likeCount, setLikeCount] = useState(likes.length);
     const [dislikeFill, setDislikeFill] = useState(false);
     const [dislikeCount, setDislikeCount] = useState(dislikes.length);
     const [currentPost, setCurrentPost] = useState(null);
 
-    const likeHandler = (likes) => {
-        if (!likeFill) {
-            if (dislikeFill) {
-                setDislikeCount(dislikeCount - 1);
-                setDislikeFill(false);
-                Axios.post("http://localhost:8000/dislike/", {
-                    undislike: true,
-                    post: post,
-                    user: currentUser,
-                })
-                    .then((response) => console.log("boom"))
-                    .catch((error) => console.log(error));
-            }
-            setLikeCount(likeCount + 1);
-            setLikeFill(true);
-            Axios.post("http://localhost:8000/like/", {
-                unlike: false,
-                post: post,
-                user: currentUser,
-            })
-                .then((response) => console.log("boom"))
-                .catch((error) => console.log(error));
-        } else {
-            setLikeCount(likeCount - 1);
-            setLikeFill(false);
-            Axios.post("http://localhost:8000/like/", {
-                unlike: true,
-                post: post,
-                user: currentUser,
-            })
-                .then((response) => console.log("boom"))
-                .catch((error) => console.log(error));
-        }
-        console.log(likes);
+    const updateLikesDislikes = (updatedLikes, updatedDislikes) => {
+        const postLikes = updatedLikes.filter((like) => like.post === post.id);
+        const postDislikes = updatedDislikes.filter(
+            (dislike) => dislike.post === post.id
+        );
+        setLikeCount(postLikes.length);
+        setLikeFill(
+            postLikes.some((like) => like.profile === currentUser.username)
+        );
+        setDislikeCount(postDislikes.length);
+        setDislikeFill(
+            postDislikes.some(
+                (dislike) => dislike.profile === currentUser.username
+            )
+        );
     };
 
-    const dislikeHandler = (dislikes) => {
-        if (!dislikeFill) {
-            if (likeFill) {
+    const likeHandler = async () => {
+        try {
+            if (!likeFill) {
+                if (dislikeFill) {
+                    setDislikeCount(dislikeCount - 1);
+                    setDislikeFill(false);
+                    await Axios.post("/backend/dislike/", {
+                        undislike: true,
+                        post: post,
+                        user: currentUser,
+                    });
+                }
+                setLikeCount(likeCount + 1);
+                setLikeFill(true);
+                await Axios.post("/backend/like/", {
+                    unlike: false,
+                    post: post,
+                    user: currentUser,
+                });
+            } else {
                 setLikeCount(likeCount - 1);
                 setLikeFill(false);
-                Axios.post("http://localhost:8000/like/", {
+                await Axios.post("/backend/like/", {
                     unlike: true,
                     post: post,
                     user: currentUser,
-                })
-                    .then((response) => console.log("boom"))
-                    .catch((error) => console.log(error));
+                });
             }
-            setDislikeCount(dislikeCount + 1);
-            setDislikeFill(true);
-            Axios.post("http://localhost:8000/dislike/", {
-                undislike: false,
-                post: post,
-                user: currentUser,
-            })
-                .then((response) => console.log("boom"))
-                .catch((error) => console.log(error));
-        } else {
-            setDislikeCount(dislikeCount - 1);
-            setDislikeFill(false);
-            Axios.post("http://localhost:8000/dislike/", {
-                undislike: true,
-                post: post,
-                user: currentUser,
-            })
-                .then((response) => console.log("boom"))
-                .catch((error) => console.log(error));
+        } catch (error) {
+            console.log(error);
         }
-        console.log(dislikes);
+    };
+
+    const dislikeHandler = async () => {
+        try {
+            if (!dislikeFill) {
+                if (likeFill) {
+                    setLikeCount(likeCount - 1);
+                    setLikeFill(false);
+                    await Axios.post("/backend/like/", {
+                        unlike: true,
+                        post: post,
+                        user: currentUser,
+                    });
+                }
+                setDislikeCount(dislikeCount + 1);
+                setDislikeFill(true);
+                await Axios.post("/backend/dislike/", {
+                    undislike: false,
+                    post: post,
+                    user: currentUser,
+                });
+            } else {
+                setDislikeCount(dislikeCount - 1);
+                setDislikeFill(false);
+                await Axios.post("/backend/dislike/", {
+                    undislike: true,
+                    post: post,
+                    user: currentUser,
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const commentsHandler = () => {
@@ -98,15 +117,12 @@ const Posts = ({
 
     const deleteHandler = async () => {
         try {
-            const response = await Axios.post(
-                "http://localhost:8000/delete-user-post/",
-                {
-                    post: { id: post.id },
-                    user: { id: currentUser.id },
-                }
-            );
+            await Axios.post("/backend/delete-user-post/", {
+                post: { id: post.id },
+                user: { id: currentUser.id },
+            });
             console.log("Post deleted");
-            onDelete(post.id); // Call the onDelete callback to update Community component
+            onDelete(post.id);
         } catch (error) {
             console.error("Error deleting post:", error);
         }
@@ -127,6 +143,25 @@ const Posts = ({
                 }
             });
     }, [currentPost, currentUser, likes, dislikes]);
+
+    useEffect(() => {
+        const eventSourceLikes = new EventSource("/backend/sse/likes/");
+        eventSourceLikes.onmessage = (event) => {
+            const updatedLikes = JSON.parse(event.data);
+            updateLikesDislikes(updatedLikes, dislikes);
+        };
+
+        const eventSourceDislikes = new EventSource("/backend/sse/dislikes/");
+        eventSourceDislikes.onmessage = (event) => {
+            const updatedDislikes = JSON.parse(event.data);
+            updateLikesDislikes(likes, updatedDislikes);
+        };
+
+        return () => {
+            eventSourceLikes.close();
+            eventSourceDislikes.close();
+        };
+    }, [post.id, currentUser.username]);
 
     return (
         <div
@@ -169,7 +204,7 @@ const Posts = ({
                         </div>
                         <div className="text-muted small text-center align-self-center align-items-center">
                             <span
-                                onClick={() => likeHandler(likes)}
+                                onClick={likeHandler}
                                 className=" d-sm-inline-block"
                             >
                                 {likeFill ? (
@@ -180,7 +215,7 @@ const Posts = ({
                                 {likeCount}
                             </span>
                             <span
-                                onClick={() => dislikeHandler(dislikes)}
+                                onClick={dislikeHandler}
                                 className=" d-sm-inline-block ml-2"
                             >
                                 {dislikeFill ? (

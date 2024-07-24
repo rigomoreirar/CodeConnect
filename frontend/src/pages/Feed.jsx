@@ -15,50 +15,36 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get(
-                "http://localhost:8000/all-posts/"
-            );
+            const response = await Axios.get("/backend/all-posts/");
             const postArray = Array.isArray(response.data) ? response.data : [];
 
-            const newPosts = [];
-            const newAllPosts = [];
-
-            for (const post of postArray) {
-                const postDataResponse = await Axios.post(
-                    "http://localhost:8000/postData/",
-                    {
-                        post_id: post.id,
+            const enrichedPosts = await Promise.all(
+                postArray.map(async (post) => {
+                    try {
+                        const res = await Axios.post("/backend/postData/", {
+                            post_id: post.id,
+                        });
+                        return {
+                            ...post,
+                            likes: Array.isArray(res.data.likes)
+                                ? res.data.likes
+                                : [],
+                            dislikes: Array.isArray(res.data.dislikes)
+                                ? res.data.dislikes
+                                : [],
+                            comments: Array.isArray(res.data.comments)
+                                ? res.data.comments
+                                : [],
+                        };
+                    } catch (error) {
+                        console.error("Error fetching post data:", error);
+                        return post;
                     }
-                );
+                })
+            );
 
-                let newPost = {
-                    ...post,
-                    likes: Array.isArray(postDataResponse.data.likes)
-                        ? postDataResponse.data.likes
-                        : [],
-                    dislikes: Array.isArray(postDataResponse.data.dislikes)
-                        ? postDataResponse.data.dislikes
-                        : [],
-                    comments: Array.isArray(postDataResponse.data.comments)
-                        ? postDataResponse.data.comments
-                        : [],
-                };
-
-                if (
-                    !newPost.isStudent &&
-                    newPost.categories.some((category) =>
-                        currentUser.profile_data.ctg_following.includes(
-                            category
-                        )
-                    )
-                ) {
-                    newPosts.push(newPost);
-                }
-                newAllPosts.push(newPost);
-            }
-
-            setPosts(newPosts);
-            setAllPosts(newAllPosts);
+            setPosts(enrichedPosts);
+            setAllPosts(enrichedPosts);
             setLoading(false);
         } catch (error) {
             console.error(error);
@@ -68,6 +54,60 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
 
     useEffect(() => {
         fetchData();
+
+        const postsEventSource = new EventSource("/backend/sse/posts/");
+        postsEventSource.onmessage = (event) => {
+            try {
+                console.log("Posts event data:", event.data);
+                const updatedPosts = JSON.parse(event.data);
+                setAllPosts(updatedPosts);
+                setPosts(updatedPosts);
+            } catch (error) {
+                console.error("Error parsing posts event data:", error);
+            }
+        };
+
+        const likesEventSource = new EventSource("/backend/sse/likes/");
+        likesEventSource.onmessage = (event) => {
+            try {
+                console.log("Likes event data:", event.data);
+                const updatedLikes = JSON.parse(event.data);
+                setPosts((prevPosts) =>
+                    prevPosts.map((post) => ({
+                        ...post,
+                        likes: updatedLikes.filter(
+                            (like) => like.post === post.id
+                        ),
+                    }))
+                );
+            } catch (error) {
+                console.error("Error parsing likes event data:", error);
+            }
+        };
+
+        const dislikesEventSource = new EventSource("/backend/sse/dislikes/");
+        dislikesEventSource.onmessage = (event) => {
+            try {
+                console.log("Dislikes event data:", event.data);
+                const updatedDislikes = JSON.parse(event.data);
+                setPosts((prevPosts) =>
+                    prevPosts.map((post) => ({
+                        ...post,
+                        dislikes: updatedDislikes.filter(
+                            (dislike) => dislike.post === post.id
+                        ),
+                    }))
+                );
+            } catch (error) {
+                console.error("Error parsing dislikes event data:", error);
+            }
+        };
+
+        return () => {
+            postsEventSource.close();
+            likesEventSource.close();
+            dislikesEventSource.close();
+        };
     }, [currentUser]);
 
     useEffect(() => {
@@ -99,6 +139,36 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
         setVisiblePostsCount((prevCount) => prevCount + 15);
     };
 
+    const handleCommentAdded = (postId, newComment) => {
+        const updatedPosts = posts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: [...post.comments, newComment],
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+        setAllPosts(updatedPosts);
+    };
+
+    const handleCommentDeleted = (postId, commentId) => {
+        const updatedPosts = posts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: post.comments.filter(
+                        (comment) => comment.id !== commentId
+                    ),
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+        setAllPosts(updatedPosts);
+    };
+
     const sortedPosts = posts
         .sort((a, b) => b.id - a.id)
         .slice(0, visiblePostsCount);
@@ -121,12 +191,28 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                             <div key={post.id} className="centered-items">
                                 <Posts
                                     setPost={posts}
-                                    showCommets={showCommentsPostId === post.id}
+                                    showComments={
+                                        showCommentsPostId === post.id
+                                    }
                                     setShowComments={() =>
                                         setShowCommentsPostId(post.id)
                                     }
                                     currentUser={currentUser}
                                     post={post}
+                                    onCommentAdded={handleCommentAdded}
+                                    deleteOption={
+                                        post.user_id === currentUser.id // Only show delete option if the post belongs to the current user
+                                    }
+                                    onDelete={(postId) => {
+                                        setPosts(
+                                            posts.filter((p) => p.id !== postId)
+                                        );
+                                        setAllPosts(
+                                            allPosts.filter(
+                                                (p) => p.id !== postId
+                                            )
+                                        );
+                                    }}
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
@@ -135,6 +221,8 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                                         setShowComments={() =>
                                             setShowCommentsPostId(null)
                                         }
+                                        onCommentAdded={handleCommentAdded}
+                                        onCommentDeleted={handleCommentDeleted}
                                     />
                                 )}
                             </div>
@@ -202,8 +290,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                 }
                 .load-more:hover {
                     color: darkblue;
-                }
-            `}</style>
+                }`}</style>
         </>
     );
 };

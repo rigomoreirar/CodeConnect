@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import CategoryFollow from "../containers/CategoryFollow";
 import "../styles/Profile.css";
@@ -15,13 +16,16 @@ const Profile = ({
     const [modal, setModal] = useState(false);
     const [ctgFollowingLength, setCtgFollowingLength] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [totalLikes, setTotalLikes] = useState(0);
+    const [totalDislikes, setTotalDislikes] = useState(0);
+    const [totalComments, setTotalComments] = useState(0);
 
     const fetchUserData = async () => {
         try {
             const token = window.localStorage.getItem("token");
             if (!token) return;
 
-            const response = await axios.get("http://localhost:8000/user/", {
+            const response = await axios.get("/backend/user/", {
                 headers: {
                     Authorization: token,
                 },
@@ -36,11 +40,47 @@ const Profile = ({
         }
     };
 
+    const fetchTotalLikes = async () => {
+        try {
+            const response = await axios.get(
+                `/backend/total-likes-by-user/?user_id=${currentUser.id}`
+            );
+            setTotalLikes(response.data.total_likes);
+        } catch (error) {
+            console.error("Error fetching total likes:", error);
+        }
+    };
+
+    const fetchTotalDislikes = async () => {
+        try {
+            const response = await axios.get(
+                `/backend/total-dislikes-by-user/?user_id=${currentUser.id}`
+            );
+            setTotalDislikes(response.data.total_dislikes);
+        } catch (error) {
+            console.error("Error fetching total dislikes:", error);
+        }
+    };
+
+    const fetchTotalComments = async () => {
+        try {
+            const response = await axios.get(
+                `/backend/total-comments-by-user/?user_id=${currentUser.id}`
+            );
+            setTotalComments(response.data.total_comments);
+        } catch (error) {
+            console.error("Error fetching total comments:", error);
+        }
+    };
+
     useEffect(() => {
         if (currentUser && currentUser.profile_data) {
             setCtgFollowingLength(
                 currentUser.profile_data.ctg_following.length
             );
+            fetchTotalLikes();
+            fetchTotalDislikes();
+            fetchTotalComments();
         }
     }, [currentUser]);
 
@@ -54,13 +94,42 @@ const Profile = ({
         }
     }, [modal]);
 
+    useEffect(() => {
+        const eventSourceLikes = new EventSource(
+            `/backend/sse-total-likes/${currentUser.id}/`
+        );
+        eventSourceLikes.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setTotalLikes(data.total_likes);
+        };
+
+        const eventSourceDislikes = new EventSource(
+            `/backend/sse-total-dislikes/${currentUser.id}/`
+        );
+        eventSourceDislikes.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setTotalDislikes(data.total_dislikes);
+        };
+
+        const eventSourceComments = new EventSource(
+            `/backend/sse-total-comments/${currentUser.id}/`
+        );
+        eventSourceComments.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setTotalComments(data.total_comments);
+        };
+
+        return () => {
+            eventSourceLikes.close();
+            eventSourceDislikes.close();
+            eventSourceComments.close();
+        };
+    }, [currentUser.id]);
+
     // Default values to avoid destructuring errors
     const email = currentUser?.email || "";
     const first_name = currentUser?.first_name || "";
     const last_name = currentUser?.last_name || "";
-    const likes = currentUser?.likes || [];
-    const dislikes = currentUser?.dislikes || [];
-    const comments = currentUser?.comments || [];
     const ctg_following = currentUser?.profile_data?.ctg_following || [];
     const username = currentUser?.username || "";
 
@@ -98,24 +167,43 @@ const Profile = ({
                                     </div>
                                     <div className="d-flex justify-content-center">
                                         <div className="p-3 bg-black text-white email-container-profile">
-                                            <h6>{email}</h6>
+                                            <div>
+                                                <h6>{email}</h6>
+                                            </div>
+                                            <div className="d-flex flex-row justify-content-between change-profile-buttons">
+                                                <Link
+                                                    to={{
+                                                        pathname:
+                                                            "/forum/edit-profile",
+                                                    }}
+                                                    className="btn btn-primary mr-2"
+                                                >
+                                                    Edit Profile
+                                                </Link>
+                                                <Link
+                                                    to="/forum/new-password"
+                                                    className="btn btn-secondary"
+                                                >
+                                                    Reset Password
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="skill-block-container">
                                         <InfoBlock
                                             color="bg-success"
                                             title="Likes"
-                                            count={likes.length}
+                                            count={totalLikes}
                                         />
                                         <InfoBlock
                                             color="bg-secondary"
                                             title="Comments"
-                                            count={comments.length}
+                                            count={totalComments}
                                         />
                                         <InfoBlock
                                             color="bg-danger"
                                             title="Dislikes"
-                                            count={dislikes.length}
+                                            count={totalDislikes}
                                         />
                                         <div
                                             onClick={() => setModal(!modal)}

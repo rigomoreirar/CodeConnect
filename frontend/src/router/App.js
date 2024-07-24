@@ -12,6 +12,8 @@ import Community from "../pages/Community";
 import Feed from "../pages/Feed";
 import NotFound from "../pages/NotFound";
 import ResetPassword from "../pages/ResetPassword";
+import EditProfile from "../pages/EditProfile";
+import NewPassword  from "../pages/NewPassword";
 
 function App() {
     const token = window.localStorage.getItem("token");
@@ -29,7 +31,7 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8000/user/", {
+                const response = await axios.get("/backend/user/", {
                     headers: {
                         Authorization: token,
                     },
@@ -37,7 +39,7 @@ function App() {
 
                 const user = response.data.user_info;
                 setLoggedUser(user);
-                setProfilePictureUrl(`http://localhost:8000/profile-picture/${user.id}/`);
+                setProfilePictureUrl(`/backend/profile-picture/${user.id}/`);
                 setIsValid(true);
             } catch (error) {
                 console.log(error);
@@ -47,15 +49,19 @@ function App() {
                 setIsValid(false);
             }
 
-            try {
-                const response = await axios.get("http://localhost:8000/all-categories");
-                setCategories(response.data);
-            } catch (error) {
-                console.log(error);
-            }
         };
 
         fetchData();
+
+        const eventSource = new EventSource("/backend/sse/categories/");
+        eventSource.onmessage = (event) => {
+            const updatedCategories = JSON.parse(event.data);
+            setCategories(updatedCategories);
+        };
+
+        return () => {
+            eventSource.close();
+        };
     }, [token]);
 
     return (
@@ -113,6 +119,22 @@ function App() {
                                 categories={categories}
                                 currentUser={loggedUser}
                                 setLoggedUser={setLoggedUser}
+                            />
+                        }
+                    />
+                    <Route
+                        path="edit-profile"
+                        element={
+                            <EditProfile
+                                currentUser={loggedUser}
+                            />
+                        }
+                    />
+                    <Route
+                        path="new-password"
+                        element={
+                            <NewPassword
+                                currentUser={loggedUser}
                             />
                         }
                     />

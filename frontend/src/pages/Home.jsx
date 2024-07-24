@@ -15,26 +15,17 @@ const Home = ({ currentUser, setLoggedUser }) => {
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
     const [categories, setCategories] = useState([]);
 
-    useEffect(() => {
-        console.log("Categories:", categories);
-    }, [categories]);
-
     const fetchData = async () => {
         try {
-            const response = await Axios.get(
-                "http://localhost:8000/all-posts/"
-            );
+            const response = await Axios.get("/backend/all-posts/");
             const postArray = Array.isArray(response.data) ? response.data : [];
 
             const enrichedPosts = await Promise.all(
                 postArray.map(async (post) => {
                     try {
-                        const res = await Axios.post(
-                            "http://localhost:8000/postData/",
-                            {
-                                post_id: post.id,
-                            }
-                        );
+                        const res = await Axios.post("/backend/postData/", {
+                            post_id: post.id,
+                        });
                         return {
                             ...post,
                             likes: Array.isArray(res.data.likes)
@@ -54,7 +45,6 @@ const Home = ({ currentUser, setLoggedUser }) => {
                 })
             );
 
-            console.log("Enriched Posts:", enrichedPosts);
             setAllPosts(enrichedPosts);
             setPosts(enrichedPosts);
             setLoading(false);
@@ -66,9 +56,7 @@ const Home = ({ currentUser, setLoggedUser }) => {
 
     const fetchCategories = async () => {
         try {
-            const response = await Axios.get(
-                "http://localhost:8000/all-categories/"
-            );
+            const response = await Axios.get("/backend/all-categories/");
             const categoriesArray = Array.isArray(response.data)
                 ? response.data
                 : [];
@@ -81,6 +69,36 @@ const Home = ({ currentUser, setLoggedUser }) => {
     useEffect(() => {
         fetchData();
         fetchCategories();
+
+        const postsEventSource = new EventSource("/backend/sse/posts/");
+        postsEventSource.onmessage = (event) => {
+            try {
+                console.log("Posts event data:", event.data);
+                const updatedPosts = JSON.parse(event.data);
+                setAllPosts(updatedPosts);
+                setPosts(updatedPosts);
+            } catch (error) {
+                console.error("Error parsing posts event data:", error);
+            }
+        };
+
+        const categoriesEventSource = new EventSource(
+            "/backend/sse/categories/"
+        );
+        categoriesEventSource.onmessage = (event) => {
+            try {
+                console.log("Categories event data:", event.data);
+                const updatedCategories = JSON.parse(event.data);
+                setCategories(updatedCategories);
+            } catch (error) {
+                console.error("Error parsing categories event data:", error);
+            }
+        };
+
+        return () => {
+            postsEventSource.close();
+            categoriesEventSource.close();
+        };
     }, [currentUser]);
 
     useEffect(() => {
@@ -96,6 +114,36 @@ const Home = ({ currentUser, setLoggedUser }) => {
 
     const handleLoadMore = () => {
         setVisiblePostsCount((prevCount) => prevCount + 15);
+    };
+
+    const handleCommentAdded = (postId, newComment) => {
+        const updatedPosts = posts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: [...post.comments, newComment],
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+        setAllPosts(updatedPosts);
+    };
+
+    const handleCommentDeleted = (postId, commentId) => {
+        const updatedPosts = posts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: post.comments.filter(
+                        (comment) => comment.id !== commentId
+                    ),
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+        setAllPosts(updatedPosts);
     };
 
     const sortedPosts = posts
@@ -126,14 +174,19 @@ const Home = ({ currentUser, setLoggedUser }) => {
                                     }
                                     currentUser={currentUser}
                                     post={post}
+                                    onCommentAdded={handleCommentAdded}
+                                    onCommentDeleted={handleCommentDeleted}
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
+                                        key={post.id}
                                         currentUser={currentUser}
                                         currentPost={post}
                                         setShowComments={() =>
                                             setShowCommentsPostId(null)
                                         }
+                                        onCommentAdded={handleCommentAdded}
+                                        onCommentDeleted={handleCommentDeleted}
                                     />
                                 )}
                             </div>
@@ -154,7 +207,8 @@ const Home = ({ currentUser, setLoggedUser }) => {
                     )}
                 </div>
             </div>
-            <style>{`
+            <style>
+                {`
                 .loading {
                     display: flex;
                     justify-content: center;
@@ -178,8 +232,8 @@ const Home = ({ currentUser, setLoggedUser }) => {
                 }
                 .load-more:hover {
                     color: darkblue;
-                }
-            `}</style>
+                }`}
+            </style>
         </>
     );
 };

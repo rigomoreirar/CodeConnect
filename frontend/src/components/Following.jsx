@@ -18,11 +18,10 @@ const Following = ({
             newArray = array.filter((cat) => cat !== category.name);
             setLength((prevLength) => prevLength - 1);
             try {
-                await Axios.post("http://localhost:8000/unfollow/", {
+                await Axios.post("/backend/unfollow/", {
                     ...category,
                     user: currentUser,
                 });
-                console.log("removed");
             } catch (error) {
                 console.log(error);
             }
@@ -30,11 +29,10 @@ const Following = ({
             newArray = [...array, category.name];
             setLength((prevLength) => prevLength + 1);
             try {
-                await Axios.post("http://localhost:8000/follow/", {
+                await Axios.post("/backend/follow/", {
                     ...category,
                     user: currentUser,
                 });
-                console.log("added");
             } catch (error) {
                 console.log(error);
             }

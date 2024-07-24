@@ -799,7 +799,8 @@ def edit_user_info(request):
     data = request.data
     new_username = data.get('username')
     new_email = data.get('email')
-    new_name = data.get('name')
+    new_first_name = data.get('first_name')
+    new_last_name = data.get('last_name')
 
     try:
         if new_username and User.objects.filter(username=new_username).exclude(id=user.id).exists():
@@ -812,8 +813,10 @@ def edit_user_info(request):
             user.username = new_username
         if new_email:
             user.email = new_email
-        if new_name:
-            user.first_name, user.last_name = new_name.split(' ', 1) if ' ' in new_name else (new_name, '')
+        if new_first_name:
+            user.first_name = new_first_name
+        if new_last_name:
+            user.last_name = new_last_name
 
         user.save()
         return Response({'message': 'User information updated successfully'}, status=status.HTTP_200_OK)
@@ -822,6 +825,7 @@ def edit_user_info(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 def change_user_password(request):

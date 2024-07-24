@@ -21,6 +21,16 @@
 
     .resetingcard {
         height: 35rem !important;
+        /* width: 100rem !important; */
+    }
+
+    .card-login {
+        margin-top: 3rem;
+        background-color: #fff; /* White background */
+        border: 1px solid rgba(0, 0, 0, 0.125); /* Gray border */
+        border-radius: 0.25rem; /* Rounded corners */
+        padding: 20px; /* Padding inside the card */
+        width: 30rem;
     }
 }
 
@@ -33,4 +43,12 @@
     justify-content: center;
     align-items: center;
     border-radius: 25px;
+}
+
+.card-login {
+    margin-top: 3rem;
+    background-color: #fff; /* White background */
+    border: 1px solid rgba(0, 0, 0, 0.125); /* Gray border */
+    border-radius: 0.25rem; /* Rounded corners */
+    padding: 20px; /* Padding inside the card */
 }
