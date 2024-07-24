@@ -8,9 +8,23 @@ img {
     background: #000;
 }
 
+.skill-block-container {
+    display: flex;
+    flex-wrap: row;
+    justify-content: center;
+    color: white;
+}
+
+.email-container-profile {
+    width: 28rem !important;
+}
+
 /* Smallest big screen */
 .skill-block {
     width: 30%;
+}
+.email-container-profile {
+    width: 100% !important;
 }
 
 /* Medium big screen */
@@ -18,12 +32,24 @@ img {
     .skill-block {
         padding: 32px !important;
     }
+    .name-username-container {
+        width: 100% !important;
+    }
+    .email-container-profile {
+        width: 100% !important;
+    }
 }
 
 /* Big big screen */
 @media (min-width: 1200px) {
     .skill-block {
         padding: 56px !important;
+    }
+    .name-username-container {
+        width: 100% !important;
+    }
+    .email-container-profile {
+        width: 100% !important;
     }
 }
 
@@ -36,8 +62,21 @@ body {
 }
 /* Small screens */
 @media (max-width: 768px) {
-    body .container {
-        margin-top: 70px !important;
+    .container {
+        margin-top: 8rem !important;
+        width: 3rem !important;
+        margin-bottom: 10rem !important;
+    }
+
+    .skill-block {
+        width: 6.7rem;
+    }
+
+    .name-username-container {
+        width: 26.8rem !important;
+    }
+    .email-container-profile {
+        width: 26.8rem !important;
     }
 }
 

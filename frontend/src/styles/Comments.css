@@ -1,148 +1,37 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
-textarea {
-    width: 100%;
-    height: 70px; /* Adjusted the height of the textarea */
-    padding: 12px 20px;
-    box-sizing: border-box;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    background-color: #f8f8f8;
-    font-size: 16px;
-    resize: none;
-    overflow-y: hidden;
-}
-::selection {
-    color: #fff;
-    background: #1da1f2;
-}
 .comments-container {
     background: #fff;
-    max-width: 450px; /* Slightly less wide than the Posts section */
+    max-width: 450px;
     width: 100%;
     border-radius: 4px;
     padding: 25px;
     margin: 20px 0;
 }
-.input-box {
-    padding-top: 10px;
-    padding-bottom: 0px; /* Remove bottom padding */
-    border-bottom: 1px solid #e6e6e6;
-    margin-bottom: 0; /* Remove margin */
-}
-.input-box .tweet-area {
-    position: relative;
-    max-height: 70px;
-    overflow-y: auto;
-    margin-bottom: 0px; /* Remove margin */
-}
-.tweet-area::-webkit-scrollbar {
-    width: 0px;
-}
-.tweet-area .placeholder {
-    position: absolute;
-    margin-top: -3px;
-    font-size: 22px;
-    color: #98a5b1;
-    pointer-events: none;
-}
-.tweet-area .input {
-    outline: none;
-    font-size: 17px;
-    min-height: inherit;
-    word-wrap: break-word;
-    word-break: break-all;
-}
-.tweet-area .editable {
-    position: relative;
-    z-index: 5;
-}
-.tweet-area .readonly {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    color: transparent;
-    background: transparent;
-}
-.readonly .highlight {
-    background: #fd9bb0;
-}
-.input-box .privacy {
-    color: #1da1f2;
-    margin: 15px 0;
-    display: inline-flex;
-    align-items: center;
-    padding: 7px 10px;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-.privacy:hover,
-.icons li:hover {
-    background: #e7f5fe;
-}
-.privacy i {
-    font-size: 18px;
-}
-.privacy span {
-    font-size: 15px;
-    font-weight: 600;
-    margin-left: 7px;
-}
-.bottom {
+
+.comment-item {
     display: flex;
-    margin-top: 10px;
+    flex-direction: column;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.comment-header {
+    display: flex;
     align-items: center;
     justify-content: space-between;
 }
-.bottom .icons {
-    display: inline-flex;
-}
-.icons li {
-    list-style: none;
-    color: #1da1f2;
-    font-size: 20px;
-    margin: 0 2px;
-    height: 38px;
-    width: 38px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+.profile-picture {
     border-radius: 50%;
-    transition: background 0.2s ease;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
 }
-.bottom .content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+.comment-content {
+    margin-left: 50px;
+    word-wrap: break-word;
 }
-.bottom .counter {
-    color: #333;
-    display: none;
-    font-weight: 500;
-    margin-right: 15px;
-    padding-right: 15px;
-    border-right: 1px solid #aab8c2;
-}
-.bottom button {
-    padding: 9px 18px;
-    border: none;
-    outline: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: 700;
-    background: #0d8bd9;
-    color: #fff;
-    cursor: pointer;
-    opacity: 0.5;
-    pointer-events: none;
-    transition: background 0.2s ease;
-}
-.bottom button.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-.bottom button:hover {
-    background: #0d8bd9;
+
+.delete-icon {
+    margin-left: auto;
 }

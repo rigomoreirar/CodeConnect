@@ -29,10 +29,15 @@ const Login = () => {
                 window.location.href = "/";
             })
             .catch(function (error) {
-                console.log(error);
-                error.response.data.non_field_errors
-                    ? alert(error.response.data.non_field_errors)
-                    : console.log("credentials are okay");
+                if (
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.error
+                ) {
+                    alert(error.response.data.error);
+                } else {
+                    console.log(error);
+                }
             });
     };
 
@@ -45,7 +50,7 @@ const Login = () => {
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-lg-12 col-xl-11">
                         <div
-                            className="mt-2 mb-5 card text-black"
+                            className="card-login text-black"
                             style={{ borderRadius: "25px" }}
                         >
                             <div className="card-body p-md-3">

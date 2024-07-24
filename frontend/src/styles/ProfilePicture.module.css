@@ -6,7 +6,7 @@
 .profile-picture {
     position: relative;
     width: 14.5rem;
-    height: 23.5rem;
+    height: 25.7rem;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -18,7 +18,7 @@
 @media (min-width: 991px) and (max-width: 1200px) {
     .profile-picture {
         width: 20.3rem;
-        height: 22.4rem;
+        height: 24.6rem;
     }
 }
 
@@ -26,14 +26,14 @@
 @media (min-width: 1200px) {
     .profile-picture {
         width: 23.3rem;
-        height: 23.3rem;
+        height: 25.6rem;
     }
 }
 
 /* Small screens */
 @media (max-width: 768px) {
     .profile-picture {
-        width: 33.3rem;
+        width: 26.8rem;
         height: 23.3rem;
     }
 }

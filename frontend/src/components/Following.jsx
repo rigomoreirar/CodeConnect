@@ -22,7 +22,6 @@ const Following = ({
                     ...category,
                     user: currentUser,
                 });
-                console.log("removed");
             } catch (error) {
                 console.log(error);
             }
@@ -34,7 +33,6 @@ const Following = ({
                     ...category,
                     user: currentUser,
                 });
-                console.log("added");
             } catch (error) {
                 console.log(error);
             }
