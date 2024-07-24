@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'api',
     'knox',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

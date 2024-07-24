@@ -1,11 +1,15 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.db import models, IntegrityError
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 class User(AbstractUser):
     pass
 
 class Category(models.Model):
+    id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     name = models.CharField(max_length=280, default="")
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
     followers = models.ManyToManyField("Profile", related_name="profileFollowing", blank=True)
@@ -14,6 +18,7 @@ class Category(models.Model):
         return str(self.name)
 
 class Profile(models.Model):
+    id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="userProfile", null=True, blank=True)
     ctg_following = models.ManyToManyField("Category", related_name="categoriesFollowing", blank=True)
     isTeacher = models.BooleanField(default=False)
@@ -22,6 +27,7 @@ class Profile(models.Model):
         return str(self.user)
 
 class Post(models.Model):
+    id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     isStudent = models.BooleanField(default=False)
     creator = models.ForeignKey("Profile", on_delete=models.PROTECT, related_name="postCreator", null=True, blank=True)
     categories = models.ManyToManyField("Category", related_name="postCategories", blank=True)
@@ -34,22 +40,31 @@ class Post(models.Model):
         return f"post by {self.creator}: {self.title}"
 
 class Like(models.Model):
+    id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     profile = models.ForeignKey("Profile", on_delete=models.PROTECT, related_name="profile_like")
     timestamp = models.DateTimeField(auto_now_add=True)
     post = models.ForeignKey("Post", on_delete=models.PROTECT, related_name="post_like")
+
+    class Meta:
+        unique_together = ('profile', 'post')
 
     def __str__(self):
         return f"liked by {self.profile} on {self.post}"
 
 class Dislike(models.Model):
+    id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     profile = models.ForeignKey("Profile", on_delete=models.PROTECT, related_name="profile_dislike")
     timestamp = models.DateTimeField(auto_now_add=True)
     post = models.ForeignKey("Post", on_delete=models.PROTECT, related_name="post_dislike")
+
+    class Meta:
+        unique_together = ('profile', 'post')
 
     def __str__(self):
         return f"disliked by {self.profile} on {self.post}"
 
 class Comment(models.Model):
+    id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     profile = models.ForeignKey("Profile", on_delete=models.PROTECT, related_name="profile_comment")
     timestamp = models.DateTimeField(auto_now_add=True)
     post = models.ForeignKey("Post", on_delete=models.PROTECT, related_name="post_comment")
@@ -57,3 +72,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"commented by {self.profile} on {self.post}"
+    
+@receiver(post_save, sender=Comment)
+@receiver(post_delete, sender=Comment)
+def comment_change_handler(sender, instance, **kwargs):
+    from .views import trigger_sse_update
+    trigger_sse_update('comments')
