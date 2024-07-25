@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
-import axios from "axios";
+import axios from "../utils/Axios";
 import RegisterProfilePicture from "../components/RegisterProfilePicture";
 import styles from "../styles/Register.module.css";
 
@@ -68,7 +68,7 @@ const Register = () => {
         }
 
         axios
-            .post("/backend/register/", formData, {
+            .post("register/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -76,7 +76,7 @@ const Register = () => {
             .then(function (response) {
                 const token = `Token ${response.data.token}`;
                 window.localStorage.setItem("token", token);
-                navigate("/");
+                navigate("");
             })
             .catch(function (error) {
                 console.log(error);

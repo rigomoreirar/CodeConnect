@@ -3,7 +3,7 @@ import "../styles/Home.css";
 import Posts from "../components/Posts";
 import Comments from "./Comments";
 import Filters from "../containers/Filters";
-import Axios from "axios";
+import Axios from "../utils/Axios";
 
 const Home = ({ currentUser, setLoggedUser }) => {
     const [posts, setPosts] = useState([]);
@@ -17,13 +17,13 @@ const Home = ({ currentUser, setLoggedUser }) => {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get("/backend/all-posts/");
+            const response = await Axios.get("all-posts/");
             const postArray = Array.isArray(response.data) ? response.data : [];
 
             const enrichedPosts = await Promise.all(
                 postArray.map(async (post) => {
                     try {
-                        const res = await Axios.post("/backend/postData/", {
+                        const res = await Axios.post("postData/", {
                             post_id: post.id,
                         });
                         return {
@@ -56,7 +56,7 @@ const Home = ({ currentUser, setLoggedUser }) => {
 
     const fetchCategories = async () => {
         try {
-            const response = await Axios.get("/backend/all-categories/");
+            const response = await Axios.get("all-categories/");
             const categoriesArray = Array.isArray(response.data)
                 ? response.data
                 : [];
@@ -70,7 +70,7 @@ const Home = ({ currentUser, setLoggedUser }) => {
         fetchData();
         fetchCategories();
 
-        const postsEventSource = new EventSource("/backend/sse/posts/");
+        const postsEventSource = new EventSource("/sse/posts/");
         postsEventSource.onmessage = (event) => {
             try {
                 console.log("Posts event data:", event.data);
@@ -82,9 +82,7 @@ const Home = ({ currentUser, setLoggedUser }) => {
             }
         };
 
-        const categoriesEventSource = new EventSource(
-            "/backend/sse/categories/"
-        );
+        const categoriesEventSource = new EventSource("/sse/categories/");
         categoriesEventSource.onmessage = (event) => {
             try {
                 console.log("Categories event data:", event.data);

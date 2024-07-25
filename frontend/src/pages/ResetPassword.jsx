@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Layout.css";
 import Logo from "../components/Logo";
+import axios from "../utils/Axios";
 
 const ResetPassword = () => {
     const [email, setEmail] = useState("");
@@ -11,23 +12,17 @@ const ResetPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("/backend/reset-user-password/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email }),
+            const response = await axios.post("reset-user-password-email/", {
+                email,
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
+            if (response.status === 200) {
                 alert("Check your email for the reset password instructions.");
                 setEmail("");
                 setErrorMessage("");
             } else {
                 setErrorMessage(
-                    data.error ||
+                    response.data.error ||
                         "An error occurred while resetting your password."
                 );
             }

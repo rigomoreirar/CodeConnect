@@ -3,7 +3,7 @@ import "../styles/Home.css";
 import Posts from "../components/Posts";
 import Comments from "./Comments";
 import Filters from "../containers/Filters";
-import Axios from "axios";
+import Axios from "../utils/Axios";
 
 const Feed = ({ currentUser, categories, setLoggedUser }) => {
     const [posts, setPosts] = useState([]);
@@ -15,13 +15,13 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
 
     const fetchData = async () => {
         try {
-            const response = await Axios.get("/backend/all-posts/");
+            const response = await Axios.get("all-posts/");
             const postArray = Array.isArray(response.data) ? response.data : [];
 
             const enrichedPosts = await Promise.all(
                 postArray.map(async (post) => {
                     try {
-                        const res = await Axios.post("/backend/postData/", {
+                        const res = await Axios.post("postData/", {
                             post_id: post.id,
                         });
                         return {
@@ -55,7 +55,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
     useEffect(() => {
         fetchData();
 
-        const postsEventSource = new EventSource("/backend/sse/posts/");
+        const postsEventSource = new EventSource("/sse/posts/");
         postsEventSource.onmessage = (event) => {
             try {
                 console.log("Posts event data:", event.data);
@@ -67,7 +67,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
             }
         };
 
-        const likesEventSource = new EventSource("/backend/sse/likes/");
+        const likesEventSource = new EventSource("/sse/likes/");
         likesEventSource.onmessage = (event) => {
             try {
                 console.log("Likes event data:", event.data);
@@ -85,7 +85,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
             }
         };
 
-        const dislikesEventSource = new EventSource("/backend/sse/dislikes/");
+        const dislikesEventSource = new EventSource("/sse/dislikes/");
         dislikesEventSource.onmessage = (event) => {
             try {
                 console.log("Dislikes event data:", event.data);

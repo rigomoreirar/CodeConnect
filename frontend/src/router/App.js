@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/Axios"
 
 import Layout from "../pages/Layout";
 import Home from "../pages/Home";
@@ -31,7 +31,7 @@ function App() {
                     return;
                 }
 
-                const response = await axios.get("/backend/user/", {
+                const response = await axios.get("user/", {
                     headers: {
                         Authorization: token,
                     },
@@ -39,7 +39,7 @@ function App() {
 
                 const user = response.data.user_info;
                 setLoggedUser(user);
-                setProfilePictureUrl(`/backend/profile-picture/${user.id}/`);
+                setProfilePictureUrl(`http://localhost:8000/profile-picture/${user.id}/`);
                 setIsValid(true);
             } catch (error) {
                 console.log(error);
@@ -53,7 +53,7 @@ function App() {
 
         fetchData();
 
-        const eventSource = new EventSource("/backend/sse/categories/");
+        const eventSource = new EventSource("/sse/categories/");
         eventSource.onmessage = (event) => {
             const updatedCategories = JSON.parse(event.data);
             setCategories(updatedCategories);

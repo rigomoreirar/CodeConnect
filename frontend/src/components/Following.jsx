@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
-import Axios from "axios";
+import Axios from "../utils/Axios";
 
 const Following = ({
     category,
@@ -18,7 +18,7 @@ const Following = ({
             newArray = array.filter((cat) => cat !== category.name);
             setLength((prevLength) => prevLength - 1);
             try {
-                await Axios.post("/backend/unfollow/", {
+                await Axios.post("unfollow/", {
                     ...category,
                     user: currentUser,
                 });
@@ -29,7 +29,7 @@ const Following = ({
             newArray = [...array, category.name];
             setLength((prevLength) => prevLength + 1);
             try {
-                await Axios.post("/backend/follow/", {
+                await Axios.post("follow/", {
                     ...category,
                     user: currentUser,
                 });

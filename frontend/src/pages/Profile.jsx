@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../utils/Axios";
 import CategoryFollow from "../containers/CategoryFollow";
 import "../styles/Profile.css";
 import ProfilePicture from "../components/ProfilePicture";
@@ -25,7 +25,7 @@ const Profile = ({
             const token = window.localStorage.getItem("token");
             if (!token) return;
 
-            const response = await axios.get("/backend/user/", {
+            const response = await axios.get("user/", {
                 headers: {
                     Authorization: token,
                 },
@@ -43,7 +43,7 @@ const Profile = ({
     const fetchTotalLikes = async () => {
         try {
             const response = await axios.get(
-                `/backend/total-likes-by-user/?user_id=${currentUser.id}`
+                `http://localhost:8000/total-likes-by-user/?user_id=${currentUser.id}`
             );
             setTotalLikes(response.data.total_likes);
         } catch (error) {
@@ -54,7 +54,7 @@ const Profile = ({
     const fetchTotalDislikes = async () => {
         try {
             const response = await axios.get(
-                `/backend/total-dislikes-by-user/?user_id=${currentUser.id}`
+                `http://localhost:8000/total-dislikes-by-user/?user_id=${currentUser.id}`
             );
             setTotalDislikes(response.data.total_dislikes);
         } catch (error) {
@@ -65,7 +65,7 @@ const Profile = ({
     const fetchTotalComments = async () => {
         try {
             const response = await axios.get(
-                `/backend/total-comments-by-user/?user_id=${currentUser.id}`
+                `http://localhost:8000/total-comments-by-user/?user_id=${currentUser.id}`
             );
             setTotalComments(response.data.total_comments);
         } catch (error) {
@@ -96,7 +96,7 @@ const Profile = ({
 
     useEffect(() => {
         const eventSourceLikes = new EventSource(
-            `/backend/sse-total-likes/${currentUser.id}/`
+            `http://localhost:8000/sse-total-likes/${currentUser.id}/`
         );
         eventSourceLikes.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -104,7 +104,7 @@ const Profile = ({
         };
 
         const eventSourceDislikes = new EventSource(
-            `/backend/sse-total-dislikes/${currentUser.id}/`
+            `http://localhost:8000/sse-total-dislikes/${currentUser.id}/`
         );
         eventSourceDislikes.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -112,7 +112,7 @@ const Profile = ({
         };
 
         const eventSourceComments = new EventSource(
-            `/backend/sse-total-comments/${currentUser.id}/`
+            `http://localhost:8000/sse-total-comments/${currentUser.id}/`
         );
         eventSourceComments.onmessage = (event) => {
             const data = JSON.parse(event.data);

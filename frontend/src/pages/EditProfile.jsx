@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/Axios";
 import { Link } from "react-router-dom";
 import "../styles/EditProfile.css";
 
@@ -22,7 +22,7 @@ const EditProfile = ({ currentUser }) => {
     const handleSave = async () => {
         try {
             const response = await axios.post(
-                "/backend/edit-user-info/",
+                "/edit-user-info/",
                 {
                     username,
                     email,
