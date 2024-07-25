@@ -1,0 +1,41 @@
+.like {
+    fill: rgb(47, 47, 255);
+}
+.dislike {
+    fill: red;
+}
+.none {
+    fill: grey;
+}
+
+.text-holder-no-categories {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    flex-direction: column;
+
+    gap: 3rem;
+}
+.text-holder-no-categories-second {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    flex-direction: column;
+}
+
+.btn-bg-modified {
+    background-color: #6c757d !important;
+    border: none;
+}
+.btn-bg-modified:hover {
+    background-color: #007bff !important;
+}
+
+.centered-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
