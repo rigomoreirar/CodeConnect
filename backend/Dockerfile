@@ -15,10 +15,10 @@ COPY requirements.txt /code/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy project
+# Copy the backend code
 COPY . /code/
 
-# Copy built React app to static files
+# Copy the React build into the Django static files directory
 COPY ../frontend/build /code/frontend/build
 
 # Run migrations
