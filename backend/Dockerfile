@@ -19,7 +19,7 @@ RUN pip install -r requirements.txt
 COPY . /code/
 
 # Copy the React build into the Django static files directory
-COPY ../frontend/build /code/frontend/build
+COPY ./frontend/build /code/frontend/build
 
 # Run migrations
 RUN python manage.py makemigrations
