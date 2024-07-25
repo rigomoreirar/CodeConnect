@@ -1,4 +1,4 @@
-import Axios from "axios";
+import Axios from "../utils/Axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
@@ -18,7 +18,7 @@ const Login = () => {
             alert("No blanks!");
             return;
         }
-        Axios.post("/backend/login/", {
+        Axios.post("login/", {
             username: username,
             password: password,
         })

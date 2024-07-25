@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../utils/Axios";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 import "../styles/Header.css";
@@ -8,7 +8,7 @@ const Header = () => {
         const token = window.localStorage.getItem("token");
         axios
             .post(
-                "/backend/logout/",
+                "/logout/",
                 {},
                 {
                     headers: {

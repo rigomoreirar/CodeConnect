@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaThumbsDown, FaThumbsUp, FaTrashAlt } from "react-icons/fa";
 import "../styles/Posts.css";
-import Axios from "axios";
+import Axios from "../utils/Axios";
 
 const Posts = ({
     post,
@@ -49,7 +49,7 @@ const Posts = ({
                 if (dislikeFill) {
                     setDislikeCount(dislikeCount - 1);
                     setDislikeFill(false);
-                    await Axios.post("/backend/dislike/", {
+                    await Axios.post("dislike/", {
                         undislike: true,
                         post: post,
                         user: currentUser,
@@ -57,7 +57,7 @@ const Posts = ({
                 }
                 setLikeCount(likeCount + 1);
                 setLikeFill(true);
-                await Axios.post("/backend/like/", {
+                await Axios.post("like/", {
                     unlike: false,
                     post: post,
                     user: currentUser,
@@ -65,7 +65,7 @@ const Posts = ({
             } else {
                 setLikeCount(likeCount - 1);
                 setLikeFill(false);
-                await Axios.post("/backend/like/", {
+                await Axios.post("like/", {
                     unlike: true,
                     post: post,
                     user: currentUser,
@@ -82,7 +82,7 @@ const Posts = ({
                 if (likeFill) {
                     setLikeCount(likeCount - 1);
                     setLikeFill(false);
-                    await Axios.post("/backend/like/", {
+                    await Axios.post("like/", {
                         unlike: true,
                         post: post,
                         user: currentUser,
@@ -90,7 +90,7 @@ const Posts = ({
                 }
                 setDislikeCount(dislikeCount + 1);
                 setDislikeFill(true);
-                await Axios.post("/backend/dislike/", {
+                await Axios.post("dislike/", {
                     undislike: false,
                     post: post,
                     user: currentUser,
@@ -98,7 +98,7 @@ const Posts = ({
             } else {
                 setDislikeCount(dislikeCount - 1);
                 setDislikeFill(false);
-                await Axios.post("/backend/dislike/", {
+                await Axios.post("dislike/", {
                     undislike: true,
                     post: post,
                     user: currentUser,
@@ -117,7 +117,7 @@ const Posts = ({
 
     const deleteHandler = async () => {
         try {
-            await Axios.post("/backend/delete-user-post/", {
+            await Axios.post("delete-user-post/", {
                 post: { id: post.id },
                 user: { id: currentUser.id },
             });
@@ -145,13 +145,13 @@ const Posts = ({
     }, [currentPost, currentUser, likes, dislikes]);
 
     useEffect(() => {
-        const eventSourceLikes = new EventSource("/backend/sse/likes/");
+        const eventSourceLikes = new EventSource("/sse/likes/");
         eventSourceLikes.onmessage = (event) => {
             const updatedLikes = JSON.parse(event.data);
             updateLikesDislikes(updatedLikes, dislikes);
         };
 
-        const eventSourceDislikes = new EventSource("/backend/sse/dislikes/");
+        const eventSourceDislikes = new EventSource("/sse/dislikes/");
         eventSourceDislikes.onmessage = (event) => {
             const updatedDislikes = JSON.parse(event.data);
             updateLikesDislikes(likes, updatedDislikes);

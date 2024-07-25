@@ -1,7 +1,11 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:3.001
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        environment:
+            SECRET_KEY: ${SECRET_KEY}
         expose:
             - "8000"
         restart: unless-stopped
@@ -9,22 +13,6 @@ services:
             - ./data:/data
         networks:
             - code-connect-network
-        deploy:
-            update_config:
-                order: start-first
-        env_file:
-            - ./.env
-
-    frontend:
-        container_name: frontend
-        image: rigomoreirar/code-connect-frontend:3.001
-        expose:
-            - "3000"
-        networks:
-            - code-connect-network
-        deploy:
-            update_config:
-                order: start-first
 
     nginx:
         container_name: nginx
@@ -34,11 +22,11 @@ services:
             - "80:80"
             - "443:443"
         volumes:
-            - ./frontend/nginx.conf:/etc/nginx/nginx.conf
+            - ./nginx.conf:/etc/nginx/nginx.conf
             - ./codeconnect.crt:/etc/ssl/codeconnect.crt
             - ./codeconnect.key:/etc/ssl/codeconnect.key
         depends_on:
-            - frontend
+            - backend
         networks:
             - code-connect-network
 

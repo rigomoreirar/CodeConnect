@@ -18,6 +18,9 @@ RUN pip install -r requirements.txt
 # Copy project
 COPY . /code/
 
+# Copy built React app to static files
+COPY ../frontend/build /code/frontend/build
+
 # Run migrations
 RUN python manage.py makemigrations
 RUN python manage.py migrate

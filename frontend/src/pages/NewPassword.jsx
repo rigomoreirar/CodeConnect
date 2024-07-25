@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../utils/Axios";
 import { Link } from "react-router-dom";
 import "../styles/EditProfile.css";
 
@@ -11,7 +11,7 @@ const NewPassword = () => {
     const handleSave = async () => {
         try {
             const response = await axios.post(
-                "/backend/change-user-password/",
+                "/change-user-password/",
                 {
                     current_password: currentPassword,
                     new_password: newPassword,

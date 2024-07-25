@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Axios from "axios";
+import Axios from "../utils/Axios";
 import "../styles/Home.css";
 import "../styles/Create.css";
 import "../styles/Comments-legacy.css";
@@ -32,7 +32,7 @@ const Community = ({
         setIsLoading(true);
         try {
             const response = await Axios.get(
-                `/backend/posts-by-user-id/?user_id=${currentUser.id}`
+                `http://localhost:8000/posts-by-user-id/?user_id=${currentUser.id}`
             );
             const postArray = Array.isArray(response.data) ? response.data : [];
             console.log("Posts by user ID:", postArray);
@@ -48,14 +48,12 @@ const Community = ({
         const userId = currentUser.id;
         try {
             const response = await Axios.get(
-                `/backend/user-categories/?user_id=${userId}`
+                `http://localhost:8000/user-categories/?user_id=${userId}`
             );
             setUserCategories(
                 Array.isArray(response.data) ? response.data : []
             );
-            const allCategoriesResponse = await Axios.get(
-                "/backend/all-categories/"
-            );
+            const allCategoriesResponse = await Axios.get("all-categories/");
             setCategories(
                 Array.isArray(allCategoriesResponse.data)
                     ? allCategoriesResponse.data
@@ -72,7 +70,7 @@ const Community = ({
         fetchCategories();
 
         // Set up Server-Sent Events (SSE) for categories
-        const eventSource = new EventSource("/backend/sse/categories/");
+        const eventSource = new EventSource("/sse/categories/");
 
         eventSource.onmessage = (event) => {
             console.log("New category message:", event.data);
@@ -173,7 +171,7 @@ const Community = ({
         }
 
         try {
-            const response = await Axios.post("/backend/new-post/", post);
+            const response = await Axios.post("new-post/", post);
             console.log("New Post Response:", response.data);
             fetchPosts();
         } catch (error) {
@@ -191,7 +189,7 @@ const Community = ({
         const categoryName = formData.get("category");
 
         try {
-            await Axios.post("/backend/create-category/", {
+            await Axios.post("create-category/", {
                 name: categoryName,
                 user_id: currentUser.id,
             });
@@ -204,7 +202,7 @@ const Community = ({
 
     const handleCategoryDelete = async (categoryId) => {
         try {
-            await Axios.post("/backend/delete-category/", {
+            await Axios.post("delete-category/", {
                 id: categoryId,
             });
             fetchCategories(); // Refresh categories after deletion

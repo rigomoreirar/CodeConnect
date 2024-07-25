@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -55,8 +53,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware'
 ]
-
-# settings.py
 
 LOGGING = {
     'version': 1,
@@ -82,20 +78,19 @@ LOGGING = {
     },
 }
 
-
 ROOT_URLCONF = 'forum.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'frontend/build')],  # Added to serve React frontend
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages'
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -112,10 +107,14 @@ DATABASES = {
         'NAME': BASE_DIR / os.getenv('DB_NAME', 'db.sqlite3'),
     }
 }
+
 # SMTP server
-ENV_SMTP_SERVER = os.getenv('SMTP_SERVER')
-ENV_SMTP_USER = os.getenv('SMTP_USER')
-ENV_SMTP_PASS = os.getenv('SMTP_PASS')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('SMTP_SERVER')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('SMTP_USER')
+EMAIL_HOST_PASSWORD = os.getenv('SMTP_PASS')
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -140,7 +139,14 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend/build/static'),  # Added to serve React static files
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'assets'),
+]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -151,8 +157,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', )
 }
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'assets')]
+# SMTP server
+ENV_SMTP_SERVER = os.getenv('SMTP_SERVER')
+ENV_SMTP_USER = os.getenv('SMTP_USER')
+ENV_SMTP_PASS = os.getenv('SMTP_PASS')

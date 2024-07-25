@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../utils/Axios";
 import React, { useState, useEffect } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import "../styles/Comments.css";
@@ -22,7 +22,7 @@ const Comments = ({
                 if (!pictures[comment.profile]) {
                     try {
                         const response = await axios.get(
-                            `/backend/profile-picture-username/${comment.profile}/`
+                            `http://localhost:8000/profile-picture-username/${comment.profile}/`
                         );
                         pictures[comment.profile] = response.config.url;
                     } catch (error) {
@@ -40,7 +40,7 @@ const Comments = ({
 
     const fetchComments = async () => {
         try {
-            const response = await axios.post("/backend/postData/", {
+            const response = await axios.post("postData/", {
                 post_id: currentPost.id,
             });
             const newComments = Array.isArray(response.data.comments)
@@ -53,7 +53,7 @@ const Comments = ({
     };
 
     useEffect(() => {
-        const eventSource = new EventSource("/backend/sse/comments/");
+        const eventSource = new EventSource("/sse/comments/");
         eventSource.onmessage = (event) => {
             try {
                 const updatedComments = JSON.parse(event.data);
@@ -82,7 +82,7 @@ const Comments = ({
             content: e.target.elements.content.value,
         };
         axios
-            .post("/backend/addComment/", newComment)
+            .post("addComment/", newComment)
             .then((res) => {
                 const createdComment = res.data;
                 setComments([...comments, createdComment]);
@@ -96,7 +96,7 @@ const Comments = ({
 
     const handleDelete = (commentId) => {
         axios
-            .post("/backend/delete_comment/", {
+            .post("delete_comment/", {
                 comment_id: commentId,
                 user_id: currentUser.id,
             })
