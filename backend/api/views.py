@@ -84,11 +84,13 @@ def sse_profiles(request):
 logger = logging.getLogger(__name__)
 
 # Function to generate a unique ID
+@csrf_exempt
 def generate_unique_id(model):
     last_instance = model.objects.order_by('-id').first()
     return last_instance.id + 1 if last_instance else 1
 
 # Register API
+@csrf_exempt
 @api_view(["POST"])
 def register(request):
     serializer = RegisterSerializers(data=request.data)
@@ -123,10 +125,12 @@ def register(request):
         'token': token
     })
 
+@csrf_exempt
 @api_view(['GET'])
 def index(request):
     return Response({"Hello": "World!"})
 
+@csrf_exempt
 @api_view(["POST"])
 def login(request):
     serializer = AuthTokenSerializer(data=request.data)
@@ -153,6 +157,7 @@ def login(request):
     else:
         return Response({'error': 'Invalid login details'}, status=status.HTTP_400_BAD_REQUEST)
 
+@csrf_exempt
 @api_view(['GET'])
 def get_user_data(request):
     user = request.user
@@ -185,18 +190,21 @@ def get_user_data(request):
         })
     return Response({'error': "not authenticated"}, status=400)
 
+@csrf_exempt
 @api_view(['GET'])
 def allPosts(request):
     posts = Post.objects.all()
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(['GET'])
 def allCategories(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(['POST'])
 def postData(request):
     data = request.data
@@ -215,30 +223,35 @@ def postData(request):
         "comments": comments
     })
 
+@csrf_exempt
 @api_view(['GET'])
 def allProfiles(request):
     profiles = Profile.objects.all()
     serializer = ProfileSerializer(profiles, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(['GET'])
 def allLikes(request):
     likes = Like.objects.all()
     serializer = LikeSerializer(likes, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(['GET'])
 def allDislikes(request):
     dislikes = Dislike.objects.all()
     serializer = DislikeSerializer(dislikes, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(['GET'])
 def allComments(request):
     comments = Comment.objects.all()
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(["POST"])
 def like(request):
     data = request.data
@@ -267,6 +280,7 @@ def like(request):
 
     return Response(request.data)
 
+@csrf_exempt
 @api_view(["POST"])
 def dislike(request):
     data = request.data
@@ -309,6 +323,7 @@ def dislike(request):
 #     print(f"data: {json.dumps(data)}\n\n")
 
 
+@csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
 def addComment(request):
@@ -485,6 +500,7 @@ def get_user_categories(request):
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@csrf_exempt
 @api_view(['GET'])
 def posts_by_user_id(request):
     user_id = request.query_params.get('user_id')
@@ -503,7 +519,7 @@ def posts_by_user_id(request):
 
 
 
-
+@csrf_exempt
 @api_view(['GET'])
 def get_profile_picture(request, user_id):
     logger.info(f"Received request for user ID: {user_id}")
@@ -523,6 +539,7 @@ def get_profile_picture(request, user_id):
     with open(default_picture_path, 'rb') as f:
         return HttpResponse(f.read(), content_type=mime_type)
 
+@csrf_exempt
 @api_view(["POST"])
 def change_profile_picture(request):
     user = request.user
@@ -554,6 +571,7 @@ def change_profile_picture(request):
 
     return Response({'message': 'Profile picture updated successfully'}, status=status.HTTP_200_OK)
 
+@csrf_exempt
 @api_view(['POST'])
 def send_test_email(request):
     user_email = request.data.get('email')
@@ -593,6 +611,7 @@ def send_test_email(request):
         logger.error(f"Error sending email: {str(e)}")
         return Response({'error': 'Error sending email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@csrf_exempt
 @api_view(['POST'])
 def reset_user_password_email(request):
     email = request.data.get('email')
@@ -647,6 +666,7 @@ def reset_user_password_email(request):
         logger.error(f"Error sending email: {str(e)}")
         return Response({'error': 'Error sending email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
 def delete_comment(request):
@@ -675,6 +695,7 @@ def delete_comment(request):
         logger.error(f"Error deleting comment: {str(e)}")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@csrf_exempt
 @api_view(['GET'])
 def get_profile_picture_by_username(request, username):
     logger.info(f"Received request for username: {username}")
@@ -700,7 +721,7 @@ def get_profile_picture_by_username(request, username):
         return HttpResponse(f.read(), content_type=mime_type)
 
 
-
+@csrf_exempt
 @api_view(['GET'])
 def total_likes_by_user(request):
     user_id = request.query_params.get('user_id')
@@ -717,6 +738,7 @@ def total_likes_by_user(request):
     
     return Response({'total_likes': total_likes}, status=status.HTTP_200_OK)
 
+@csrf_exempt
 @api_view(['GET'])
 def total_dislikes_by_user(request):
     user_id = request.query_params.get('user_id')
@@ -733,6 +755,7 @@ def total_dislikes_by_user(request):
     
     return Response({'total_dislikes': total_dislikes}, status=status.HTTP_200_OK)
 
+@csrf_exempt
 @api_view(['GET'])
 def total_comments_by_user(request):
     user_id = request.query_params.get('user_id')
@@ -751,6 +774,7 @@ def total_comments_by_user(request):
 
 
 from django.db.models import Count
+
 
 @csrf_exempt
 def sse_total_likes(request, user_id):
@@ -788,7 +812,7 @@ def sse_total_comments(request, user_id):
             yield f"data: {json.dumps({'total_comments': total_comments})}\n\n"
     return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
 
-
+@csrf_exempt
 @api_view(['POST'])
 def edit_user_info(request):
     user = request.user
@@ -826,7 +850,7 @@ def edit_user_info(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+@csrf_exempt
 @api_view(['POST'])
 def change_user_password(request):
     user = request.user
