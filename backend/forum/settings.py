@@ -81,6 +81,7 @@ LOGGING = {
 
 ROOT_URLCONF = 'forum.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -96,6 +97,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'forum.wsgi.application'
 
