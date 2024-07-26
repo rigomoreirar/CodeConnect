@@ -1,9 +1,7 @@
 version: "3.8"
 services:
     backend:
-        build:
-            context: ./backend
-            dockerfile: Dockerfile
+        image: rigomoreirar/code-connect-backend:3.400
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
