@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import "../styles/Comments.css";
 
+// This is a test comment, delete me if you find me
 const Comments = ({
     currentPost,
     setShowComments,
