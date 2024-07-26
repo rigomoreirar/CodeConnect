@@ -6,7 +6,20 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 class User(AbstractUser):
-    pass
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='custom_user_set',  # Change to a unique related_name
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='custom_user_set',  # Change to a unique related_name
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
 
 class Category(models.Model):
     id = models.IntegerField(primary_key=True)  # Explicitly define the id field

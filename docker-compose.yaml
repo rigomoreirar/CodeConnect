@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:3.92
+        image: rigomoreirar/code-connect-backend:3.95
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
@@ -9,7 +9,6 @@ services:
         restart: unless-stopped
         volumes:
             - ./data:/data
-            - ./build:/code/frontend/build # Ensure build directory is correctly mounted
         networks:
             - code-connect-network
 
