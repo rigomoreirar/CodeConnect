@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:3.91
+        image: rigomoreirar/code-connect-backend:3.92
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
