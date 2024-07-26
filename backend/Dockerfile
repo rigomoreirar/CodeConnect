@@ -21,14 +21,17 @@ RUN pip install -r requirements.txt
 COPY . /code/
 
 # Copy the React build into the Django static files directory
-COPY ./build /code/frontend/build
+COPY ./frontend/build /code/frontend/build
 
 # Run migrations
 RUN python manage.py makemigrations
 RUN python manage.py migrate
 
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
 # Expose port
 EXPOSE 8000
 
-# Run the application:
+# Run the application
 CMD ["gunicorn", "forum.wsgi:application", "--bind", "0.0.0.0:8000"]

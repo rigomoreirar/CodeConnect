@@ -145,10 +145,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Ensure you collect static files to this directory
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend/build/static'),  # Added to serve React static files
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'assets'),
+    os.path.join(BASE_DIR, 'frontend/build/static'),
 ]
 
 # Default primary key field type
