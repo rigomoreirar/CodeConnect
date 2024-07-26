@@ -26,7 +26,7 @@ jobs:
               with:
                   context: ./backend
                   push: true
-                  tags: rigomoreirar/code-connect-backend:3.697
+                  tags: rigomoreirar/code-connect-backend:3.700
                   build-args: |
                       SECRET_KEY=${{ secrets.SECRET_KEY }}
               env:
