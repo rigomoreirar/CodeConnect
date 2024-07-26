@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:3.700
+        image: rigomoreirar/code-connect-backend:3.72
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
@@ -20,7 +20,7 @@ services:
             - "80:80"
             - "443:443"
         volumes:
-            - ./frontend/build:/code/frontend/build
+            - ./backend/build:/code/frontend/build
             - ./nginx.conf:/etc/nginx/nginx.conf
             - ./codeconnect.crt:/etc/ssl/codeconnect.crt
             - ./codeconnect.key:/etc/ssl/codeconnect.key
