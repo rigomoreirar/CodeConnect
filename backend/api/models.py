@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
-from django.db import models, IntegrityError
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
@@ -24,17 +23,16 @@ class User(AbstractUser):
 class Category(models.Model):
     id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     name = models.CharField(max_length=280, default="")
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
-    followers = models.ManyToManyField("Profile", related_name="profileFollowing", blank=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.name)
 
 class Profile(models.Model):
     id = models.IntegerField(primary_key=True)  # Explicitly define the id field
-    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="userProfile", null=True, blank=True)
-    ctg_following = models.ManyToManyField("Category", related_name="categoriesFollowing", blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="userProfile", null=True, blank=True)
     isTeacher = models.BooleanField(default=False)
+    ctg_following = models.ManyToManyField(Category, through='ProfileCtgFollowing', related_name='following_profiles')
 
     def __str__(self):
         return str(self.user)
@@ -43,11 +41,11 @@ class Post(models.Model):
     id = models.IntegerField(primary_key=True)  # Explicitly define the id field
     isStudent = models.BooleanField(default=False)
     creator = models.ForeignKey("Profile", on_delete=models.PROTECT, related_name="postCreator", null=True, blank=True)
-    categories = models.ManyToManyField("Category", related_name="postCategories", blank=True)
     title = models.CharField(max_length=100, default="")
     content = models.TextField(max_length=1000, default="")
     timestamp = models.DateTimeField(auto_now_add=True)
     isActive = models.BooleanField(default=True)
+    categories = models.ManyToManyField(Category, through='PostCategories', related_name='posts')
 
     def __str__(self):
         return f"post by {self.creator}: {self.title}"
@@ -85,9 +83,24 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"commented by {self.profile} on {self.post}"
-    
+
+class CategoryFollowers(models.Model):
+    id = models.IntegerField(primary_key=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='followers')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+
+class PostCategories(models.Model):
+    id = models.IntegerField(primary_key=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+class ProfileCtgFollowing(models.Model):
+    id = models.IntegerField(primary_key=True)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
 @receiver(post_save, sender=Comment)
 @receiver(post_delete, sender=Comment)
 def comment_change_handler(sender, instance, **kwargs):
-    from .views import trigger_sse_update
+    from .views_sse import trigger_sse_update
     trigger_sse_update('comments')

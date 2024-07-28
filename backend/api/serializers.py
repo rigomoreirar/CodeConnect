@@ -1,5 +1,5 @@
 from rest_framework import serializers, validators
-from .models import Post, Profile, Like, Dislike, Comment, User, Category
+from .models import Post, Profile, Like, Dislike, Comment, User, Category, CategoryFollowers, PostCategories, ProfileCtgFollowing
 
 class RegisterSerializers(serializers.ModelSerializer):
     class Meta:
@@ -12,32 +12,25 @@ class RegisterSerializers(serializers.ModelSerializer):
                 "required": True,
                 "validators": [
                     validators.UniqueValidator(
-                        User.objects.all(), "A user with that Email already exists"
+                        queryset=User.objects.all(), message="A user with that Email already exists"
                     )
                 ]
             }
         }
 
     def create(self, validated_data):
-        username = validated_data.get('username')
-        email = validated_data.get('email')
-        password = validated_data.get('password')
-        first_name = validated_data.get('first_name')
-        last_name = validated_data.get('last_name')
-
         user = User.objects.create_user(
-            username=username,
-            password=password,
-            email=email,
-            first_name=first_name,
-            last_name=last_name
+            username=validated_data['username'],
+            password=validated_data['password'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name']
         )
-
         return user
 
 class PostSerializer(serializers.ModelSerializer):
     creator = serializers.PrimaryKeyRelatedField(queryset=Profile.objects.all())
-    categories = serializers.StringRelatedField(many=True)
+    categories = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all(), source='postcategories_set')
 
     class Meta:
         model = Post
@@ -45,7 +38,7 @@ class PostSerializer(serializers.ModelSerializer):
                   'content', 'timestamp', 'isActive')
 
 class ProfileSerializer(serializers.ModelSerializer):
-    ctg_following = serializers.StringRelatedField(many=True)
+    ctg_following = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all())
 
     class Meta:
         model = Profile
@@ -73,8 +66,12 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'timestamp', 'profile', 'post', 'content')
 
 class CategorySerializer(serializers.ModelSerializer):
-    followers = serializers.StringRelatedField(many=True)
+    followers = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
         fields = ('id', 'name', 'followers')
+
+    def get_followers(self, obj):
+        followers = CategoryFollowers.objects.filter(category=obj).values_list('profile', flat=True)
+        return list(followers)
