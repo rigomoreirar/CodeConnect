@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import axios from "../utils/Axios";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import "../styles/EditProfile.css";
+import { AppContext } from "../context/AppContext";
 
-const EditProfile = ({ currentUser }) => {
+const EditProfile = () => {
+    const { user, setUser } = useContext(AppContext);
     const [error, setError] = useState("");
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -11,36 +12,33 @@ const EditProfile = ({ currentUser }) => {
     const [firstName, setFirstName] = useState("");
 
     useEffect(() => {
-        if (currentUser) {
-            setUsername(currentUser.username);
-            setEmail(currentUser.email);
-            setLastName(currentUser.last_name);
-            setFirstName(currentUser.first_name);
+        if (user) {
+            setUsername(user.username);
+            setEmail(user.email);
+            setLastName(user.last_name);
+            setFirstName(user.first_name);
         }
-    }, [currentUser]);
+    }, [user]);
 
     const handleSave = async () => {
         try {
-            const response = await axios.post(
-                "/edit-user-info/",
-                {
-                    username,
-                    email,
-                    first_name: firstName,
-                    last_name: lastName,
-                },
-                {
-                    headers: {
-                        Authorization: window.localStorage.getItem("token"),
-                    },
-                }
-            );
-            if (response.status === 200) {
-                alert("Profile updated successfully");
-            }
+            const updatedUser = {
+                ...user,
+                username,
+                email,
+                first_name: firstName,
+                last_name: lastName,
+            };
+            // Simulate a successful update with a console log
+            console.log("Profile updated:", updatedUser);
+
+            // Update the user in the context
+            setUser(updatedUser);
+
+            alert("Profile updated successfully");
         } catch (error) {
-            setError("Error updating profile: " + error.response.data.error);
-            alert("Error updating profile: " + error.response.data.error);
+            setError("Error updating profile: " + error.message);
+            alert("Error updating profile: " + error.message);
         }
     };
 

@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import axios from "../utils/Axios";
+import React, { useState, useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import styles from "../styles/ProfilePicture.module.css";
 
-const ProfilePicture = ({ userId, imageUrl, setImageUrl, refreshProfile }) => {
+const ProfilePicture = () => {
+    const { user, profilePictureUrl, setProfilePictureUrl } =
+        useContext(AppContext);
     const [error, setError] = useState("");
 
     const handleFileChange = async (event) => {
@@ -21,17 +23,11 @@ const ProfilePicture = ({ userId, imageUrl, setImageUrl, refreshProfile }) => {
             formData.append("profile_picture", file);
 
             try {
-                const token = window.localStorage.getItem("token");
-                if (!token) return;
+                // Simulate a successful upload with a console log
+                console.log("Profile picture uploaded:", file);
 
-                await axios.post("change-profile-picture/", formData, {
-                    headers: {
-                        Authorization: token,
-                        "Content-Type": "multipart/form-data",
-                    },
-                });
-
-                setImageUrl(URL.createObjectURL(file));
+                // Update the profile picture URL
+                setProfilePictureUrl(URL.createObjectURL(file));
             } catch (error) {
                 console.error("Error uploading profile picture:", error);
             }
@@ -41,7 +37,7 @@ const ProfilePicture = ({ userId, imageUrl, setImageUrl, refreshProfile }) => {
     return (
         <div className={styles["profile-picture-container"]}>
             <div className={styles["profile-picture"]}>
-                <img src={imageUrl} alt="Profile" />
+                <img src={profilePictureUrl} alt="Profile" />
                 <label className={styles["upload-button"]}>
                     Change Profile Picture
                     <input

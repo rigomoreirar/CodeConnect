@@ -1,29 +1,24 @@
-import axios from "../utils/Axios";
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import Logo from "../components/Logo";
 import "../styles/Header.css";
 
 const Header = () => {
+    const { setUser } = useContext(AppContext);
+    const navigate = useNavigate();
+
     const handleLogout = () => {
-        const token = window.localStorage.getItem("token");
-        axios
-            .post(
-                "/logout/",
-                {},
-                {
-                    headers: {
-                        Authorization: token,
-                    },
-                }
-            )
-            .then(function (response) {
-                window.localStorage.removeItem("token");
-                window.localStorage.removeItem("isLoggedIn");
-                window.location.href = "/";
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        window.localStorage.removeItem("token");
+        window.localStorage.removeItem("isLoggedIn");
+
+        setUser((prevUser) => ({
+            ...prevUser,
+            isLoggedIn: false,
+            token: null,
+        }));
+
+        navigate("/");
     };
 
     return (

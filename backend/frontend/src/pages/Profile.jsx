@@ -1,137 +1,39 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import axios from "../utils/Axios";
+import { AppContext } from "../context/AppContext";
 import CategoryFollow from "../containers/CategoryFollow";
 import "../styles/Profile.css";
 import ProfilePicture from "../components/ProfilePicture";
 import Filters from "../containers/Filters";
 
-const Profile = ({
-    currentUser,
-    categories,
-    setLoggedUser,
-    profilePictureUrl,
-    setProfilePictureUrl,
-}) => {
+const Profile = () => {
+    const { user, categories, profilePictureUrl, setProfilePictureUrl } =
+        useContext(AppContext);
     const [modal, setModal] = useState(false);
-    const [ctgFollowingLength, setCtgFollowingLength] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [totalLikes, setTotalLikes] = useState(0);
-    const [totalDislikes, setTotalDislikes] = useState(0);
-    const [totalComments, setTotalComments] = useState(0);
+    const [ctgFollowingLength, setCtgFollowingLength] = useState(
+        user.profile_data.ctg_following.length
+    );
+    const [loading, setLoading] = useState(false); // Set to false since data is static
+    const [totalLikes, setTotalLikes] = useState(user.total_likes);
+    const [totalDislikes, setTotalDislikes] = useState(user.total_dislikes);
+    const [totalComments, setTotalComments] = useState(user.total_comments);
 
-    const fetchUserData = async () => {
-        try {
-            const token = window.localStorage.getItem("token");
-            if (!token) return;
-
-            const response = await axios.get("user/", {
-                headers: {
-                    Authorization: token,
-                },
-            });
-
-            const user = response.data.user_info;
-            setLoggedUser(user);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-            setLoading(false);
-        }
-    };
-
-    const fetchTotalLikes = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:8000/total-likes-by-user/?user_id=${currentUser.id}`
-            );
-            setTotalLikes(response.data.total_likes);
-        } catch (error) {
-            console.error("Error fetching total likes:", error);
-        }
-    };
-
-    const fetchTotalDislikes = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:8000/total-dislikes-by-user/?user_id=${currentUser.id}`
-            );
-            setTotalDislikes(response.data.total_dislikes);
-        } catch (error) {
-            console.error("Error fetching total dislikes:", error);
-        }
-    };
-
-    const fetchTotalComments = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:8000/total-comments-by-user/?user_id=${currentUser.id}`
-            );
-            setTotalComments(response.data.total_comments);
-        } catch (error) {
-            console.error("Error fetching total comments:", error);
-        }
+    const refreshUserData = () => {
+        setTotalLikes(user.total_likes);
+        setTotalDislikes(user.total_dislikes);
+        setTotalComments(user.total_comments);
+        setCtgFollowingLength(user.profile_data.ctg_following.length);
     };
 
     useEffect(() => {
-        if (currentUser && currentUser.profile_data) {
-            setCtgFollowingLength(
-                currentUser.profile_data.ctg_following.length
-            );
-            fetchTotalLikes();
-            fetchTotalDislikes();
-            fetchTotalComments();
-        }
-    }, [currentUser]);
+        refreshUserData();
+    }, [user]);
 
-    useEffect(() => {
-        fetchUserData();
-    }, [setLoggedUser]);
-
-    useEffect(() => {
-        if (!modal) {
-            fetchUserData();
-        }
-    }, [modal]);
-
-    useEffect(() => {
-        const eventSourceLikes = new EventSource(
-            `http://localhost:8000/sse-total-likes/${currentUser.id}/`
-        );
-        eventSourceLikes.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setTotalLikes(data.total_likes);
-        };
-
-        const eventSourceDislikes = new EventSource(
-            `http://localhost:8000/sse-total-dislikes/${currentUser.id}/`
-        );
-        eventSourceDislikes.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setTotalDislikes(data.total_dislikes);
-        };
-
-        const eventSourceComments = new EventSource(
-            `http://localhost:8000/sse-total-comments/${currentUser.id}/`
-        );
-        eventSourceComments.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setTotalComments(data.total_comments);
-        };
-
-        return () => {
-            eventSourceLikes.close();
-            eventSourceDislikes.close();
-            eventSourceComments.close();
-        };
-    }, [currentUser.id]);
-
-    // Default values to avoid destructuring errors
-    const email = currentUser?.email || "";
-    const first_name = currentUser?.first_name || "";
-    const last_name = currentUser?.last_name || "";
-    const ctg_following = currentUser?.profile_data?.ctg_following || [];
-    const username = currentUser?.username || "";
+    const email = user?.email || "";
+    const first_name = user?.first_name || "";
+    const last_name = user?.last_name || "";
+    const ctg_following = user?.profile_data?.ctg_following || [];
+    const username = user?.username || "";
 
     return (
         <>
@@ -149,10 +51,10 @@ const Profile = ({
                         <div className="row no-gutters">
                             <div className="col-md-4 col-lg-4 d-flex justify-content-center align-items-center">
                                 <ProfilePicture
-                                    userId={currentUser.id}
+                                    userId={user.id}
                                     imageUrl={profilePictureUrl}
                                     setImageUrl={setProfilePictureUrl}
-                                    refreshProfile={fetchUserData}
+                                    refreshProfile={refreshUserData}
                                 />
                             </div>
                             <div className="col-md-8 col-lg-8">
@@ -172,10 +74,7 @@ const Profile = ({
                                             </div>
                                             <div className="d-flex flex-row justify-content-between change-profile-buttons">
                                                 <Link
-                                                    to={{
-                                                        pathname:
-                                                            "/forum/edit-profile",
-                                                    }}
+                                                    to="/forum/edit-profile"
                                                     className="btn btn-primary mr-2"
                                                 >
                                                     Edit Profile
@@ -223,8 +122,8 @@ const Profile = ({
                         setLength={setCtgFollowingLength}
                         length={ctgFollowingLength}
                         categories={categories}
-                        currentUser={currentUser}
-                        refreshUserData={fetchUserData}
+                        currentUser={user}
+                        refreshUserData={refreshUserData}
                     />
                 )}
             </div>

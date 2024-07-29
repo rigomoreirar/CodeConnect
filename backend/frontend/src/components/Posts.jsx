@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp, FaTrashAlt } from "react-icons/fa";
 import "../styles/Posts.css";
-import Axios from "../utils/Axios";
+import { AppContext } from "../context/AppContext";
 
 const Posts = ({
     post,
@@ -12,6 +12,7 @@ const Posts = ({
     onDelete,
     onCommentAdded,
 }) => {
+    const { user } = useContext(AppContext);
     const {
         content,
         title,
@@ -32,14 +33,10 @@ const Posts = ({
             (dislike) => dislike.post === post.id
         );
         setLikeCount(postLikes.length);
-        setLikeFill(
-            postLikes.some((like) => like.profile === currentUser.username)
-        );
+        setLikeFill(postLikes.some((like) => like.profile === currentUser.id));
         setDislikeCount(postDislikes.length);
         setDislikeFill(
-            postDislikes.some(
-                (dislike) => dislike.profile === currentUser.username
-            )
+            postDislikes.some((dislike) => dislike.profile === currentUser.id)
         );
     };
 
@@ -49,28 +46,14 @@ const Posts = ({
                 if (dislikeFill) {
                     setDislikeCount(dislikeCount - 1);
                     setDislikeFill(false);
-                    await Axios.post("dislike/", {
-                        undislike: true,
-                        post: post,
-                        user: currentUser,
-                    });
                 }
                 setLikeCount(likeCount + 1);
                 setLikeFill(true);
-                await Axios.post("like/", {
-                    unlike: false,
-                    post: post,
-                    user: currentUser,
-                });
             } else {
                 setLikeCount(likeCount - 1);
                 setLikeFill(false);
-                await Axios.post("like/", {
-                    unlike: true,
-                    post: post,
-                    user: currentUser,
-                });
             }
+            console.log("Like handled for post:", post.id);
         } catch (error) {
             console.log(error);
         }
@@ -82,28 +65,14 @@ const Posts = ({
                 if (likeFill) {
                     setLikeCount(likeCount - 1);
                     setLikeFill(false);
-                    await Axios.post("like/", {
-                        unlike: true,
-                        post: post,
-                        user: currentUser,
-                    });
                 }
                 setDislikeCount(dislikeCount + 1);
                 setDislikeFill(true);
-                await Axios.post("dislike/", {
-                    undislike: false,
-                    post: post,
-                    user: currentUser,
-                });
             } else {
                 setDislikeCount(dislikeCount - 1);
                 setDislikeFill(false);
-                await Axios.post("dislike/", {
-                    undislike: true,
-                    post: post,
-                    user: currentUser,
-                });
             }
+            console.log("Dislike handled for post:", post.id);
         } catch (error) {
             console.log(error);
         }
@@ -117,11 +86,7 @@ const Posts = ({
 
     const deleteHandler = async () => {
         try {
-            await Axios.post("delete-user-post/", {
-                post: { id: post.id },
-                user: { id: currentUser.id },
-            });
-            console.log("Post deleted");
+            console.log("Post deleted:", post.id);
             onDelete(post.id);
         } catch (error) {
             console.error("Error deleting post:", error);
@@ -131,37 +96,18 @@ const Posts = ({
     useEffect(() => {
         Array.isArray(likes) &&
             likes.forEach((like) => {
-                if (like.profile === currentUser.username) {
+                if (like.profile === currentUser.id) {
                     setLikeFill(true);
                 }
             });
 
         Array.isArray(dislikes) &&
             dislikes.forEach((dislike) => {
-                if (dislike.profile === currentUser.username) {
+                if (dislike.profile === currentUser.id) {
                     setDislikeFill(true);
                 }
             });
     }, [currentPost, currentUser, likes, dislikes]);
-
-    useEffect(() => {
-        const eventSourceLikes = new EventSource("/sse/likes/");
-        eventSourceLikes.onmessage = (event) => {
-            const updatedLikes = JSON.parse(event.data);
-            updateLikesDislikes(updatedLikes, dislikes);
-        };
-
-        const eventSourceDislikes = new EventSource("/sse/dislikes/");
-        eventSourceDislikes.onmessage = (event) => {
-            const updatedDislikes = JSON.parse(event.data);
-            updateLikesDislikes(likes, updatedDislikes);
-        };
-
-        return () => {
-            eventSourceLikes.close();
-            eventSourceDislikes.close();
-        };
-    }, [post.id, currentUser.username]);
 
     return (
         <div
@@ -192,9 +138,9 @@ const Posts = ({
                                 <section id="cats">
                                     {Array.isArray(categories) &&
                                         categories.map((category) => (
-                                            <div key={category}>
+                                            <div key={category.id}>
                                                 <span className="badge badge-secondary mr-2">
-                                                    {category}
+                                                    {category.name}
                                                 </span>
                                             </div>
                                         ))}

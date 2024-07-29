@@ -1,33 +1,27 @@
-import React, { useState } from "react";
-import axios from "../utils/Axios";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import "../styles/EditProfile.css";
 
 const NewPassword = () => {
+    const { user } = useContext(AppContext);
     const [error, setError] = useState("");
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
 
-    const handleSave = async () => {
-        try {
-            const response = await axios.post(
-                "/change-user-password/",
-                {
-                    current_password: currentPassword,
-                    new_password: newPassword,
-                },
-                {
-                    headers: {
-                        Authorization: window.localStorage.getItem("token"),
-                    },
-                }
-            );
-            if (response.status === 200) {
-                alert("Password updated successfully");
-            }
-        } catch (error) {
-            setError("Error updating password: " + error.response.data.error);
-            alert("Error updating password: " + error.response.data.error);
+    const handleSave = () => {
+        if (!currentPassword || !newPassword) {
+            setError("Both fields are required.");
+            return;
+        }
+
+        // Simulating password change
+        if (currentPassword === "correct_password") {
+            alert("Password updated successfully");
+            setError("");
+        } else {
+            setError("Error updating password: Incorrect current password.");
+            alert("Error updating password: Incorrect current password.");
         }
     };
 

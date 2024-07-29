@@ -1,108 +1,50 @@
-import { useEffect, useState } from "react";
-import Axios from "../utils/Axios";
+import { useContext, useState, useEffect } from "react";
 import "../styles/Home.css";
 import "../styles/Create.css";
 import "../styles/Comments-legacy.css";
 import Posts from "../components/Posts";
-import Comments from "./Comments";
+import Comments from "../components/Comments";
 import Filters from "../containers/Filters";
 import CategoryBox from "../containers/CategoryBox";
 import Loader from "../components/Loader";
+import { AppContext } from "../context/AppContext";
 
-const Community = ({
-    currentUser,
-    categories,
-    setCategories,
-    catArray,
-    setCatArray,
-    setLoggedUser,
-}) => {
+const Community = () => {
+    const {
+        user,
+        categories,
+        posts: allPosts,
+        setPosts,
+        setCategories,
+    } = useContext(AppContext);
     const [isLoading, setIsLoading] = useState(true);
-    const [posts, setPosts] = useState([]);
+    const [posts, setPostsState] = useState([]);
     const [userCategories, setUserCategories] = useState([]);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [activeFilter, setActiveFilter] = useState([]);
     const [visiblePostsCount, setVisiblePostsCount] = useState(3);
+    const [catArray, setCatArray] = useState([]);
 
     useEffect(() => {
-        console.log("Current user community:", currentUser);
-    }, [currentUser]);
-
-    const fetchPosts = async () => {
-        setIsLoading(true);
-        try {
-            const response = await Axios.get(
-                `http://localhost:8000/posts-by-user-id/?user_id=${currentUser.id}`
-            );
-            const postArray = Array.isArray(response.data) ? response.data : [];
-            console.log("Posts by user ID:", postArray);
-            setPosts(postArray.filter((post) => post.isStudent));
-            setIsLoading(false);
-        } catch (error) {
-            console.error("Error fetching posts:", error);
-            setIsLoading(false);
-        }
-    };
-
-    const fetchCategories = async () => {
-        const userId = currentUser.id;
-        try {
-            const response = await Axios.get(
-                `http://localhost:8000/user-categories/?user_id=${userId}`
-            );
-            setUserCategories(
-                Array.isArray(response.data) ? response.data : []
-            );
-            const allCategoriesResponse = await Axios.get("all-categories/");
-            setCategories(
-                Array.isArray(allCategoriesResponse.data)
-                    ? allCategoriesResponse.data
-                    : []
-            );
-            console.log("All categories in community:", allCategoriesResponse);
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        }
-    };
+        setUserCategories(user.profile_data.ctg_following);
+        setPostsState(allPosts.filter((post) => post.user_id === user.id));
+        setIsLoading(false);
+    }, [user, allPosts]);
 
     useEffect(() => {
-        fetchPosts();
-        fetchCategories();
-
-        // Set up Server-Sent Events (SSE) for categories
-        const eventSource = new EventSource("/sse/categories/");
-
-        eventSource.onmessage = (event) => {
-            console.log("New category message:", event.data);
-            fetchCategories(); // Refetch categories when a new category is created
-        };
-
-        eventSource.onerror = (error) => {
-            console.error("EventSource failed:", error);
-            eventSource.close();
-        };
-
-        return () => {
-            eventSource.close();
-        };
-    }, [currentUser]);
-
-    useEffect(() => {
-        const filterPosts = () => {
-            if (activeFilter.length === 0) {
-                fetchPosts(); // Refetch posts if no filter is active
-            } else {
-                const filtered = posts.filter((post) =>
-                    activeFilter.some((filter) =>
-                        post.categories.includes(filter.name)
+        if (activeFilter.length === 0) {
+            setPostsState(allPosts.filter((post) => post.user_id === user.id));
+        } else {
+            const filtered = allPosts.filter((post) =>
+                activeFilter.some((filter) =>
+                    post.categories.some(
+                        (category) => category.name === filter.name
                     )
-                );
-                setPosts(filtered);
-            }
-        };
-
-        filterPosts();
-    }, [activeFilter]);
+                )
+            );
+            setPostsState(filtered);
+        }
+    }, [activeFilter, allPosts, user.id]);
 
     const handleLoadMore = () => {
         setVisiblePostsCount((prevCount) => prevCount + 3);
@@ -118,6 +60,7 @@ const Community = ({
             }
             return post;
         });
+        setPostsState(updatedPosts);
         setPosts(updatedPosts);
     };
 
@@ -133,6 +76,7 @@ const Community = ({
             }
             return post;
         });
+        setPostsState(updatedPosts);
         setPosts(updatedPosts);
     };
 
@@ -140,75 +84,79 @@ const Community = ({
         .sort((a, b) => b.id - a.id)
         .slice(0, visiblePostsCount);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const post = {
-            isStudent: true,
-            creator: { id: currentUser.id }, // Only send the user ID
-            title: formData.get("question"), // Change "question" to "title"
+        const newPost = {
+            id: posts.length + 1,
+            user_id: user.id,
+            title: formData.get("question"),
             content: formData.get("content"),
             categories: catArray,
+            likes: [],
+            dislikes: [],
+            comments: [],
         };
 
-        if (!post.title || !post.content || post.categories.length === 0) {
+        if (
+            !newPost.title ||
+            !newPost.content ||
+            newPost.categories.length === 0
+        ) {
             alert(
                 "Please fill all the fields and select at least one category."
             );
             return;
         }
 
-        if (post.title.length > 99) {
+        if (newPost.title.length > 99) {
             alert(
                 "Please be more concise with your question (max 100 characters)."
             );
             return;
         }
 
-        if (post.content.length > 999) {
+        if (newPost.content.length > 999) {
             alert("The description limit is 1000 characters.");
             return;
         }
 
-        try {
-            const response = await Axios.post("new-post/", post);
-            console.log("New Post Response:", response.data);
-            fetchPosts();
-        } catch (error) {
-            console.error("Error creating new post:", error);
-        }
+        setPosts([...posts, newPost]);
+        setPostsState([...posts, newPost]);
+        console.log("New Post Added:", newPost);
     };
 
     const handlePostDelete = (postId) => {
+        setPostsState((prevPosts) =>
+            prevPosts.filter((post) => post.id !== postId)
+        );
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+        console.log(`Post deleted: ${postId}`);
     };
 
-    const handleCategorySubmit = async (e) => {
+    const handleCategorySubmit = (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const categoryName = formData.get("category");
 
-        try {
-            await Axios.post("create-category/", {
-                name: categoryName,
-                user_id: currentUser.id,
-            });
-            console.log("Category created:", categoryName, " by ", currentUser);
-            fetchCategories(); // Refresh categories after creation
-        } catch (error) {
-            console.error("Error creating category:", error);
-        }
+        const newCategory = { id: categories.length + 1, name: categoryName };
+
+        setCategories([...categories, newCategory]);
+        setUserCategories([...userCategories, newCategory]);
+        console.log("Category created:", categoryName);
     };
 
-    const handleCategoryDelete = async (categoryId) => {
-        try {
-            await Axios.post("delete-category/", {
-                id: categoryId,
-            });
-            fetchCategories(); // Refresh categories after deletion
-        } catch (error) {
-            console.error("Error deleting category:", error);
-        }
+    const handleCategoryDelete = (categoryId) => {
+        const updatedCategories = categories.filter(
+            (category) => category.id !== categoryId
+        );
+        const updatedUserCategories = userCategories.filter(
+            (category) => category.id !== categoryId
+        );
+
+        setCategories(updatedCategories);
+        setUserCategories(updatedUserCategories);
+        console.log(`Category deleted: ${categoryId}`);
     };
 
     return (
@@ -221,7 +169,7 @@ const Community = ({
                 />
                 <div className="inner-main d-flex flex-column align-items-center">
                     <h1 className="mb-4 ml-3 mt-3 display-4">
-                        Welcome back, {currentUser.first_name}
+                        Welcome back, {user.first_name}
                     </h1>
                     <form onSubmit={handleSubmit} id="tweet-form">
                         <div id="tweetbox" className="wrapper mb-5">
@@ -269,7 +217,7 @@ const Community = ({
                             <div key={post.id} className="centered-items">
                                 <Posts
                                     post={post}
-                                    currentUser={currentUser}
+                                    currentUser={user}
                                     setShowComments={() =>
                                         setShowCommentsPostId(post.id)
                                     }
@@ -280,7 +228,7 @@ const Community = ({
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
-                                        currentUser={currentUser}
+                                        currentUser={user}
                                         currentPost={post}
                                         setShowComments={() =>
                                             setShowCommentsPostId(null)

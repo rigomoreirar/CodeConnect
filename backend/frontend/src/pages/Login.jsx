@@ -1,13 +1,14 @@
-import Axios from "../utils/Axios";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import Logo from "../components/Logo";
 import "../styles/Layout.css";
-import { Hidden } from "@mui/material";
 
 const Login = () => {
+    const { user, setUser } = useContext(AppContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleLogin = () => {
         console.log({
@@ -18,27 +19,16 @@ const Login = () => {
             alert("No blanks!");
             return;
         }
-        Axios.post("login/", {
-            username: username,
-            password: password,
-        })
-            .then(function (response) {
-                const token = `Token ${response.data.token}`;
-                window.localStorage.setItem("token", token);
-                window.localStorage.setItem("isLoggedIn", "true");
-                window.location.href = "/";
-            })
-            .catch(function (error) {
-                if (
-                    error.response &&
-                    error.response.data &&
-                    error.response.data.error
-                ) {
-                    alert(error.response.data.error);
-                } else {
-                    console.log(error);
-                }
-            });
+
+        if (username === user.username && password === "correct_password") {
+            const updatedUser = { ...user, isLoggedIn: true };
+            setUser(updatedUser);
+            window.localStorage.setItem("token", updatedUser.token);
+            window.localStorage.setItem("isLoggedIn", "true");
+            navigate("/forum");
+        } else {
+            alert("Invalid username or password");
+        }
     };
 
     return (

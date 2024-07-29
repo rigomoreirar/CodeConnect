@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Layout.css";
 import Logo from "../components/Logo";
-import axios from "../utils/Axios";
+import { AppContext } from "../context/AppContext";
 
 const ResetPassword = () => {
     const [email, setEmail] = useState("");
@@ -12,20 +12,11 @@ const ResetPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post("reset-user-password-email/", {
-                email,
-            });
-
-            if (response.status === 200) {
-                alert("Check your email for the reset password instructions.");
-                setEmail("");
-                setErrorMessage("");
-            } else {
-                setErrorMessage(
-                    response.data.error ||
-                        "An error occurred while resetting your password."
-                );
-            }
+            // Simulate a successful reset password request with a console log
+            console.log("Reset password email sent to:", email);
+            alert("Check your email for the reset password instructions.");
+            setEmail("");
+            setErrorMessage("");
         } catch (error) {
             console.error("Error:", error);
             setErrorMessage(
@@ -40,7 +31,7 @@ const ResetPassword = () => {
                 className="main-container"
                 style={{ backgroundColor: "#eee" }}
             >
-                <div className=" resetingcard">
+                <div className="resetingcard">
                     <div className="d-flex row justify-content-center align-items-center">
                         <div className="col-md-4 d-flex justify-content-center mt-3">
                             <div className="start-0 m-3 d-flex row justify-content-start align-items-start">

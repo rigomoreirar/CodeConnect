@@ -1,9 +1,8 @@
-import axios from "../utils/Axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import "../styles/Comments.css";
+import { AppContext } from "../context/AppContext";
 
-// This is a test comment, delete me if you find me
 const Comments = ({
     currentPost,
     setShowComments,
@@ -11,6 +10,7 @@ const Comments = ({
     onCommentAdded,
     onCommentDeleted,
 }) => {
+    const { user } = useContext(AppContext);
     const [comments, setComments] = useState(
         Array.isArray(currentPost.comments) ? currentPost.comments : []
     );
@@ -22,10 +22,10 @@ const Comments = ({
             for (const comment of comments) {
                 if (!pictures[comment.profile]) {
                     try {
-                        const response = await axios.get(
-                            `http://localhost:8000/profile-picture-username/${comment.profile}/`
-                        );
-                        pictures[comment.profile] = response.config.url;
+                        // Mocking the profile picture URL, update logic as needed
+                        pictures[
+                            comment.profile
+                        ] = `path/to/profile-picture/${comment.profile}.png`;
                     } catch (error) {
                         console.error("Error fetching profile picture:", error);
                         pictures[comment.profile] =
@@ -39,77 +39,28 @@ const Comments = ({
         fetchProfilePictures();
     }, [comments]);
 
-    const fetchComments = async () => {
-        try {
-            const response = await axios.post("postData/", {
-                post_id: currentPost.id,
-            });
-            const newComments = Array.isArray(response.data.comments)
-                ? response.data.comments
-                : [];
-            setComments(newComments);
-        } catch (error) {
-            console.error("Error fetching comments:", error);
-        }
-    };
-
-    useEffect(() => {
-        const eventSource = new EventSource("/sse/comments/");
-        eventSource.onmessage = (event) => {
-            try {
-                const updatedComments = JSON.parse(event.data);
-                if (
-                    updatedComments.some(
-                        (comment) => comment.post === currentPost.id
-                    )
-                ) {
-                    fetchComments();
-                }
-            } catch (error) {
-                console.error("Error parsing comments event data:", error);
-            }
-        };
-
-        return () => {
-            eventSource.close();
-        };
-    }, [currentPost]);
-
     const handleSubmit = (e) => {
         e.preventDefault();
         const newComment = {
+            id: comments.length + 1, // Mocked ID, update with actual logic
             profile: currentUser.id,
             post: currentPost.id,
             content: e.target.elements.content.value,
         };
-        axios
-            .post("addComment/", newComment)
-            .then((res) => {
-                const createdComment = res.data;
-                setComments([...comments, createdComment]);
-                e.target.elements.content.value = "";
-                onCommentAdded(currentPost.id, createdComment);
-            })
-            .catch((error) => {
-                console.error("Error adding comment:", error);
-            });
+
+        setComments([...comments, newComment]);
+        onCommentAdded(currentPost.id, newComment);
+        e.target.elements.content.value = "";
+        console.log("Comment added:", newComment);
     };
 
     const handleDelete = (commentId) => {
-        axios
-            .post("delete_comment/", {
-                comment_id: commentId,
-                user_id: currentUser.id,
-            })
-            .then((res) => {
-                setComments(
-                    comments.filter((comment) => comment.id !== commentId)
-                );
-                onCommentDeleted(currentPost.id, commentId);
-            })
-            .catch((error) => {
-                console.error("Error deleting comment:", error);
-            });
+        const updatedComments = comments.filter(
+            (comment) => comment.id !== commentId
+        );
+        setComments(updatedComments);
+        onCommentDeleted(currentPost.id, commentId);
+        console.log("Comment deleted:", commentId);
     };
 
     return (
@@ -165,7 +116,7 @@ const Comments = ({
                                 className="profile-picture"
                             />
                             <h6 className="mb-0">{comment.profile}</h6>
-                            {comment.profile === currentUser.username && (
+                            {comment.profile === currentUser.id && (
                                 <FaTrashAlt
                                     className="delete-icon"
                                     onClick={() => handleDelete(comment.id)}

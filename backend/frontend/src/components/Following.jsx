@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
-import Axios from "../utils/Axios";
+import { AppContext } from "../context/AppContext";
 
 const Following = ({
     category,
@@ -9,40 +9,29 @@ const Following = ({
     setLength,
     refreshUserData,
 }) => {
+    const { user } = useContext(AppContext);
     const [array, setArray] = useState(ctg_following);
-    const [fill, setFill] = useState(array.includes(category.name));
+    const [fill, setFill] = useState(
+        array.some((cat) => cat.name === category.name)
+    );
 
     const handleCat = async (category) => {
         let newArray;
-        if (array.includes(category.name)) {
-            newArray = array.filter((cat) => cat !== category.name);
+        if (array.some((cat) => cat.name === category.name)) {
+            newArray = array.filter((cat) => cat.name !== category.name);
             setLength((prevLength) => prevLength - 1);
-            try {
-                await Axios.post("unfollow/", {
-                    ...category,
-                    user: currentUser,
-                });
-            } catch (error) {
-                console.log(error);
-            }
+            console.log("Unfollowed category:", category.name);
         } else {
-            newArray = [...array, category.name];
+            newArray = [...array, category];
             setLength((prevLength) => prevLength + 1);
-            try {
-                await Axios.post("follow/", {
-                    ...category,
-                    user: currentUser,
-                });
-            } catch (error) {
-                console.log(error);
-            }
+            console.log("Followed category:", category.name);
         }
         setArray(newArray);
         refreshUserData();
     };
 
     useEffect(() => {
-        setFill(array.includes(category.name));
+        setFill(array.some((cat) => cat.name === category.name));
     }, [array, category.name]);
 
     return (

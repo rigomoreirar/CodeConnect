@@ -1,152 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import "../styles/Home.css";
 import Posts from "../components/Posts";
-import Comments from "./Comments";
+import Comments from "../components/Comments";
 import Filters from "../containers/Filters";
-import Axios from "../utils/Axios";
 
-const Home = ({ currentUser, setLoggedUser }) => {
-    const [posts, setPosts] = useState([]);
+const Home = () => {
+    const { user, categories, posts } = useContext(AppContext);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
-    const [post, setPost] = useState([]);
     const [activeFilter, setActiveFilter] = useState([]);
-    const [allPosts, setAllPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
-    const [categories, setCategories] = useState([]);
 
-    const fetchData = async () => {
-        try {
-            const response = await Axios.get("all-posts/");
-            const postArray = Array.isArray(response.data) ? response.data : [];
+    const filteredPosts =
+        activeFilter.length === 0
+            ? posts
+            : posts.filter((post) =>
+                  post.categories.some((category) =>
+                      activeFilter.some(
+                          (filter) => filter.name === category.name
+                      )
+                  )
+              );
 
-            const enrichedPosts = await Promise.all(
-                postArray.map(async (post) => {
-                    try {
-                        const res = await Axios.post("postData/", {
-                            post_id: post.id,
-                        });
-                        return {
-                            ...post,
-                            likes: Array.isArray(res.data.likes)
-                                ? res.data.likes
-                                : [],
-                            dislikes: Array.isArray(res.data.dislikes)
-                                ? res.data.dislikes
-                                : [],
-                            comments: Array.isArray(res.data.comments)
-                                ? res.data.comments
-                                : [],
-                        };
-                    } catch (error) {
-                        console.error("Error fetching post data:", error);
-                        return post;
-                    }
-                })
-            );
-
-            setAllPosts(enrichedPosts);
-            setPosts(enrichedPosts);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching posts:", error);
-            setLoading(false);
-        }
-    };
-
-    const fetchCategories = async () => {
-        try {
-            const response = await Axios.get("all-categories/");
-            const categoriesArray = Array.isArray(response.data)
-                ? response.data
-                : [];
-            setCategories(categoriesArray);
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchData();
-        fetchCategories();
-
-        const postsEventSource = new EventSource("/sse/posts/");
-        postsEventSource.onmessage = (event) => {
-            try {
-                console.log("Posts event data:", event.data);
-                const updatedPosts = JSON.parse(event.data);
-                setAllPosts(updatedPosts);
-                setPosts(updatedPosts);
-            } catch (error) {
-                console.error("Error parsing posts event data:", error);
-            }
-        };
-
-        const categoriesEventSource = new EventSource("/sse/categories/");
-        categoriesEventSource.onmessage = (event) => {
-            try {
-                console.log("Categories event data:", event.data);
-                const updatedCategories = JSON.parse(event.data);
-                setCategories(updatedCategories);
-            } catch (error) {
-                console.error("Error parsing categories event data:", error);
-            }
-        };
-
-        return () => {
-            postsEventSource.close();
-            categoriesEventSource.close();
-        };
-    }, [currentUser]);
-
-    useEffect(() => {
-        if (activeFilter.length === 0) {
-            setPosts(allPosts);
-        } else if (activeFilter.length === 1) {
-            const filteredPosts = allPosts.filter((post) =>
-                post.categories.includes(activeFilter[0].name)
-            );
-            setPosts(filteredPosts);
-        }
-    }, [activeFilter, allPosts]);
+    const sortedPosts = filteredPosts
+        .sort((a, b) => b.id - a.id)
+        .slice(0, visiblePostsCount);
 
     const handleLoadMore = () => {
         setVisiblePostsCount((prevCount) => prevCount + 15);
     };
 
     const handleCommentAdded = (postId, newComment) => {
-        const updatedPosts = posts.map((post) => {
-            if (post.id === postId) {
-                return {
-                    ...post,
-                    comments: [...post.comments, newComment],
-                };
-            }
-            return post;
-        });
-        setPosts(updatedPosts);
-        setAllPosts(updatedPosts);
+        console.log(`Comment added to post ${postId}:`, newComment);
     };
 
     const handleCommentDeleted = (postId, commentId) => {
-        const updatedPosts = posts.map((post) => {
-            if (post.id === postId) {
-                return {
-                    ...post,
-                    comments: post.comments.filter(
-                        (comment) => comment.id !== commentId
-                    ),
-                };
-            }
-            return post;
-        });
-        setPosts(updatedPosts);
-        setAllPosts(updatedPosts);
+        console.log(`Comment deleted from post ${postId}:`, commentId);
     };
-
-    const sortedPosts = posts
-        .sort((a, b) => b.id - a.id)
-        .slice(0, visiblePostsCount);
 
     return (
         <>
@@ -159,18 +49,16 @@ const Home = ({ currentUser, setLoggedUser }) => {
                 />
                 <div className="inner-main d-flex flex-column align-items-center">
                     <h1 className="ml-3 mt-3 display-4">Here's what's new!</h1>
-                    {loading ? (
-                        <div className="loading">Loading...</div>
-                    ) : sortedPosts.length > 0 ? (
+                    {sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
                             <div key={post.id} className="centered-items">
                                 <Posts
-                                    setPost={setPost}
+                                    setPost={() => {}}
                                     showCommets={showCommentsPostId === post.id}
                                     setShowComments={() =>
                                         setShowCommentsPostId(post.id)
                                     }
-                                    currentUser={currentUser}
+                                    currentUser={user}
                                     post={post}
                                     onCommentAdded={handleCommentAdded}
                                     onCommentDeleted={handleCommentDeleted}
@@ -178,7 +66,7 @@ const Home = ({ currentUser, setLoggedUser }) => {
                                 {showCommentsPostId === post.id && (
                                     <Comments
                                         key={post.id}
-                                        currentUser={currentUser}
+                                        currentUser={user}
                                         currentPost={post}
                                         setShowComments={() =>
                                             setShowCommentsPostId(null)
@@ -196,9 +84,9 @@ const Home = ({ currentUser, setLoggedUser }) => {
                         </div>
                     )}
                     <div className="post-counter">
-                        {sortedPosts.length}/{posts.length} posts shown
+                        {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
-                    {sortedPosts.length < posts.length && (
+                    {sortedPosts.length < filteredPosts.length && (
                         <div className="load-more" onClick={handleLoadMore}>
                             Load more...
                         </div>

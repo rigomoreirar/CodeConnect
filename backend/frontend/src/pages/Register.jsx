@@ -1,7 +1,7 @@
-import { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import Logo from "../components/Logo";
-import axios from "../utils/Axios";
 import RegisterProfilePicture from "../components/RegisterProfilePicture";
 import styles from "../styles/Register.module.css";
 
@@ -32,6 +32,7 @@ const FormField = ({ icon, label, type, value, setValue, id }) => {
 
 const Register = () => {
     const navigate = useNavigate();
+    const { setUser } = useContext(AppContext);
     const [name, setName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -57,36 +58,23 @@ const Register = () => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append("first_name", name);
-        formData.append("last_name", lastName);
-        formData.append("username", username);
-        formData.append("password", password);
-        formData.append("email", email);
-        if (profilePicture) {
-            formData.append("profile_picture", profilePicture);
-        }
+        // Simulating registration and user state update
+        setUser({
+            id: Math.floor(Math.random() * 1000),
+            username,
+            email,
+            first_name: name,
+            last_name: lastName,
+            profile_data: {
+                ctg_following: [],
+            },
+            total_likes: 0,
+            total_dislikes: 0,
+            total_comments: 0,
+        });
 
-        axios
-            .post("register/", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            })
-            .then(function (response) {
-                const token = `Token ${response.data.token}`;
-                window.localStorage.setItem("token", token);
-                navigate("");
-            })
-            .catch(function (error) {
-                console.log(error);
-                error.response.data.username
-                    ? alert(error.response.data.username)
-                    : console.log("Username passed");
-                error.response.data.email
-                    ? alert(error.response.data.email)
-                    : console.log("Email passed");
-            });
+        alert("User registered successfully!");
+        navigate("/forum");
     };
 
     return (

@@ -1,175 +1,70 @@
-import { useEffect, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "../styles/Home.css";
 import Posts from "../components/Posts";
-import Comments from "./Comments";
+import Comments from "../components/Comments";
 import Filters from "../containers/Filters";
-import Axios from "../utils/Axios";
+import { AppContext } from "../context/AppContext";
 
-const Feed = ({ currentUser, categories, setLoggedUser }) => {
-    const [posts, setPosts] = useState([]);
-    const [showCommentsPostId, setShowCommentsPostId] = useState(null);
-    const [activeFilter, setActiveFilter] = useState([]);
-    const [allPosts, setAllPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
+const Feed = () => {
+    const { user, categories, posts: allPosts } = useContext(AppContext);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
-
-    const fetchData = async () => {
-        try {
-            const response = await Axios.get("all-posts/");
-            const postArray = Array.isArray(response.data) ? response.data : [];
-
-            const enrichedPosts = await Promise.all(
-                postArray.map(async (post) => {
-                    try {
-                        const res = await Axios.post("postData/", {
-                            post_id: post.id,
-                        });
-                        return {
-                            ...post,
-                            likes: Array.isArray(res.data.likes)
-                                ? res.data.likes
-                                : [],
-                            dislikes: Array.isArray(res.data.dislikes)
-                                ? res.data.dislikes
-                                : [],
-                            comments: Array.isArray(res.data.comments)
-                                ? res.data.comments
-                                : [],
-                        };
-                    } catch (error) {
-                        console.error("Error fetching post data:", error);
-                        return post;
-                    }
-                })
-            );
-
-            setPosts(enrichedPosts);
-            setAllPosts(enrichedPosts);
-            setLoading(false);
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
-        }
-    };
+    const [activeFilter, setActiveFilter] = useState([]);
+    const [showCommentsPostId, setShowCommentsPostId] = useState(null);
+    const [filteredPosts, setFilteredPosts] = useState([]);
 
     useEffect(() => {
-        fetchData();
-
-        const postsEventSource = new EventSource("/sse/posts/");
-        postsEventSource.onmessage = (event) => {
-            try {
-                console.log("Posts event data:", event.data);
-                const updatedPosts = JSON.parse(event.data);
-                setAllPosts(updatedPosts);
-                setPosts(updatedPosts);
-            } catch (error) {
-                console.error("Error parsing posts event data:", error);
-            }
-        };
-
-        const likesEventSource = new EventSource("/sse/likes/");
-        likesEventSource.onmessage = (event) => {
-            try {
-                console.log("Likes event data:", event.data);
-                const updatedLikes = JSON.parse(event.data);
-                setPosts((prevPosts) =>
-                    prevPosts.map((post) => ({
-                        ...post,
-                        likes: updatedLikes.filter(
-                            (like) => like.post === post.id
-                        ),
-                    }))
-                );
-            } catch (error) {
-                console.error("Error parsing likes event data:", error);
-            }
-        };
-
-        const dislikesEventSource = new EventSource("/sse/dislikes/");
-        dislikesEventSource.onmessage = (event) => {
-            try {
-                console.log("Dislikes event data:", event.data);
-                const updatedDislikes = JSON.parse(event.data);
-                setPosts((prevPosts) =>
-                    prevPosts.map((post) => ({
-                        ...post,
-                        dislikes: updatedDislikes.filter(
-                            (dislike) => dislike.post === post.id
-                        ),
-                    }))
-                );
-            } catch (error) {
-                console.error("Error parsing dislikes event data:", error);
-            }
-        };
-
-        return () => {
-            postsEventSource.close();
-            likesEventSource.close();
-            dislikesEventSource.close();
-        };
-    }, [currentUser]);
+        const filtered = allPosts.filter((post) =>
+            post.categories.some((category) =>
+                user.profile_data.ctg_following.some(
+                    (followedCategory) =>
+                        followedCategory.name === category.name
+                )
+            )
+        );
+        setFilteredPosts(filtered);
+    }, [allPosts, user.profile_data.ctg_following]);
 
     useEffect(() => {
         if (activeFilter.length === 0) {
-            setPosts(
-                allPosts.filter((post) =>
-                    post.categories.some((category) =>
-                        currentUser.profile_data.ctg_following.includes(
-                            category
-                        )
+            const filtered = allPosts.filter((post) =>
+                post.categories.some((category) =>
+                    user.profile_data.ctg_following.some(
+                        (followedCategory) =>
+                            followedCategory.name === category.name
                     )
                 )
             );
+            setFilteredPosts(filtered);
         } else if (activeFilter.length === 1) {
-            const filteredPosts = allPosts.filter(
+            const filtered = allPosts.filter(
                 (post) =>
-                    post.categories.includes(activeFilter[0].name) &&
+                    post.categories.some(
+                        (category) => category.name === activeFilter[0].name
+                    ) &&
                     post.categories.some((category) =>
-                        currentUser.profile_data.ctg_following.includes(
-                            category
+                        user.profile_data.ctg_following.some(
+                            (followedCategory) =>
+                                followedCategory.name === category.name
                         )
                     )
             );
-            setPosts(filteredPosts);
+            setFilteredPosts(filtered);
         }
-    }, [activeFilter, allPosts, currentUser]);
+    }, [activeFilter, allPosts, user.profile_data.ctg_following]);
 
     const handleLoadMore = () => {
         setVisiblePostsCount((prevCount) => prevCount + 15);
     };
 
     const handleCommentAdded = (postId, newComment) => {
-        const updatedPosts = posts.map((post) => {
-            if (post.id === postId) {
-                return {
-                    ...post,
-                    comments: [...post.comments, newComment],
-                };
-            }
-            return post;
-        });
-        setPosts(updatedPosts);
-        setAllPosts(updatedPosts);
+        console.log(`Comment added to post ${postId}:`, newComment);
     };
 
     const handleCommentDeleted = (postId, commentId) => {
-        const updatedPosts = posts.map((post) => {
-            if (post.id === postId) {
-                return {
-                    ...post,
-                    comments: post.comments.filter(
-                        (comment) => comment.id !== commentId
-                    ),
-                };
-            }
-            return post;
-        });
-        setPosts(updatedPosts);
-        setAllPosts(updatedPosts);
+        console.log(`Comment deleted from post ${postId}:`, commentId);
     };
 
-    const sortedPosts = posts
+    const sortedPosts = filteredPosts
         .sort((a, b) => b.id - a.id)
         .slice(0, visiblePostsCount);
 
@@ -184,31 +79,23 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                 <div className="inner-main d-flex flex-column align-items-center">
                     <h1 className="mt-2 ml-3 display-4">My Feed</h1>
 
-                    {loading ? (
-                        <div className="loading">Loading...</div>
-                    ) : sortedPosts.length > 0 ? (
+                    {sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
                             <div key={post.id} className="centered-items">
                                 <Posts
-                                    setPost={posts}
-                                    showComments={
-                                        showCommentsPostId === post.id
-                                    }
+                                    setPost={() => {}}
+                                    showCommets={showCommentsPostId === post.id}
                                     setShowComments={() =>
                                         setShowCommentsPostId(post.id)
                                     }
-                                    currentUser={currentUser}
+                                    currentUser={user}
                                     post={post}
                                     onCommentAdded={handleCommentAdded}
-                                    deleteOption={
-                                        post.user_id === currentUser.id // Only show delete option if the post belongs to the current user
-                                    }
+                                    deleteOption={post.user_id === user.id}
                                     onDelete={(postId) => {
-                                        setPosts(
-                                            posts.filter((p) => p.id !== postId)
-                                        );
-                                        setAllPosts(
-                                            allPosts.filter(
+                                        console.log(`Post deleted: ${postId}`);
+                                        setFilteredPosts(
+                                            filteredPosts.filter(
                                                 (p) => p.id !== postId
                                             )
                                         );
@@ -216,7 +103,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
-                                        currentUser={currentUser}
+                                        currentUser={user}
                                         currentPost={post}
                                         setShowComments={() =>
                                             setShowCommentsPostId(null)
@@ -240,12 +127,7 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                                     page, then go to{" "}
                                     <em>
                                         <b>My Profile</b>
-                                    </em>
-                                    ,
-                                </p>
-
-                                <p>
-                                    {" "}
+                                    </em>{" "}
                                     and click on{" "}
                                     <em>
                                         <b>Categories</b>
@@ -256,9 +138,9 @@ const Feed = ({ currentUser, categories, setLoggedUser }) => {
                         </div>
                     )}
                     <div className="post-counter">
-                        {sortedPosts.length}/{posts.length} posts shown
+                        {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
-                    {sortedPosts.length < posts.length && (
+                    {sortedPosts.length < filteredPosts.length && (
                         <div className="load-more" onClick={handleLoadMore}>
                             Load more...
                         </div>
