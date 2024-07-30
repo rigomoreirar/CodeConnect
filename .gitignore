@@ -1,3 +1,4 @@
 backend/frontend/node_modules
 .venv
 .usefulstuff
+.env
