@@ -1,52 +1,52 @@
+# urls.py
+
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from knox import views as knox_views
-from . import views
+from . import views_get_data
+from . import views_post_data
+from . import views_post_email
+from . import views_sse
 
 urlpatterns = [
-    path('register/', views.register, name='register'),
-    path('login/', views.login, name='login'),
-    path('user/', views.get_user_data, name="user"),
-    path('logout/', knox_views.LogoutView.as_view(), name="user"),
-    path('all-posts/', views.allPosts, name="allPosts"),
-    path('all-profiles/', views.allProfiles, name="allProfiles"),
-    path('all-likes/', views.allLikes, name="allLikes"),
-    path('all-dislikes/', views.allDislikes, name="allDislikes"),
-    path('', views.index, name="index"),
-    path('all-comments/', views.allComments, name="allComments"),
-    path('all-categories/', views.allCategories, name="allCategories"),
-    path('postData/', views.postData, name="postData"),
-    path('like/', views.like, name="like"),
-    path('dislike/', views.dislike, name="dislike"),
-    path('addComment/', views.addComment, name="addComment"),
-    path('new-post/', views.newPost, name="newPost"),
-    path('follow/', views.follow, name="follow"),
-    path('unfollow/', views.unfollow, name="unfollow"),
-    path('delete-user-post/', views.delete_user_post, name='deleteUserPost'),
-    path('user-categories/', views.get_user_categories, name='getUserCategories'),
-    path('create-category/', views.create_category, name='createCategory'),
-    path('delete-category/', views.delete_category, name='deleteCategory'),
-    path('posts-by-user-id/', views.posts_by_user_id, name='postsByUserCategories'),
-    path('profile-picture/<int:user_id>/', views.get_profile_picture, name='getProfilePicture'),
-    path('change-profile-picture/', views.change_profile_picture, name='changeProfilePicture'),
-    path('send-test-email/', views.send_test_email, name='sendTestEmail'),
-    path('reset-user-password-email/', views.reset_user_password_email, name='resetUserPasswordEmail'),
-    path('delete_comment/', views.delete_comment, name='deleteComment'),
-    path('profile-picture-username/<str:username>/', views.get_profile_picture_by_username, name='getProfilePictureByUsername'),
-    path('sse/categories/', views.sse_categories, name='sse_categories'),
-    path('sse/likes/', views.sse_likes, name='sse_likes'),
-    path('sse/dislikes/', views.sse_dislikes, name='sse_dislikes'),
-    path('sse/posts/', views.sse_posts, name='sse_posts'),
-    path('sse/comments/', views.sse_comments, name='sse_comments'),
-    path('sse/users/', views.sse_users, name='sse_users'),
-    path('sse/profiles/', views.sse_profiles, name='sse_profiles'),
-    path('total-likes-by-user/', views.total_likes_by_user, name='total-likes-by-user'),
-    path('total-dislikes-by-user/', views.total_dislikes_by_user, name='total-dislikes-by-user'),
-    path('total-comments-by-user/', views.total_comments_by_user, name='total-comments-by-user'),
-    path('sse-total-likes/<int:user_id>/', views.sse_total_likes, name='sse-total-likes'),
-    path('sse-total-dislikes/<int:user_id>/', views.sse_total_dislikes, name='sse-total-dislikes'),
-    path('sse-total-comments/<int:user_id>/', views.sse_total_comments, name='sse-total-comments'),
-    path('edit-user-info/', views.edit_user_info, name='edit_user_info'),
-    path('change-user-password/', views.change_user_password, name='change_user_password'),
+    # Authentication and User Endpoints
+    path('register/', views_post_data.register, name='register'),
+    path('login/', views_post_data.login, name='login'),
+    path('logout/', views_post_data.logout, name='logout'),
+    path('edit-user-info/', views_post_data.edit_user_info, name='editUserInfo'),
+    path('change-user-password/', views_post_data.change_user_password, name='change_user_password'),
+
+    # Data Retrieval Endpoints
+    path('get-all-data/', views_get_data.get_all_data, name='getAllData'),
+    path('profile-picture/<int:user_id>/', views_get_data.get_profile_picture, name='getProfilePicture'),
+    path('profile-picture-username/<str:username>/', views_get_data.get_profile_picture_by_username, name='get_profile_picture_by_username'),
+    path('categories-by-user/<int:user_id>/', views_get_data.get_categories_by_user, name='getCategoriesByUser'),
+
+    # Email Endpoints
+    path('send-test-email/', views_post_email.send_test_email, name='sendTestEmail'),
+    path('reset-user-password-email/', views_post_email.reset_user_password_email, name='resetUserPasswordEmail'),
+
+    # Like and Dislike Endpoints
+    path('create-like/', views_post_data.create_like, name='createLike'),
+    path('create-dislike/', views_post_data.create_dislike, name='createDislike'),
+
+    # Comment Endpoints
+    path('add-comment/', views_post_data.add_comment, name='addComment'),
+    path('delete-comment/', views_post_data.delete_comment, name='deleteComment'),
+
+    # Post Endpoints
+    path('create-post/', views_post_data.create_post, name='createPost'),
+    path('delete-post/', views_post_data.delete_post, name='deletePost'),
+
+    # Category Endpoints
+    path('create-category/', views_post_data.create_category, name='createCategory'),
+    path('delete-category/', views_post_data.delete_category, name='deleteCategory'),
+    path('follow-category/', views_post_data.follow_category, name='followCategory'),
+    path('unfollow-category/', views_post_data.unfollow_category, name='unfollowCategory'),
+
+    # Profile Picture Endpoint
+    path('change-profile-picture/', views_post_data.change_profile_picture, name='changeProfilePicture'),
+    path('get_profile_picture/', views_get_data.get_profile_picture, name='getProfilePicture'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

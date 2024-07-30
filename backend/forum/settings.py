@@ -90,6 +90,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'api.User'
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -113,8 +115,14 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     'X-CSRFToken',
 ]
 
+# Ensure this block only includes TokenAuthentication for views that require it
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', )
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'knox.auth.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',  # Default to allow any unless overridden
+    ),
 }
 
 ENV_SMTP_SERVER = os.getenv('SMTP_SERVER')

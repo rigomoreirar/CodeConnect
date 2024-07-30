@@ -1,0 +1,435 @@
+import os
+from django.conf import settings
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from knox.auth import AuthToken
+from rest_framework import status
+import logging
+from .models import Post, Profile, Like, Dislike, Comment, ProfileCtgFollowing, User, Category, PostCategories
+from .serializers import LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer
+from django.views.decorators.csrf import csrf_exempt
+from django.db import IntegrityError, transaction
+
+# Define a logger
+logger = logging.getLogger(__name__)
+
+# Function to generate a unique ID
+def generate_unique_id(model):
+    last_instance = model.objects.order_by('-id').first()
+    return last_instance.id + 1 if last_instance else 1
+
+# Define the directory for profile pictures
+PROFILE_PICTURE_DIR = os.path.join(settings.BASE_DIR, 'assets', 'profile-pictures')
+
+
+# Register API
+@csrf_exempt
+@api_view(["POST"])
+def register(request):
+    serializer = RegisterSerializers(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        _, token = AuthToken.objects.create(user)
+        
+        profile_id = generate_unique_id(Profile)
+        profile = Profile(id=profile_id, user=user)
+        profile.save()
+
+        # Handle profile picture upload
+        if 'profile_picture' in request.FILES:
+            profile_picture = request.FILES['profile_picture']
+            file_ext = profile_picture.name.split('.')[-1].lower()
+
+            if file_ext not in ['png', 'jpg', 'jpeg']:
+                return Response({'error': 'Invalid file extension. Only png, jpg, and jpeg are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{file_ext}")
+
+            with open(profile_picture_path, 'wb') as f:
+                for chunk in profile_picture.chunks():
+                    f.write(chunk)
+
+        return Response({
+            'user_info': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            },
+            'token': token
+        })
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
+@api_view(["POST"])
+def login(request):
+    serializer = AuthTokenSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response({'error': 'Invalid login details'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = serializer.validated_data['user']
+    if user:
+        token = AuthToken.objects.create(user)[1]
+        return Response({
+            'user_info': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            },
+            'token': token
+        })
+    return Response({'error': 'Invalid login details'}, status=status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt
+@api_view(["POST"])
+def logout(request):
+    try:
+        request._auth.delete()
+        return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def create_like(request):
+    data = request.data
+    unlike = data["unlike"]
+    post = Post.objects.get(id=data["post"]["id"])
+    user = User.objects.get(id=data["user"]["id"])
+    profile = Profile.objects.get(user=user)
+
+    if unlike:
+        Like.objects.filter(post=post, profile=profile).delete()
+    else:
+        if Dislike.objects.filter(post=post, profile=profile).exists():
+            Dislike.objects.filter(post=post, profile=profile).delete()
+        Like.objects.get_or_create(profile=profile, post=post)
+
+    return Response({"message": "Like action processed successfully."}, status=status.HTTP_200_OK)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def create_dislike(request):
+    data = request.data
+    undislike = data["undislike"]
+    post = Post.objects.get(id=data["post"]["id"])
+    user = User.objects.get(id=data["user"]["id"])
+    profile = Profile.objects.get(user=user)
+
+    if undislike:
+        Dislike.objects.filter(post=post, profile=profile).delete()
+    else:
+        if Like.objects.filter(post=post, profile=profile).exists():
+            Like.objects.filter(post=post, profile=profile).delete()
+        Dislike.objects.get_or_create(profile=profile, post=post)
+
+    return Response({"message": "Dislike action processed successfully."}, status=status.HTTP_200_OK)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def add_comment(request):
+    data = request.data
+    post = Post.objects.get(id=data["post"])
+    user = User.objects.get(id=data["profile"])
+    profile = Profile.objects.get(user=user)
+
+    comment_id = generate_unique_id(Comment)
+    comment = Comment.objects.create(id=comment_id, profile=profile, post=post, content=data["content"])
+    return Response({
+        'id': comment.id,
+        'profile': profile.user.username,
+        'post': post.id,
+        'content': comment.content,
+        'timestamp': comment.timestamp
+    })
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def delete_comment(request):
+    data = request.data
+    comment_id = data.get("comment_id")
+    user_id = data.get("user_id")
+
+    try:
+        comment = Comment.objects.get(id=comment_id)
+        user = User.objects.get(id=user_id)
+        profile = Profile.objects.get(user=user)
+
+        if comment.profile == profile:
+            comment.delete()
+            return Response({"message": "Comment deleted successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "You are not authorized to delete this comment"}, status=status.HTTP_403_FORBIDDEN)
+
+    except Comment.DoesNotExist:
+        return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def create_post(request):
+    data = request.data
+
+    try:
+        user = User.objects.get(id=data["creator"]["id"])
+        profile = Profile.objects.get(user=user)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Profile.DoesNotExist:
+        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    post_id = generate_unique_id(Post)
+    new_post = Post.objects.create(
+        id=post_id,
+        isStudent=data["isStudent"],
+        creator=profile,
+        title=data["title"],
+        content=data["content"]
+    )
+
+    for category in data["categories"]:
+        try:
+            db_category = Category.objects.get(pk=category["id"])
+            PostCategories.objects.create(post=new_post, category=db_category)
+        except Category.DoesNotExist:
+            return Response({'error': f'Category with id {category["id"]} not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({'message': 'Post created successfully', 'post_id': new_post.id}, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@transaction.atomic
+def delete_post(request):
+    data = request.data
+    post_id = data.get("post_id")
+    user_id = data.get("user_id")
+
+    try:
+        post = Post.objects.get(id=post_id)
+        user = User.objects.get(id=user_id)
+
+        if post.creator.user.id == user.id:
+            Like.objects.filter(post=post).delete()
+            Dislike.objects.filter(post=post).delete()
+            Comment.objects.filter(post=post).delete()
+
+            post.delete()
+            return Response({"message": "Post and associated comments deleted successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "You are not authorized to delete this post"}, status=status.HTTP_403_FORBIDDEN)
+
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def follow_category(request):
+    data = request.data
+    try:
+        category_id = data.get("id")
+        user_id = data.get("user", {}).get("id")
+        if category_id is None or user_id is None:
+            return Response({'error': 'Missing category id or user id'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        db_category = Category.objects.get(pk=category_id)
+        user = User.objects.get(id=user_id)
+        profile = Profile.objects.get(user=user)
+
+        # Check if the relationship already exists
+        if not ProfileCtgFollowing.objects.filter(profile=profile, category=db_category).exists():
+            ProfileCtgFollowing.objects.create(profile=profile, category=db_category)
+
+        updated_category = Category.objects.get(pk=db_category.pk)
+        serializer = CategorySerializer(updated_category)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Error following category: {str(e)}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def unfollow_category(request):
+    data = request.data
+    try:
+        category_id = data.get("id")
+        user_id = data.get("user", {}).get("id")
+        if category_id is None or user_id is None:
+            return Response({'error': 'Missing category id or user id'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        db_category = Category.objects.get(pk=category_id)
+        user = User.objects.get(id=user_id)
+        profile = Profile.objects.get(user=user)
+
+        # Check if the relationship exists and delete it
+        ProfileCtgFollowing.objects.filter(profile=profile, category=db_category).delete()
+
+        updated_category = Category.objects.get(pk=db_category.pk)
+        serializer = CategorySerializer(updated_category)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Error unfollowing category: {str(e)}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def create_category(request):
+    user_id = request.data.get('user_id')
+    name = request.data.get('name')
+    if not name:
+        return Response({'error': 'Category name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    category_id = generate_unique_id(Category)
+    category = Category(id=category_id, name=name, creator=user)
+    category.save()
+
+    return Response({'message': 'Category created successfully'}, status=status.HTTP_201_CREATED)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
+def delete_category(request):
+    category_id = request.data.get('id')
+    try:
+        category = Category.objects.get(id=category_id)
+        posts = Post.objects.filter(categories=category)
+        
+        # Delete likes, dislikes, and comments associated with the posts
+        for post in posts:
+            Like.objects.filter(post=post).delete()
+            Dislike.objects.filter(post=post).delete()
+            Comment.objects.filter(post=post).delete()
+            post.delete()
+        
+        category.delete()
+        return Response({'message': 'Category and associated posts and comments deleted successfully'}, status=status.HTTP_200_OK)
+    except Category.DoesNotExist:
+        return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(['POST'])
+def edit_user_info(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    data = request.data
+    new_username = data.get('username')
+    new_email = data.get('email')
+    new_first_name = data.get('first_name')
+    new_last_name = data.get('last_name')
+
+    try:
+        if new_username and User.objects.filter(username=new_username).exclude(id=user.id).exists():
+            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if new_email and User.objects.filter(email=new_email).exclude(id=user.id).exists():
+            return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if new_username:
+            user.username = new_username
+        if new_email:
+            user.email = new_email
+        if new_first_name:
+            user.first_name = new_first_name
+        if new_last_name:
+            user.last_name = new_last_name
+
+        user.save()
+        return Response({'message': 'User information updated successfully'}, status=status.HTTP_200_OK)
+    
+    except IntegrityError as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(['POST'])
+def change_user_password(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    data = request.data
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    if not user.check_password(current_password):
+        return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_password:
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password updated successfully'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'New password is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
+@api_view(["POST"])
+def change_profile_picture(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if 'profile_picture' not in request.FILES:
+        return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+    profile_picture = request.FILES['profile_picture']
+    file_ext = profile_picture.name.split('.')[-1].lower()
+
+    if file_ext not in ['png', 'jpg', 'jpeg']:
+        return Response({'error': 'Invalid file extension. Only png, jpg, and jpeg are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Delete existing profile picture
+    possible_extensions = ['jpg', 'jpeg', 'png']
+    for ext in possible_extensions:
+        existing_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{ext}")
+        if os.path.exists(existing_picture_path):
+            os.remove(existing_picture_path)
+
+    # Save new profile picture
+    profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{file_ext}")
+    with open(profile_picture_path, 'wb') as f:
+        for chunk in profile_picture.chunks():
+            f.write(chunk)
+
+    return Response({'message': 'Profile picture updated successfully'}, status=status.HTTP_200_OK)
