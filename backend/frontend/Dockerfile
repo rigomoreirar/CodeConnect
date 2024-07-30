@@ -1,5 +1,5 @@
-# Use an official Node.js runtime as a parent image
-FROM node:14
+# Stage 1: Build the React application
+FROM node:14 as build
 
 # Set work directory
 WORKDIR /app
@@ -7,26 +7,31 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Debugging step to list contents of /app
-RUN echo "Listing contents of /app after copying package.json:" && ls -la /app
-
 # Install dependencies
 RUN npm ci
 
 # Copy project files
 COPY . .
 
-# Debugging step to list contents of /app
-RUN echo "Listing contents of /app after copying project files:" && ls -la /app
-
-# Build the application
+# Build the React application
 RUN npm run build
 
-# Install serve
-RUN npm install -g serve
+# Stage 2: Setup Nginx
+FROM nginx:latest
 
-# Expose port 3000
-EXPOSE 3000
+# Copy the built React files from the previous stage to the Nginx HTML folder
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Command to run the app
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Copy Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy SSL certificates
+COPY codeconnect.crt /etc/ssl/codeconnect.crt
+COPY codeconnect.key /etc/ssl/codeconnect.key
+
+# Expose port 80 and 443
+EXPOSE 80
+EXPOSE 443
+
+# Command to run Nginx
+CMD ["nginx", "-g", "daemon off;"]
