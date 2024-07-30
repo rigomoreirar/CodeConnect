@@ -1,31 +1,26 @@
-import json
-import os
+# views_post_email.py
+
 import smtplib
 import random
 import string
 from email.mime.text import MIMEText
 from django.conf import settings
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.authtoken.serializers import AuthTokenSerializer
-from knox.auth import AuthToken
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 import logging
-from .models import Post, Profile, Like, Dislike, Comment, User, Category
-from .serializers import PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer
-import mimetypes
-from django.http import HttpResponse, Http404
+from .models import User
 from django.views.decorators.csrf import csrf_exempt
-import time
-from django.http import StreamingHttpResponse
-from django.db import IntegrityError, transaction
-from django.db import transaction
 
 # Define a logger
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
 @api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])  # This explicitly sets no authentication for this view
 def reset_user_password_email(request):
     email = request.data.get('email')
     if not email:
@@ -78,6 +73,7 @@ def reset_user_password_email(request):
     except Exception as e:
         logger.error(f"Error sending email: {str(e)}")
         return Response({'error': 'Error sending email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     
 
 @csrf_exempt

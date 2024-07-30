@@ -1,97 +1,23 @@
 // Categories data
-const categories = [
-    {
-      id: 1,
-      name: "Category1"
-    },
-    {
-      id: 2,
-      name: "Category2"
-    },
-    {
-      id: 3,
-      name: "Category3"
-    },
-    {
-      id: 4,
-      name: "UserCategory1"
-    },
-    {
-      id: 5,
-      name: "UserCategory2"
-    }
-];
+const categories = [];
 
 // Posts data
-const posts = [
-    {
-      id: 1,
-      title: "Post Title",
-      content: "Post content...",
-      likes: [
-        {
-          id: 1,
-          profile: 1
-        },
-        {
-          id: 2,
-          profile: 2
-        }
-      ],
-      dislikes: [
-        {
-          id: 1,
-          profile: 3
-        }
-      ],
-      comments: [
-        {
-          id: 1,
-          profile: 1,
-          content: "Great post!"
-        },
-        {
-          id: 2,
-          profile: 2,
-          content: "Thanks for sharing!"
-        }
-      ],
-      categories: [
-        {
-          id: 1,
-          name: "Category1"
-        },
-        {
-          id: 2,
-          name: "Category2"
-        }
-      ]
-    }
-];
+const posts = [];
 
 // User data
 const user = {
-    id: 1,
-    username: "currentUsername",
-    email: "user@example.com",
-    first_name: "John",
-    last_name: "Doe",
+    id: null,
+    username: "",
+    email: "",
+    first_name: "",
+    last_name: "",
     profile_data: {
-      ctg_following: [
-        {
-          id: 1,
-          name: "Category1"
-        },
-        {
-          id: 2,
-          name: "Category2"
-        }
-      ]
+        ctg_following: []
     },
-    total_likes: 2,
-    total_dislikes: 1,
-    total_comments: 2,
-    token: "static-token",
+    total_likes: 0,
+    total_dislikes: 0,
+    total_comments: 0,
+    token: "",
     isLoggedIn: false
 };
 

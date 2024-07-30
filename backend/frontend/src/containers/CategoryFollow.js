@@ -8,6 +8,8 @@ const CategoryFollow = ({
     setLength,
     length,
     refreshUserData,
+    onFollow,
+    onUnfollow,
 }) => {
     const categoryArray = Array.isArray(categories) ? categories : [];
 
@@ -24,13 +26,15 @@ const CategoryFollow = ({
                 <p className="ml-1 mb-0">Available categories:</p>
                 {categoryArray.map((category) => (
                     <Following
-                        key={category.name}
+                        key={category.id}
                         setLength={setLength}
                         length={length}
                         currentUser={currentUser}
                         ctg_following={currentUser.profile_data.ctg_following}
                         category={category}
                         refreshUserData={refreshUserData}
+                        onFollow={onFollow}
+                        onUnfollow={onUnfollow}
                     />
                 ))}
             </div>

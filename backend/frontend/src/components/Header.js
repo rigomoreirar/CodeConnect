@@ -1,16 +1,16 @@
 import { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
-import Logo from "../components/Logo";
+import { logoutUser } from "../actions/actionHeader";
+import Logo from "./Logo";
 import "../styles/Header.css";
 
 const Header = () => {
     const { setUser } = useContext(AppContext);
-    const navigate = useNavigate();
 
-    const handleLogout = () => {
-        window.localStorage.removeItem("token");
-        window.localStorage.removeItem("isLoggedIn");
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        await logoutUser();
 
         setUser((prevUser) => ({
             ...prevUser,
@@ -18,7 +18,7 @@ const Header = () => {
             token: null,
         }));
 
-        navigate("/");
+        window.location.reload();
     };
 
     return (
@@ -51,8 +51,13 @@ const Header = () => {
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/forum/community">
-                            Community
+                        <Link className="nav-link" to="/forum/my-posts">
+                            My Posts
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/forum/create-categories">
+                            Create Categories
                         </Link>
                     </li>
                     <li className="nav-item">

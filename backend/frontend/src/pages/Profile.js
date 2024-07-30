@@ -5,18 +5,64 @@ import CategoryFollow from "../containers/CategoryFollow";
 import "../styles/Profile.css";
 import ProfilePicture from "../components/ProfilePicture";
 import Filters from "../containers/Filters";
+import { followCategory, unfollowCategory } from "../actions/actionProfile";
 
 const Profile = () => {
-    const { user, categories, profilePictureUrl, setProfilePictureUrl } =
-        useContext(AppContext);
+    const { user, categories, posts, profilePictureUrl, setProfilePictureUrl, setUser } = useContext(AppContext);
     const [modal, setModal] = useState(false);
-    const [ctgFollowingLength, setCtgFollowingLength] = useState(
-        user.profile_data.ctg_following.length
-    );
-    const [loading, setLoading] = useState(false); // Set to false since data is static
-    const [totalLikes, setTotalLikes] = useState(user.total_likes);
-    const [totalDislikes, setTotalDislikes] = useState(user.total_dislikes);
-    const [totalComments, setTotalComments] = useState(user.total_comments);
+    const [loading, setLoading] = useState(false);
+    const [totalLikes, setTotalLikes] = useState(0);
+    const [totalDislikes, setTotalDislikes] = useState(0);
+    const [totalComments, setTotalComments] = useState(0);
+    const [ctgFollowingLength, setCtgFollowingLength] = useState(0);
+
+    useEffect(() => {
+        if (user && posts) {
+            const userPosts = posts.filter(post => post.creator === user.id);
+            const likes = userPosts.reduce((acc, post) => acc + (post.likes ? post.likes.length : 0), 0);
+            const dislikes = userPosts.reduce((acc, post) => acc + (post.dislikes ? post.dislikes.length : 0), 0);
+            const comments = posts.reduce((acc, post) => acc + post.comments.filter(comment => comment.profile === user.username).length, 0);
+
+            setTotalLikes(likes);
+            setTotalDislikes(dislikes);
+            setTotalComments(comments);
+            setCtgFollowingLength(user.profile_data.ctg_following.length);
+        }
+    }, [user, posts]);
+
+    const handleFollowCategory = async (categoryId) => {
+        try {
+            await followCategory(categoryId, user.id);
+            const updatedUser = {
+                ...user,
+                profile_data: {
+                    ...user.profile_data,
+                    ctg_following: [...user.profile_data.ctg_following, categoryId]
+                }
+            };
+            setUser(updatedUser);
+            setCtgFollowingLength(prevLength => prevLength + 1);
+        } catch (error) {
+            console.error("Error following category:", error);
+        }
+    };
+
+    const handleUnfollowCategory = async (categoryId) => {
+        try {
+            await unfollowCategory(categoryId, user.id);
+            const updatedUser = {
+                ...user,
+                profile_data: {
+                    ...user.profile_data,
+                    ctg_following: user.profile_data.ctg_following.filter(catId => catId !== categoryId)
+                }
+            };
+            setUser(updatedUser);
+            setCtgFollowingLength(prevLength => prevLength - 1);
+        } catch (error) {
+            console.error("Error unfollowing category:", error);
+        }
+    };
 
     const refreshUserData = () => {
         setTotalLikes(user.total_likes);
@@ -25,14 +71,9 @@ const Profile = () => {
         setCtgFollowingLength(user.profile_data.ctg_following.length);
     };
 
-    useEffect(() => {
-        refreshUserData();
-    }, [user]);
-
     const email = user?.email || "";
     const first_name = user?.first_name || "";
     const last_name = user?.last_name || "";
-    const ctg_following = user?.profile_data?.ctg_following || [];
     const username = user?.username || "";
 
     return (
@@ -124,6 +165,8 @@ const Profile = () => {
                         categories={categories}
                         currentUser={user}
                         refreshUserData={refreshUserData}
+                        onFollow={handleFollowCategory}
+                        onUnfollow={handleUnfollowCategory}
                     />
                 )}
             </div>

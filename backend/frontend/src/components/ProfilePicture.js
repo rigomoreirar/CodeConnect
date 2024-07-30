@@ -1,11 +1,24 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import styles from "../styles/ProfilePicture.module.css";
+import { getProfilePicture, changeProfilePicture } from "../actions/actionProfilePicture";
 
 const ProfilePicture = () => {
-    const { user, profilePictureUrl, setProfilePictureUrl } =
-        useContext(AppContext);
+    const { user, profilePictureUrl, setProfilePictureUrl } = useContext(AppContext);
     const [error, setError] = useState("");
+
+    useEffect(() => {
+        const fetchProfilePicture = async () => {
+            try {
+                const profilePictureUrl = await getProfilePicture(user.id);
+                setProfilePictureUrl(profilePictureUrl);
+            } catch (error) {
+                console.error("Error fetching profile picture:", error);
+            }
+        };
+
+        fetchProfilePicture();
+    }, [user.id, setProfilePictureUrl]);
 
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
@@ -19,17 +32,13 @@ const ProfilePicture = () => {
             }
 
             setError("");
-            const formData = new FormData();
-            formData.append("profile_picture", file);
-
             try {
-                // Simulate a successful upload with a console log
-                console.log("Profile picture uploaded:", file);
-
-                // Update the profile picture URL
+                await changeProfilePicture(file);
+                // Update the profile picture URL locally
                 setProfilePictureUrl(URL.createObjectURL(file));
             } catch (error) {
                 console.error("Error uploading profile picture:", error);
+                setError("Error uploading profile picture.");
             }
         }
     };

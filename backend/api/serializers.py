@@ -31,11 +31,22 @@ class RegisterSerializers(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     creator = serializers.PrimaryKeyRelatedField(queryset=Profile.objects.all())
     categories = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all(), source='postcategories_set')
+    likes = serializers.SerializerMethodField()
+    dislikes = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ('id', 'isStudent', 'creator', 'categories', 'title',
-                  'content', 'timestamp', 'isActive')
+        fields = ('id', 'title', 'content', 'likes', 'dislikes', 'comments', 'categories', 'creator')
+
+    def get_likes(self, obj):
+        return LikeSerializer(obj.post_like.all(), many=True).data
+
+    def get_dislikes(self, obj):
+        return DislikeSerializer(obj.post_dislike.all(), many=True).data
+
+    def get_comments(self, obj):
+        return CommentSerializer(obj.post_comment.all(), many=True).data
 
 class ProfileSerializer(serializers.ModelSerializer):
     ctg_following = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all())
@@ -75,3 +86,4 @@ class CategorySerializer(serializers.ModelSerializer):
     def get_followers(self, obj):
         followers = CategoryFollowers.objects.filter(category=obj).values_list('profile', flat=True)
         return list(followers)
+

@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import "../styles/Home.css";
 import Posts from "../components/Posts";
@@ -6,7 +6,7 @@ import Comments from "../components/Comments";
 import Filters from "../containers/Filters";
 
 const Home = () => {
-    const { user, categories, posts } = useContext(AppContext);
+    const { user, categories, posts, setPosts } = useContext(AppContext);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [activeFilter, setActiveFilter] = useState([]);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
@@ -16,9 +16,7 @@ const Home = () => {
             ? posts
             : posts.filter((post) =>
                   post.categories.some((category) =>
-                      activeFilter.some(
-                          (filter) => filter.name === category.name
-                      )
+                      activeFilter.some((filter) => filter.name === category.name)
                   )
               );
 
@@ -31,11 +29,34 @@ const Home = () => {
     };
 
     const handleCommentAdded = (postId, newComment) => {
-        console.log(`Comment added to post ${postId}:`, newComment);
+        const updatedPosts = posts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: [...post.comments, newComment],
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
     };
 
     const handleCommentDeleted = (postId, commentId) => {
-        console.log(`Comment deleted from post ${postId}:`, commentId);
+        const updatedPosts = posts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: post.comments.filter((comment) => comment.id !== commentId),
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+    };
+
+    const handlePostDeleted = (postId) => {
+        const updatedPosts = posts.filter(post => post.id !== postId);
+        setPosts(updatedPosts);
     };
 
     return (
@@ -55,11 +76,10 @@ const Home = () => {
                                 <Posts
                                     setPost={() => {}}
                                     showCommets={showCommentsPostId === post.id}
-                                    setShowComments={() =>
-                                        setShowCommentsPostId(post.id)
-                                    }
+                                    setShowComments={() => setShowCommentsPostId(post.id)}
                                     currentUser={user}
                                     post={post}
+                                    onDelete={handlePostDeleted}
                                     onCommentAdded={handleCommentAdded}
                                     onCommentDeleted={handleCommentDeleted}
                                 />
@@ -68,9 +88,7 @@ const Home = () => {
                                         key={post.id}
                                         currentUser={user}
                                         currentPost={post}
-                                        setShowComments={() =>
-                                            setShowCommentsPostId(null)
-                                        }
+                                        setShowComments={() => setShowCommentsPostId(null)}
                                         onCommentAdded={handleCommentAdded}
                                         onCommentDeleted={handleCommentDeleted}
                                     />

@@ -1,36 +1,32 @@
-import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
-import "../styles/Layout.css";
-import Logo from "../components/Logo";
-import { AppContext } from "../context/AppContext";
+// pages/ResetPassword.js
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import '../styles/Layout.css';
+import Logo from '../components/Logo';
+import { resetPassword } from '../actions/actionResetPassword';
 
 const ResetPassword = () => {
-    const [email, setEmail] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [email, setEmail] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            // Simulate a successful reset password request with a console log
-            console.log("Reset password email sent to:", email);
-            alert("Check your email for the reset password instructions.");
-            setEmail("");
-            setErrorMessage("");
+            await resetPassword(email);
+            alert('Check your email for the reset password instructions.');
+            setEmail('');
+            setErrorMessage('');
         } catch (error) {
-            console.error("Error:", error);
-            setErrorMessage(
-                "Enter a valid email address or check your internet connection."
-            );
+            console.error('Error:', error);
+            setErrorMessage(error.message || 'Enter a valid email address or check your internet connection.');
         }
     };
 
     return (
         <>
-            <section
-                className="main-container"
-                style={{ backgroundColor: "#eee" }}
-            >
+            <section className="main-container" style={{ backgroundColor: '#eee' }}>
                 <div className="resetingcard">
                     <div className="d-flex row justify-content-center align-items-center">
                         <div className="col-md-4 d-flex justify-content-center mt-3">
@@ -43,21 +39,14 @@ const ResetPassword = () => {
                         </div>
                         <div className="col-md-8 d-flex flex-column align-items-center">
                             <h1 className="mb-4">Reset Password</h1>
-                            <form
-                                onSubmit={handleSubmit}
-                                className="w-100 px-3"
-                            >
+                            <form onSubmit={handleSubmit} className="w-100 px-3">
                                 <div className="d-flex flex-column align-items-left mb-4">
                                     <strong>
-                                        <label className="form-label">
-                                            Enter your email:
-                                        </label>
+                                        <label className="form-label">Enter your email:</label>
                                     </strong>
                                     <div className="form-outline flex-fill mb-0">
                                         <input
-                                            onChange={(e) =>
-                                                setEmail(e.target.value)
-                                            }
+                                            onChange={(e) => setEmail(e.target.value)}
                                             type="email"
                                             id="userEmail"
                                             value={email}
@@ -67,18 +56,12 @@ const ResetPassword = () => {
                                     </div>
                                 </div>
                                 {errorMessage && (
-                                    <div
-                                        className="alert alert-danger"
-                                        role="alert"
-                                    >
+                                    <div className="alert alert-danger" role="alert">
                                         {errorMessage}
                                     </div>
                                 )}
                                 <div className="d-flex justify-content-center">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-dark btn-lg"
-                                    >
+                                    <button type="submit" className="btn btn-dark btn-lg">
                                         Submit
                                     </button>
                                 </div>

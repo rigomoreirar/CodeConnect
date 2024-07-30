@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import { changeUserPassword } from "../actions/actionNewPassword";
 import "../styles/EditProfile.css";
 
 const NewPassword = () => {
@@ -9,23 +10,29 @@ const NewPassword = () => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!currentPassword || !newPassword) {
             setError("Both fields are required.");
             return;
         }
 
-        // Simulating password change
-        if (currentPassword === "correct_password") {
-            alert("Password updated successfully");
-            setError("");
-        } else {
-            setError("Error updating password: Incorrect current password.");
-            alert("Error updating password: Incorrect current password.");
+        try {
+            const response = await changeUserPassword(currentPassword, newPassword);
+            if (response.message) {
+                alert("Password updated successfully");
+                setError("");
+            } else {
+                throw new Error(response.error || "Error updating password");
+            }
+        } catch (error) {
+            setError("Error updating password: " + error.message);
+            alert("Error updating password: " + error.message);
         }
     };
 
     return (
+        <>
+        <div className="filterContainer"></div>
         <div className="centering-div">
             <div className="container-edit-profile">
                 <div className="back-start-container">
@@ -61,6 +68,7 @@ const NewPassword = () => {
                 </button>
             </div>
         </div>
+        </>
     );
 };
 

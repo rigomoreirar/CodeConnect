@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp, FaTrashAlt } from "react-icons/fa";
 import "../styles/Posts.css";
 import { AppContext } from "../context/AppContext";
+import { likePost, dislikePost, deletePost, fetchAllPosts } from "../actions/actionPosts";
 
 const Posts = ({
     post,
@@ -12,108 +13,74 @@ const Posts = ({
     onDelete,
     onCommentAdded,
 }) => {
-    const { user } = useContext(AppContext);
+    const { categories, setPosts } = useContext(AppContext);
     const {
         content,
         title,
         likes = [],
         dislikes = [],
         comments = [],
-        categories = [],
+        categories: postCategories = [],
     } = post;
     const [likeFill, setLikeFill] = useState(false);
     const [likeCount, setLikeCount] = useState(likes.length);
     const [dislikeFill, setDislikeFill] = useState(false);
     const [dislikeCount, setDislikeCount] = useState(dislikes.length);
-    const [currentPost, setCurrentPost] = useState(null);
 
-    const updateLikesDislikes = (updatedLikes, updatedDislikes) => {
-        const postLikes = updatedLikes.filter((like) => like.post === post.id);
-        const postDislikes = updatedDislikes.filter(
-            (dislike) => dislike.post === post.id
-        );
-        setLikeCount(postLikes.length);
-        setLikeFill(postLikes.some((like) => like.profile === currentUser.id));
-        setDislikeCount(postDislikes.length);
-        setDislikeFill(
-            postDislikes.some((dislike) => dislike.profile === currentUser.id)
-        );
-    };
+    useEffect(() => {
+        const userLiked = likes.some((like) => like.profile === currentUser.username);
+        const userDisliked = dislikes.some((dislike) => dislike.profile === currentUser.username);
+        setLikeFill(userLiked);
+        setDislikeFill(userDisliked);
+        setLikeCount(likes.length);
+        setDislikeCount(dislikes.length);
+    }, [likes, dislikes, currentUser.username]);
 
-    const likeHandler = async () => {
+    const handleLike = async () => {
         try {
-            if (!likeFill) {
-                if (dislikeFill) {
-                    setDislikeCount(dislikeCount - 1);
-                    setDislikeFill(false);
-                }
-                setLikeCount(likeCount + 1);
-                setLikeFill(true);
-            } else {
-                setLikeCount(likeCount - 1);
-                setLikeFill(false);
-            }
-            console.log("Like handled for post:", post.id);
+            const unlike = likeFill;
+            await likePost(post.id, currentUser.id, unlike);
+            const token = localStorage.getItem("token");
+            const updatedPosts = await fetchAllPosts(token);
+            setPosts(updatedPosts);
         } catch (error) {
-            console.log(error);
+            console.error("Error liking post:", error);
         }
     };
 
-    const dislikeHandler = async () => {
+    const handleDislike = async () => {
         try {
-            if (!dislikeFill) {
-                if (likeFill) {
-                    setLikeCount(likeCount - 1);
-                    setLikeFill(false);
-                }
-                setDislikeCount(dislikeCount + 1);
-                setDislikeFill(true);
-            } else {
-                setDislikeCount(dislikeCount - 1);
-                setDislikeFill(false);
-            }
-            console.log("Dislike handled for post:", post.id);
+            const undislike = dislikeFill;
+            await dislikePost(post.id, currentUser.id, undislike);
+            const token = localStorage.getItem("token");
+            const updatedPosts = await fetchAllPosts(token);
+            setPosts(updatedPosts);
         } catch (error) {
-            console.log(error);
+            console.error("Error disliking post:", error);
         }
     };
 
-    const commentsHandler = () => {
-        setCurrentPost(post);
-        setShowComments(true);
-        setPost(post);
-    };
-
-    const deleteHandler = async () => {
+    const handleDelete = async () => {
         try {
-            console.log("Post deleted:", post.id);
+            await deletePost(post.id, currentUser.id);
             onDelete(post.id);
         } catch (error) {
             console.error("Error deleting post:", error);
         }
     };
 
-    useEffect(() => {
-        Array.isArray(likes) &&
-            likes.forEach((like) => {
-                if (like.profile === currentUser.id) {
-                    setLikeFill(true);
-                }
-            });
-
-        Array.isArray(dislikes) &&
-            dislikes.forEach((dislike) => {
-                if (dislike.profile === currentUser.id) {
-                    setDislikeFill(true);
-                }
-            });
-    }, [currentPost, currentUser, likes, dislikes]);
+    const getCategoryNames = () => {
+        return postCategories.map(catId => {
+            const category = categories.find(cat => cat.id === catId);
+            return category ? category.name : "Unknown Category";
+        });
+    };
 
     return (
         <div
             style={{ maxWidth: "40rem" }}
             id="post-container"
-            className="inner-main-body p-2 p-sm-3 forum-content show "
+            className="inner-main-body p-2 p-sm-3 forum-content show"
         >
             <div className="card mb-2" style={{ maxWidth: "40rem" }}>
                 <div className="card-body p-2 p-sm-3">
@@ -123,7 +90,7 @@ const Posts = ({
                                 className="delete-icon"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    deleteHandler();
+                                    handleDelete();
                                 }}
                                 style={{
                                     alignSelf: "flex-end",
@@ -136,22 +103,21 @@ const Posts = ({
                             <div className="">
                                 <h6 className="text-body">{title}</h6>
                                 <section id="cats">
-                                    {Array.isArray(categories) &&
-                                        categories.map((category) => (
-                                            <div key={category.id}>
-                                                <span className="badge badge-secondary mr-2">
-                                                    {category.name}
-                                                </span>
-                                            </div>
-                                        ))}
+                                    {getCategoryNames().map((categoryName, index) => (
+                                        <div key={index}>
+                                            <span className="badge badge-secondary mr-2">
+                                                {categoryName}
+                                            </span>
+                                        </div>
+                                    ))}
                                 </section>
                             </div>
                             <p>{content}</p>
                         </div>
                         <div className="text-muted small text-center align-self-center align-items-center">
                             <span
-                                onClick={likeHandler}
-                                className=" d-sm-inline-block"
+                                onClick={handleLike}
+                                className="d-sm-inline-block"
                             >
                                 {likeFill ? (
                                     <FaThumbsUp className="like" />
@@ -161,8 +127,8 @@ const Posts = ({
                                 {likeCount}
                             </span>
                             <span
-                                onClick={dislikeHandler}
-                                className=" d-sm-inline-block ml-2"
+                                onClick={handleDislike}
+                                className="d-sm-inline-block ml-2"
                             >
                                 {dislikeFill ? (
                                     <FaThumbsDown className="dislike" />
@@ -171,7 +137,7 @@ const Posts = ({
                                 )}
                                 {dislikeCount}
                             </span>
-                            <span onClick={commentsHandler}>
+                            <span onClick={() => setShowComments(true)}>
                                 <button
                                     type="button"
                                     data-toggle="modal"

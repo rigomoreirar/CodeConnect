@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import "../styles/EditProfile.css";
 import { AppContext } from "../context/AppContext";
+import { editUserProfile } from "../actions/actionEditProfile";
 
 const EditProfile = () => {
     const { user, setUser } = useContext(AppContext);
@@ -23,19 +24,27 @@ const EditProfile = () => {
     const handleSave = async () => {
         try {
             const updatedUser = {
-                ...user,
                 username,
                 email,
                 first_name: firstName,
                 last_name: lastName,
             };
-            // Simulate a successful update with a console log
-            console.log("Profile updated:", updatedUser);
+            
+            const response = await editUserProfile(updatedUser);
+            if (response.message) {
+                // Update the user in the context
+                setUser(prevUser => ({
+                    ...prevUser,
+                    username,
+                    email,
+                    first_name: firstName,
+                    last_name: lastName,
+                }));
 
-            // Update the user in the context
-            setUser(updatedUser);
-
-            alert("Profile updated successfully");
+                alert("Profile updated successfully");
+            } else {
+                throw new Error(response.error || "Error updating profile");
+            }
         } catch (error) {
             setError("Error updating profile: " + error.message);
             alert("Error updating profile: " + error.message);
@@ -43,6 +52,8 @@ const EditProfile = () => {
     };
 
     return (
+        <>
+        <div className="filterContainer"></div>
         <div className="centering-div">
             <div className="container-edit-profile">
                 <div className="back-start-container">
@@ -96,6 +107,7 @@ const EditProfile = () => {
                 </button>
             </div>
         </div>
+        </>
     );
 };
 

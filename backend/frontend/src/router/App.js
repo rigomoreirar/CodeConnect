@@ -1,14 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useContext } from "react";
-import { AppProvider, AppContext } from "../context/AppContext";
+import { useEffect, useState } from "react";
+import { AppProvider } from "../context/AppContext";
 
-import Layout from "../pages/Layout";
+import Layout from "../containers/Layout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import Redirect from "../pages/Redirect";
+import RedirectPage from "../pages/Redirect";
 import Profile from "../pages/Profile";
-import Community from "../pages/Community";
+import MyPosts from "../pages/MyPosts";
+import CreateCategory from "../pages/CreateCategories";
 import Feed from "../pages/Feed";
 import NotFound from "../pages/NotFound";
 import ResetPassword from "../pages/ResetPassword";
@@ -16,53 +17,40 @@ import EditProfile from "../pages/EditProfile";
 import NewPassword from "../pages/NewPassword";
 
 function AppContent() {
-    const { user, categories, posts, profilePictureUrl } = useContext(AppContext);
+    const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
+
+    useEffect(() => {
+        setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+    }, []);
 
     return (
         <BrowserRouter>
             <Routes>
                 <Route
                     path="/"
-                    element={!user.isLoggedIn ? <Login /> : <Navigate to="/forum" />}
+                    element={!isLoggedIn ? <Login /> : <Navigate to="/forum" />}
                 />
                 <Route
                     path="/forum"
-                    element={user.isLoggedIn ? <Layout /> : <Navigate to="/" />}
+                    element={isLoggedIn ? <Layout /> : <Navigate to="/" />}
                 >
-                    <Route
-                        index
-                        element={<Home />}
-                    />
-                    <Route
-                        path="profile"
-                        element={<Profile />}
-                    />
-                    <Route
-                        path="community"
-                        element={<Community />}
-                    />
-                    <Route
-                        path="my-feed"
-                        element={<Feed />}
-                    />
-                    <Route
-                        path="edit-profile"
-                        element={<EditProfile />}
-                    />
-                    <Route
-                        path="new-password"
-                        element={<NewPassword />}
-                    />
+                    <Route index element={<Home />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="my-posts" element={<MyPosts />} />
+                    <Route path="create-categories" element={<CreateCategory />} />
+                    <Route path="my-feed" element={<Feed />} />
+                    <Route path="edit-profile" element={<EditProfile />} />
+                    <Route path="new-password" element={<NewPassword />} />
                 </Route>
                 <Route
                     path="/register"
-                    element={!user.isLoggedIn ? <Register /> : <Navigate to="/forum" />}
+                    element={!isLoggedIn ? <Register /> : <Navigate to="/forum" />}
                 />
                 <Route
                     path="/reset-password"
-                    element={!user.isLoggedIn ? <ResetPassword /> : <Navigate to="/forum" />}
+                    element={!isLoggedIn ? <ResetPassword /> : <Navigate to="/forum" />}
                 />
-                <Route path="/redirect" element={<Redirect />} />
+                <Route path="/redirect" element={<RedirectPage />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>

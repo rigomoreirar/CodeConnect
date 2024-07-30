@@ -1,137 +1,102 @@
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import Logo from "../components/Logo";
 import "../styles/Layout.css";
+import { loginUser } from "../actions/actionLogin";
 
 const Login = () => {
-    const { user, setUser } = useContext(AppContext);
+    const { setUser, setCategories, setPosts } = useContext(AppContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate();
 
-    const handleLogin = () => {
-        console.log({
-            username: username,
-            password: password,
-        });
+    const handleLogin = (e) => {
+        e.preventDefault();
         if (!username || !password) {
             alert("No blanks!");
             return;
         }
 
-        if (username === user.username && password === "correct_password") {
-            const updatedUser = { ...user, isLoggedIn: true };
-            setUser(updatedUser);
-            window.localStorage.setItem("token", updatedUser.token);
-            window.localStorage.setItem("isLoggedIn", "true");
-            navigate("/forum");
-        } else {
-            alert("Invalid username or password");
-        }
+        loginUser(username, password)
+            .then(({ user, categories, posts }) => {
+                setUser(user);
+                setCategories(categories);
+                setPosts(posts);
+                window.location.reload();
+            })
+            .catch((error) => {
+                alert("Invalid username or password");
+                console.error("Login error:", error);
+            });
     };
 
     return (
-        <section
-            className="main-container vh-100"
-            style={{ backgroundColor: "#eee" }}
-        >
+        <section className="main-container vh-100" style={{ backgroundColor: "#eee" }}>
             <div className="container h-100" style={{ marginTop: "2rem" }}>
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-lg-12 col-xl-11">
-                        <div
-                            className="card-login text-black"
-                            style={{ borderRadius: "25px" }}
-                        >
+                        <div className="card-login text-black" style={{ borderRadius: "25px" }}>
                             <div className="card-body p-md-3">
                                 <div className="row justify-content-center">
                                     <div className="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
                                         <div className="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4 d-flex align-items-center justify-content-center left-container-login">
                                             <div>Login</div>
-                                            <div
-                                                className="navbar-brand ml-1 mt-2"
-                                                href="#"
-                                            >
+                                            <div className="navbar-brand ml-1 mt-2">
                                                 <Logo size="50px" />
                                                 &nbsp;&nbsp;&nbsp;CodeConnect
                                             </div>
                                         </div>
-                                        <form className="mx-1 mx-md-4">
+                                        <form className="mx-1 mx-md-4" onSubmit={handleLogin}>
                                             <div className="d-flex flex-row align-items-center mb-4">
                                                 <i className="fas fa-user fa-lg me-3 fa-fw mb-4"></i>
                                                 <div className="form-outline flex-fill mb-0">
                                                     <input
-                                                        onChange={(e) =>
-                                                            setUsername(
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => setUsername(e.target.value)}
                                                         type="text"
                                                         id="form3Example1c"
                                                         value={username}
                                                         className="form-control"
                                                     />
                                                     <strong>
-                                                        <label
-                                                            className="form-label"
-                                                            htmlFor="form3Example1c"
-                                                        >
+                                                        <label className="form-label" htmlFor="form3Example1c">
                                                             Username
                                                         </label>
                                                     </strong>
                                                 </div>
                                             </div>
                                             <div className="d-flex flex-row align-items-center mb-4">
-                                                <i className="fas fa-lock fa-lg me-3 fa-fw  mb-4"></i>
+                                                <i className="fas fa-lock fa-lg me-3 fa-fw mb-4"></i>
                                                 <div className="form-outline flex-fill mb-0">
                                                     <input
-                                                        onChange={(e) =>
-                                                            setPassword(
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => setPassword(e.target.value)}
                                                         type="password"
                                                         id="form3Example4c"
                                                         value={password}
                                                         className="form-control"
                                                     />
                                                     <strong>
-                                                        <label
-                                                            className="form-label"
-                                                            htmlFor="form3Example4c"
-                                                        >
+                                                        <label className="form-label" htmlFor="form3Example4c">
                                                             Password
                                                         </label>
                                                     </strong>
                                                 </div>
                                             </div>
-                                            <div className="d-flex justify-content-center  mb-1 mb-lg-1">
+                                            <div className="d-flex justify-content-center mb-1 mb-lg-1">
                                                 <Link to="/reset-password">
-                                                    <p className="reset-password-p-u">
-                                                        Reset password
-                                                    </p>
+                                                    <p className="reset-password-p-u">Reset password</p>
                                                 </Link>
                                             </div>
                                             <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-3">
-                                                <button
-                                                    onClick={handleLogin}
-                                                    type="button"
-                                                    className="btn btn-dark btn-lg"
-                                                >
+                                                <button type="submit" className="btn btn-dark btn-lg">
                                                     Login
                                                 </button>
                                             </div>
                                             <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-2">
-                                                <strong>
-                                                    Don't have an account yet?
-                                                </strong>
+                                                <strong>Don't have an account yet?</strong>
                                             </div>
                                             <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                                                 <Link to="/register">
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-dark btn-lg"
-                                                    >
+                                                    <button type="button" className="btn btn-dark btn-lg">
                                                         Register
                                                     </button>
                                                 </Link>

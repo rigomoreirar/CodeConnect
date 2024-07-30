@@ -4,6 +4,7 @@ import { AppContext } from "../context/AppContext";
 import Logo from "../components/Logo";
 import RegisterProfilePicture from "../components/RegisterProfilePicture";
 import styles from "../styles/Register.module.css";
+import { registerUser } from "../actions/actionRegister";
 
 const FormField = ({ icon, label, type, value, setValue, id }) => {
     return (
@@ -32,7 +33,7 @@ const FormField = ({ icon, label, type, value, setValue, id }) => {
 
 const Register = () => {
     const navigate = useNavigate();
-    const { setUser } = useContext(AppContext);
+    const { setUser, setCategories, setPosts } = useContext(AppContext);
     const [name, setName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -41,7 +42,7 @@ const Register = () => {
     const [confirmation, setConfirmation] = useState("");
     const [profilePicture, setProfilePicture] = useState(null);
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (
             !name ||
             !lastName ||
@@ -58,23 +59,25 @@ const Register = () => {
             return;
         }
 
-        // Simulating registration and user state update
-        setUser({
-            id: Math.floor(Math.random() * 1000),
-            username,
-            email,
+        const userData = {
             first_name: name,
             last_name: lastName,
-            profile_data: {
-                ctg_following: [],
-            },
-            total_likes: 0,
-            total_dislikes: 0,
-            total_comments: 0,
-        });
+            email,
+            username,
+            password,
+        };
 
-        alert("User registered successfully!");
-        navigate("/forum");
+        try {
+            const { user, categories, posts } = await registerUser(userData, profilePicture);
+            setUser(user);
+            setCategories(categories);
+            setPosts(posts);
+            alert("User registered successfully!");
+            navigate("/forum");
+        } catch (error) {
+            alert("Error registering user");
+            console.error("Registration error:", error);
+        }
     };
 
     return (
