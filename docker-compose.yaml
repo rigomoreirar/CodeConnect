@@ -23,7 +23,7 @@ services:
             - ./nginx.conf:/etc/nginx/nginx.conf
             - ./codeconnect.crt:/etc/ssl/codeconnect.crt
             - ./codeconnect.key:/etc/ssl/codeconnect.key
-            - ./backend/frontend/build/static:/code/frontend/build/static
+            - ./backend/frontend/build/:/code/frontend/build/
             - ./backend/assets/profile-pictures:/code/assets/profile-pictures
         depends_on:
             - backend
