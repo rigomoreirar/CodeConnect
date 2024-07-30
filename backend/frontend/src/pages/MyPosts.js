@@ -71,46 +71,50 @@ const MyPosts = () => {
         .sort((a, b) => b.id - a.id)
         .slice(0, visiblePostsCount);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const newPost = {
-            creator: { id: user.id },
-            isStudent: false, // Adjust this value as needed
-            title: formData.get("question"),
-            content: formData.get("content"),
-            categories: catArray,
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            // Trim the catArray to only include the id values
+            const trimmedCatArray = catArray.map(category => ({ id: category.id }));
+        
+            const newPost = {
+                creator: { id: user.id },
+                isStudent: true, // Adjust this value as needed
+                title: formData.get("question"),
+                content: formData.get("content"),
+                categories: trimmedCatArray,
+            };
+        
+            if (!newPost.title || !newPost.content || newPost.categories.length === 0) {
+                alert("Please fill all the fields and select at least one category.");
+                return;
+            }
+        
+            if (newPost.title.length > 99) {
+                alert("Please be more concise with your question (max 100 characters).");
+                return;
+            }
+        
+            if (newPost.content.length > 999) {
+                alert("The description limit is 1000 characters.");
+                return;
+            }
+        
+            try {
+                setIsLoading(true);
+                await createPost(newPost);
+                const token = localStorage.getItem("token");
+                const allData = await fetchAllData(token);
+        
+                setPosts(allData.posts);
+                setFilteredPosts(allData.posts);
+            } catch (error) {
+                console.error("Error creating post:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
-
-        if (!newPost.title || !newPost.content || newPost.categories.length === 0) {
-            alert("Please fill all the fields and select at least one category.");
-            return;
-        }
-
-        if (newPost.title.length > 99) {
-            alert("Please be more concise with your question (max 100 characters).");
-            return;
-        }
-
-        if (newPost.content.length > 999) {
-            alert("The description limit is 1000 characters.");
-            return;
-        }
-
-        try {
-            setIsLoading(true);
-            await createPost(newPost);
-            const token = localStorage.getItem("token");
-            const allData = await fetchAllData(token);
-
-            setPosts(allData.posts);
-            setFilteredPosts(allData.posts);
-        } catch (error) {
-            console.error("Error creating post:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     return (
         <>
