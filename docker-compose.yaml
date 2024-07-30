@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:4.0.1
+        image: rigomoreirar/code-connect-backend:4.0.2
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
@@ -23,7 +23,7 @@ services:
             - ./nginx.conf:/etc/nginx/nginx.conf
             - ./codeconnect.crt:/etc/ssl/codeconnect.crt
             - ./codeconnect.key:/etc/ssl/codeconnect.key
-            - ./backend/frontend/build/static:/code/frontend/build/static
+            - ./backend/frontend/build/:/code/frontend/build/
             - ./backend/assets/profile-pictures:/code/assets/profile-pictures
         depends_on:
             - backend

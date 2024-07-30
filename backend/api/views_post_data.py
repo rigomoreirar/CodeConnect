@@ -7,7 +7,7 @@ from knox.auth import AuthToken
 from rest_framework import status
 import logging
 from .models import Post, Profile, Like, Dislike, Comment, ProfileCtgFollowing, User, Category, PostCategories
-from .serializers import LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer
+from .serializers import LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer, PostSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, transaction
 
@@ -178,6 +178,7 @@ def delete_comment(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 @csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
@@ -201,14 +202,25 @@ def create_post(request):
         content=data["content"]
     )
 
+    categories_added = []
     for category in data["categories"]:
         try:
             db_category = Category.objects.get(pk=category["id"])
             PostCategories.objects.create(post=new_post, category=db_category)
+            categories_added.append(db_category.id)
+            # Debugging statement
+            print(f'Adding category {db_category.id} to post {new_post.id}')
         except Category.DoesNotExist:
             return Response({'error': f'Category with id {category["id"]} not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    return Response({'message': 'Post created successfully', 'post_id': new_post.id}, status=status.HTTP_201_CREATED)
+    # Serialize the new post
+    post_serializer = PostSerializer(new_post)
+
+    return Response({
+        'message': 'Post created successfully',
+        'post': post_serializer.data,
+        'categories_added': categories_added
+    }, status=status.HTTP_201_CREATED)
 
 
 @api_view(["POST"])

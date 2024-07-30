@@ -70,8 +70,8 @@ const Posts = ({
     };
 
     const getCategoryNames = () => {
-        return postCategories.map(catId => {
-            const category = categories.find(cat => cat.id === catId);
+        return postCategories.map((catId) => {
+            const category = categories.find((cat) => cat.id === catId);
             return category ? category.name : "Unknown Category";
         });
     };

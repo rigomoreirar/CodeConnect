@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import "../styles/Home.css";
+
 import Posts from "../components/Posts";
 import Comments from "../components/Comments";
 import Filters from "../containers/Filters";
@@ -15,8 +16,8 @@ const Home = () => {
         activeFilter.length === 0
             ? posts
             : posts.filter((post) =>
-                  post.categories.some((category) =>
-                      activeFilter.some((filter) => filter.name === category.name)
+                  post.categories.some((categoryId) =>
+                      activeFilter.some((filter) => filter.id === categoryId)
                   )
               );
 
