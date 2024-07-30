@@ -9,8 +9,6 @@ services:
         restart: unless-stopped
         volumes:
             - ./data:/data
-            - ./staticfiles:/code/staticfiles
-            - ./media:/code/media
         networks:
             - code-connect-network
 
