@@ -15,7 +15,7 @@ const Posts = ({
 }) => {
     const { categories, setPosts } = useContext(AppContext);
     const {
-        content,
+        formatted_content,
         title,
         likes = [],
         dislikes = [],
@@ -76,6 +76,13 @@ const Posts = ({
         });
     };
 
+    const formatContent = (content) => {
+        // Replace newlines with <br> tags and multiple spaces with &nbsp;
+        return content
+            .replace(/\n/g, '<br/>')
+            .replace(/ {2,}/g, (spaces) => '&nbsp;'.repeat(spaces.length));
+    };
+
     return (
         <div
             style={{ maxWidth: "40rem" }}
@@ -112,7 +119,7 @@ const Posts = ({
                                     ))}
                                 </section>
                             </div>
-                            <p>{content}</p>
+                            <div dangerouslySetInnerHTML={{ __html: formatContent(formatted_content) }} />
                         </div>
                         <div className="text-muted small text-center align-self-center align-items-center">
                             <span

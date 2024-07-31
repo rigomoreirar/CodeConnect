@@ -224,12 +224,9 @@ def create_post(request):
             db_category = Category.objects.get(pk=category["id"])
             PostCategories.objects.create(post=new_post, category=db_category)
             categories_added.append(db_category.id)
-            # Debugging statement
-            print(f'Adding category {db_category.id} to post {new_post.id}')
         except Category.DoesNotExist:
             return Response({'error': f'Category with id {category["id"]} not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    # Serialize the new post
     post_serializer = PostSerializer(new_post)
 
     return Response({
@@ -237,6 +234,8 @@ def create_post(request):
         'post': post_serializer.data,
         'categories_added': categories_added
     }, status=status.HTTP_201_CREATED)
+
+
 
 
 @api_view(["POST"])
