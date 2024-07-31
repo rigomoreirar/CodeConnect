@@ -50,7 +50,7 @@ def get_all_data(request):
 @api_view(['GET'])
 def get_profile_picture(request, user_id):
     logger.info(f"Received request for user ID: {user_id}")
-    possible_extensions = ['jpg', 'jpeg', 'png']
+    possible_extensions = ['png', 'jpg', 'jpeg', 'heic', 'heif', 'bmp', 'tiff', 'webp']
     for ext in possible_extensions:
         profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user_id}.{ext}")
         if os.path.exists(profile_picture_path):
@@ -60,7 +60,7 @@ def get_profile_picture(request, user_id):
                 return HttpResponse(f.read(), content_type=mime_type)
     
     # Serve default profile picture if no specific one exists
-    default_picture_path = os.path.join(PROFILE_PICTURE_DIR, 'no-profile-picture.png')
+    default_picture_path = os.path.join(PROFILE_PICTURE_DIR, 'no-profile-picture.webp')
     logger.info(f"Serving default profile picture for user ID: {user_id}")
     mime_type, _ = mimetypes.guess_type(default_picture_path)
     with open(default_picture_path, 'rb') as f:
@@ -93,7 +93,7 @@ def get_profile_picture_by_username(request, username):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    possible_extensions = ['jpg', 'jpeg', 'png']
+    possible_extensions = ['png', 'jpg', 'jpeg', 'heic', 'heif', 'bmp', 'tiff', 'webp']
     for ext in possible_extensions:
         profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user_id}.{ext}")
         if os.path.exists(profile_picture_path):
@@ -103,7 +103,7 @@ def get_profile_picture_by_username(request, username):
                 return HttpResponse(f.read(), content_type=mime_type)
     
     # Serve default profile picture if no specific one exists
-    default_picture_path = os.path.join(PROFILE_PICTURE_DIR, 'no-profile-picture.png')
+    default_picture_path = os.path.join(PROFILE_PICTURE_DIR, 'no-profile-picture.webp')
     logger.info(f"Serving default profile picture for user ID: {user_id}")
     mime_type, _ = mimetypes.guess_type(default_picture_path)
     with open(default_picture_path, 'rb') as f:

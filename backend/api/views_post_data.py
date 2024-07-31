@@ -1,4 +1,5 @@
 import os
+from tkinter import Image
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -10,6 +11,9 @@ from .models import Post, Profile, Like, Dislike, Comment, ProfileCtgFollowing, 
 from .serializers import LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer, PostSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, transaction
+from PIL import Image
+import os
+import io
 
 # Define a logger
 logger = logging.getLogger(__name__)
@@ -22,8 +26,16 @@ def generate_unique_id(model):
 # Define the directory for profile pictures
 PROFILE_PICTURE_DIR = os.path.join(settings.BASE_DIR, 'assets', 'profile-pictures')
 
+# Convert images to webp for better performance, and resize them
+def resize_image(image, size=(300, 300)):
+    return image.resize(size, Image.LANCZOS)
 
-# Register API
+def convert_image_to_webp(image):
+    output = io.BytesIO()
+    image.save(output, format='WEBP', quality=80)
+    output.seek(0)
+    return output
+
 @csrf_exempt
 @api_view(["POST"])
 def register(request):
@@ -41,14 +53,18 @@ def register(request):
             profile_picture = request.FILES['profile_picture']
             file_ext = profile_picture.name.split('.')[-1].lower()
 
-            if file_ext not in ['png', 'jpg', 'jpeg']:
-                return Response({'error': 'Invalid file extension. Only png, jpg, and jpeg are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+            if file_ext not in ['png', 'jpg', 'jpeg', 'heic', 'heif', 'bmp', 'tiff', 'webp']:
+                return Response({'error': 'Invalid file extension. Only png, jpg, jpeg, heic, heif, bmp, webp, and tiff are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{file_ext}")
-
-            with open(profile_picture_path, 'wb') as f:
-                for chunk in profile_picture.chunks():
-                    f.write(chunk)
+            try:
+                image = Image.open(profile_picture)
+                image = resize_image(image)
+                webp_image = convert_image_to_webp(image)
+                profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.webp")
+                with open(profile_picture_path, 'wb') as f:
+                    f.write(webp_image.read())
+            except Exception as e:
+                return Response({'error': f'Image processing failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
             'user_info': {
@@ -414,6 +430,7 @@ def change_user_password(request):
         return Response({'error': 'New password is required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 @csrf_exempt
 @api_view(["POST"])
 def change_profile_picture(request):
@@ -428,20 +445,25 @@ def change_profile_picture(request):
     profile_picture = request.FILES['profile_picture']
     file_ext = profile_picture.name.split('.')[-1].lower()
 
-    if file_ext not in ['png', 'jpg', 'jpeg']:
-        return Response({'error': 'Invalid file extension. Only png, jpg, and jpeg are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+    if file_ext not in ['png', 'jpg', 'jpeg', 'heic', 'heif', 'bmp', 'tiff', 'webp']:
+        return Response({'error': 'Invalid file extension. Only png, jpg, jpeg, heic, heif, bmp, webp, and tiff are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Delete existing profile picture
-    possible_extensions = ['jpg', 'jpeg', 'png']
+    possible_extensions = ['jpg', 'jpeg', 'png', 'webp']
     for ext in possible_extensions:
         existing_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{ext}")
         if os.path.exists(existing_picture_path):
             os.remove(existing_picture_path)
 
     # Save new profile picture
-    profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{file_ext}")
-    with open(profile_picture_path, 'wb') as f:
-        for chunk in profile_picture.chunks():
-            f.write(chunk)
+    try:
+        image = Image.open(profile_picture)
+        image = resize_image(image)
+        webp_image = convert_image_to_webp(image)
+        profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.webp")
+        with open(profile_picture_path, 'wb') as f:
+            f.write(webp_image.read())
+    except Exception as e:
+        return Response({'error': f'Image processing failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'message': 'Profile picture updated successfully'}, status=status.HTTP_200_OK)
