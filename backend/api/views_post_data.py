@@ -12,8 +12,8 @@ from .serializers import LikeSerializer, DislikeSerializer, CommentSerializer, R
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, transaction
 from PIL import Image
-import os
 import io
+import json
 
 # Define a logger
 logger = logging.getLogger(__name__)
@@ -35,6 +35,8 @@ def convert_image_to_webp(image):
     image.save(output, format='WEBP', quality=80)
     output.seek(0)
     return output
+
+
 
 @csrf_exempt
 @api_view(["POST"])
@@ -194,7 +196,6 @@ def delete_comment(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 @csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
@@ -229,6 +230,9 @@ def create_post(request):
 
     post_serializer = PostSerializer(new_post)
 
+    with open('sse_notifications.txt', 'w') as f:
+        f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
+
     return Response({
         'message': 'Post created successfully',
         'post': post_serializer.data,
@@ -255,6 +259,8 @@ def delete_post(request):
             Comment.objects.filter(post=post).delete()
 
             post.delete()
+            with open('sse_notifications.txt', 'w') as f:
+                f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
             return Response({"message": "Post and associated comments deleted successfully"}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "You are not authorized to delete this post"}, status=status.HTTP_403_FORBIDDEN)

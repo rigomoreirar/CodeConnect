@@ -49,4 +49,7 @@ urlpatterns = [
     path('change-profile-picture/', views_post_data.change_profile_picture, name='changeProfilePicture'),
     path('get_profile_picture/', views_get_data.get_profile_picture, name='getProfilePicture'),
 
+    # Server-Sent Events Endpoint
+    path('sse/', views_sse.sse_view, name='sse'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
