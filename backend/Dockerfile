@@ -33,8 +33,8 @@ RUN python manage.py migrate
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
-# Expose ports
-EXPOSE 8000 8001
+# Expose port
+EXPOSE 8000
 
 # Run the application
-CMD ["sh", "-c", "gunicorn forum.asgi:application --bind 0.0.0.0:8000 & gunicorn forum.asgi_sse:application --bind 0.0.0.0:8001"]
+CMD ["gunicorn", "forum.wsgi:application", "--bind", "0.0.0.0:8000"]
