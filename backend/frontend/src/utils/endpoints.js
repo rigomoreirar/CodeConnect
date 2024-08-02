@@ -1,4 +1,4 @@
-const environment = "development"; // Change this as needed
+const environment = "production"; // Change this as needed
 
 const baseURL = environment === "development" ? "http://localhost:8000/api" : "/api";
 
