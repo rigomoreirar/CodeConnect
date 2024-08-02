@@ -12,6 +12,19 @@ services:
         networks:
             - code-connect-network
 
+    sse_backend:
+        image: rigomoreirar/code-connect-backend:4.1.7
+        environment:
+            SECRET_KEY: ${SECRET_KEY}
+        expose:
+            - "8001"
+        restart: unless-stopped
+        command: gunicorn forum.asgi_sse:application --bind 0.0.0.0:8001
+        volumes:
+            - ./data:/data
+        networks:
+            - code-connect-network
+
     nginx:
         container_name: nginx
         restart: unless-stopped
@@ -27,6 +40,7 @@ services:
             - ./backend/assets/profile-pictures:/code/assets/profile-pictures
         depends_on:
             - backend
+            - sse_backend
         networks:
             - code-connect-network
 

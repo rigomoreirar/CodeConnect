@@ -1,6 +1,7 @@
-const environment = "production"; // Change this as needed
+const environment = "development"; // Change this as needed
 
 const baseURL = environment === "development" ? "http://localhost:8000/api" : "/api";
+const baseURLSSE = environment === "development" ? "http://localhost:8000/api" : "/sse";
 
 const endpoints = {
     auth: {
@@ -40,7 +41,7 @@ const endpoints = {
         resetUserPasswordEmail: `${baseURL}/reset-user-password-email/`,
     },
     sse: {
-        sseEndpoint: `${baseURL}/sse/`,
+        sseEndpoint: `${baseURLSSE}/sse/`,
     }
 };
 
