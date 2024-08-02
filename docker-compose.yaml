@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:4.1.7
+        image: rigomoreirar/code-connect-backend:4.2.0
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
@@ -11,15 +11,13 @@ services:
             - ./data:/data
         networks:
             - code-connect-network
-
-    sse_backend:
-        image: rigomoreirar/code-connect-backend:4.1.7
+    sse-backend:
+        image: rigomoreirar/code-connect-backend:4.2.0
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
-            - "8001"
+            - "8000"
         restart: unless-stopped
-        command: gunicorn forum.asgi_sse:application --bind 0.0.0.0:8001
         volumes:
             - ./data:/data
         networks:
@@ -40,7 +38,7 @@ services:
             - ./backend/assets/profile-pictures:/code/assets/profile-pictures
         depends_on:
             - backend
-            - sse_backend
+            - sse-backend
         networks:
             - code-connect-network
 

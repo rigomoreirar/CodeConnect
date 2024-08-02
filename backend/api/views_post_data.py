@@ -126,9 +126,6 @@ def create_like(request):
             Dislike.objects.filter(post=post, profile=profile).delete()
         Like.objects.get_or_create(profile=profile, post=post)
 
-    with open('sse_notifications.txt', 'w') as f:
-        f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
-
     return Response({"message": "Like action processed successfully."}, status=status.HTTP_200_OK)
 
 
@@ -149,9 +146,6 @@ def create_dislike(request):
             Like.objects.filter(post=post, profile=profile).delete()
         Dislike.objects.get_or_create(profile=profile, post=post)
 
-    with open('sse_notifications.txt', 'w') as f:
-        f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
-
     return Response({"message": "Dislike action processed successfully."}, status=status.HTTP_200_OK)
 
 
@@ -166,9 +160,6 @@ def add_comment(request):
 
     comment_id = generate_unique_id(Comment)
     comment = Comment.objects.create(id=comment_id, profile=profile, post=post, content=data["content"])
-
-    with open('sse_notifications.txt', 'w') as f:
-        f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
 
     return Response({
         'id': comment.id,
@@ -244,8 +235,6 @@ def create_post(request):
 
     post_serializer = PostSerializer(new_post)
 
-    with open('sse_notifications.txt', 'w') as f:
-        f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
 
     return Response({
         'message': 'Post created successfully',
@@ -360,9 +349,6 @@ def create_category(request):
     category_id = generate_unique_id(Category)
     category = Category(id=category_id, name=name, creator=user)
     category.save()
-
-    with open('sse_notifications.txt', 'w') as f:
-        f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
 
     return Response({'message': 'Category created successfully'}, status=status.HTTP_201_CREATED)
 
