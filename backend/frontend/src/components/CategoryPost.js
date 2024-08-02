@@ -4,15 +4,15 @@ const CategoryPost = ({ category, catArray, setCatArray }) => {
     const [select, setSelect] = useState(false);
 
     const handleSelect = () => {
-        if (catArray.some((cat) => cat === category)) {
-            setCatArray(catArray.filter((cat) => cat !== category));
+        if (catArray.some((cat) => cat.id === category.id)) {
+            setCatArray(catArray.filter((cat) => cat.id !== category.id));
         } else {
             setCatArray([...catArray, category]);
         }
     };
 
     useEffect(() => {
-        if (catArray.indexOf(category) !== -1) {
+        if (catArray.some(cat => cat.id === category.id)) {
             setSelect(true);
         } else {
             setSelect(false);

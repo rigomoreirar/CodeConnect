@@ -99,8 +99,3 @@ class ProfileCtgFollowing(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
-@receiver(post_save, sender=Comment)
-@receiver(post_delete, sender=Comment)
-def comment_change_handler(sender, instance, **kwargs):
-    from .views_sse import trigger_sse_update
-    trigger_sse_update('comments')

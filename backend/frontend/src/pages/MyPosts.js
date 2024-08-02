@@ -11,7 +11,7 @@ import { createPost, fetchUserPosts } from "../actions/actionMyPosts";
 import { fetchAllData } from "../actions/actionAppContext";
 
 const MyPosts = () => {
-    const { user, categories, posts, setPosts } = useContext(AppContext);
+    const { user, posts, setPosts } = useContext(AppContext);
     const [isLoading, setIsLoading] = useState(false);
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
@@ -63,6 +63,12 @@ const MyPosts = () => {
             }
             return post;
         });
+        setFilteredPosts(updatedPosts);
+        setPosts(updatedPosts);
+    };
+
+    const handlePostDeleted = (postId) => {
+        const updatedPosts = posts.filter(post => post.id !== postId);
         setFilteredPosts(updatedPosts);
         setPosts(updatedPosts);
     };
@@ -135,7 +141,6 @@ const MyPosts = () => {
                                 <CategoryBox
                                     catArray={catArray}
                                     setCatArray={setCatArray}
-                                    categories={categories}
                                 />
                                 <h6>Detail your post!</h6>
                                 <div className="tweet-area">
@@ -175,11 +180,7 @@ const MyPosts = () => {
                                     }
                                     setSelectedPost={posts}
                                     deleteOption={true}
-                                    onDelete={(postId) => {
-                                        const updatedPosts = posts.filter(p => p.id !== postId);
-                                        setFilteredPosts(updatedPosts);
-                                        setPosts(updatedPosts);
-                                    }}
+                                    onDelete={handlePostDeleted}
                                     onCommentAdded={handleCommentAdded}
                                 />
                                 {showCommentsPostId === post.id && (
