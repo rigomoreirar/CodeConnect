@@ -1,7 +1,7 @@
 const environment = "production"; // Change this as needed
 
 const baseURL = environment === "development" ? "http://localhost:8000/api" : "/api";
-const baseURLSSE = environment === "development" ? "http://localhost:8000/api" : "/sse";
+const baseURLSSE = environment === "development" ? "http://localhost:8000/api" : "/sse/api";
 
 const endpoints = {
     auth: {
