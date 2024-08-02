@@ -9,7 +9,16 @@ const RegisterProfilePicture = ({ setProfilePicture }) => {
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            const validExtensions = ["image/png", "image/jpeg", "image/jpg"];
+            const validExtensions = [
+                "image/png",
+                "image/jpeg",
+                "image/jpg",
+                "image/heic",
+                "image/heif",
+                "image/bmp",
+                "image/tiff",
+                "image/webp"
+            ];
             if (!validExtensions.includes(file.type)) {
                 setError(
                     "Invalid file type. Only PNG, JPG, and JPEG are allowed."

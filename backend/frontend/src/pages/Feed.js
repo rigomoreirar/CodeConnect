@@ -6,7 +6,7 @@ import Filters from "../containers/Filters";
 import { AppContext } from "../context/AppContext";
 
 const Feed = () => {
-    const { user, categories, posts: allPosts } = useContext(AppContext);
+    const { user, categories, posts: allPosts, setPosts } = useContext(AppContext);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
     const [activeFilter, setActiveFilter] = useState([]);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
@@ -16,8 +16,7 @@ const Feed = () => {
         const filtered = allPosts.filter((post) =>
             post.categories.some((category) =>
                 user.profile_data.ctg_following.some(
-                    (followedCategory) =>
-                        followedCategory.name === category.name
+                    (followedCategory) => followedCategory.name === category.name
                 )
             )
         );
@@ -29,8 +28,7 @@ const Feed = () => {
             const filtered = allPosts.filter((post) =>
                 post.categories.some((category) =>
                     user.profile_data.ctg_following.some(
-                        (followedCategory) =>
-                            followedCategory.name === category.name
+                        (followedCategory) => followedCategory.name === category.name
                     )
                 )
             );
@@ -43,8 +41,7 @@ const Feed = () => {
                     ) &&
                     post.categories.some((category) =>
                         user.profile_data.ctg_following.some(
-                            (followedCategory) =>
-                                followedCategory.name === category.name
+                            (followedCategory) => followedCategory.name === category.name
                         )
                     )
             );
@@ -57,11 +54,34 @@ const Feed = () => {
     };
 
     const handleCommentAdded = (postId, newComment) => {
-        console.log(`Comment added to post ${postId}:`, newComment);
+        const updatedPosts = allPosts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: [...post.comments, newComment],
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
     };
 
     const handleCommentDeleted = (postId, commentId) => {
-        console.log(`Comment deleted from post ${postId}:`, commentId);
+        const updatedPosts = allPosts.map((post) => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    comments: post.comments.filter((comment) => comment.id !== commentId),
+                };
+            }
+            return post;
+        });
+        setPosts(updatedPosts);
+    };
+
+    const handlePostDeleted = (postId) => {
+        const updatedPosts = allPosts.filter(post => post.id !== postId);
+        setPosts(updatedPosts);
     };
 
     const sortedPosts = filteredPosts
@@ -85,29 +105,19 @@ const Feed = () => {
                                 <Posts
                                     setPost={() => {}}
                                     showCommets={showCommentsPostId === post.id}
-                                    setShowComments={() =>
-                                        setShowCommentsPostId(post.id)
-                                    }
+                                    setShowComments={() => setShowCommentsPostId(post.id)}
                                     currentUser={user}
                                     post={post}
                                     onCommentAdded={handleCommentAdded}
+                                    onCommentDeleted={handleCommentDeleted}
                                     deleteOption={post.user_id === user.id}
-                                    onDelete={(postId) => {
-                                        console.log(`Post deleted: ${postId}`);
-                                        setFilteredPosts(
-                                            filteredPosts.filter(
-                                                (p) => p.id !== postId
-                                            )
-                                        );
-                                    }}
+                                    onDelete={handlePostDeleted}
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
                                         currentUser={user}
                                         currentPost={post}
-                                        setShowComments={() =>
-                                            setShowCommentsPostId(null)
-                                        }
+                                        setShowComments={() => setShowCommentsPostId(null)}
                                         onCommentAdded={handleCommentAdded}
                                         onCommentDeleted={handleCommentDeleted}
                                     />

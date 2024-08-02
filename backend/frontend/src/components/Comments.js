@@ -6,9 +6,18 @@ import defaultPicture from "../assets/no-profile-picture.webp";
 import "../styles/Comments.css";
 
 const Comments = ({ currentPost, setShowComments, currentUser, onCommentAdded, onCommentDeleted }) => {
-    const { user } = useContext(AppContext);
-    const [comments, setComments] = useState(Array.isArray(currentPost.comments) ? currentPost.comments : []);
+    const { posts } = useContext(AppContext);
+    const [comments, setComments] = useState([]);
+
     const [profilePictures, setProfilePictures] = useState({});
+
+    useEffect(() => {
+        // Update comments based on the latest post data from the context
+        const updatedPost = posts.find(post => post.id === currentPost.id);
+        if (updatedPost) {
+            setComments(updatedPost.comments);
+        }
+    }, [posts, currentPost.id]);
 
     useEffect(() => {
         const fetchProfilePictures = async () => {
@@ -35,7 +44,6 @@ const Comments = ({ currentPost, setShowComments, currentUser, onCommentAdded, o
         const content = e.target.elements.content.value;
         try {
             const newComment = await addComment(currentPost.id, currentUser.id, content);
-            setComments([...comments, newComment]);
             onCommentAdded(currentPost.id, newComment);
             e.target.elements.content.value = "";
         } catch (error) {
@@ -46,8 +54,6 @@ const Comments = ({ currentPost, setShowComments, currentUser, onCommentAdded, o
     const handleDelete = async (commentId) => {
         try {
             await deleteComment(commentId, currentUser.id);
-            const updatedComments = comments.filter((comment) => comment.id !== commentId);
-            setComments(updatedComments);
             onCommentDeleted(currentPost.id, commentId);
         } catch (error) {
             console.error("Error deleting comment:", error);

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AppProvider } from "../context/AppContext";
+import SSEHandler from "../utils/SSEHandler";
 
 import Layout from "../containers/Layout";
 import Home from "../pages/Home";
@@ -60,6 +61,7 @@ function AppContent() {
 function App() {
     return (
         <AppProvider>
+            <SSEHandler />
             <AppContent />
         </AppProvider>
     );

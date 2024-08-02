@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers, validators
 from .models import Post, Profile, Like, Dislike, Comment, User, Category, CategoryFollowers, PostCategories, ProfileCtgFollowing
 
@@ -39,10 +40,11 @@ class PostSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()
     dislikes = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
+    formatted_content = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'content', 'likes', 'dislikes', 'comments', 'categories', 'creator')
+        fields = ('id', 'title', 'content', 'formatted_content', 'likes', 'dislikes', 'comments', 'categories', 'creator')
 
     def get_categories(self, obj):
         return [category.id for category in obj.categories.all()]
@@ -55,6 +57,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_comments(self, obj):
         return CommentSerializer(obj.post_comment.all(), many=True).data
+
+    def get_formatted_content(self, obj):
+        content = obj.content
+        # Convert URLs in content to HTML links
+        content = re.sub(r'(https?://\S+)', r'<a href="\1" target="_blank">\1</a>', content)
+        return content
 
 
 class ProfileSerializer(serializers.ModelSerializer):

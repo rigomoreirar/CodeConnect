@@ -8,6 +8,7 @@ export const fetchAllData = async (token) => {
 
     const { user, categories, posts } = allDataResponse.data;
     
+    console.log(JSON.stringify(posts, null, 2)); // Pretty-print the JSON data
     return {
         user,
         categories,
