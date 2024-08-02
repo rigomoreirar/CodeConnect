@@ -39,6 +39,9 @@ const endpoints = {
         sendTestEmail: `${baseURL}/send-test-email/`,
         resetUserPasswordEmail: `${baseURL}/reset-user-password-email/`,
     },
+    sse: {
+        sseEndpoint: `${baseURL}/sse/`,
+    }
 };
 
 export default endpoints;
