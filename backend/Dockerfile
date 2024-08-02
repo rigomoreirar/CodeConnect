@@ -1,7 +1,10 @@
-# Dockerfile for backend
-
 # Use an official Python runtime as a parent image
 FROM python:3.8-slim-buster
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    python3-tk \
+    && apt-get clean
 
 # Set environment variables
 ARG SECRET_KEY
@@ -12,7 +15,7 @@ ENV PYTHONUNBUFFERED=1
 # Set work directory
 WORKDIR /code
 
-# Install dependencies
+# Install pip dependencies
 COPY requirements.txt /code/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
@@ -24,11 +27,11 @@ COPY . /code/
 COPY ./frontend/build /code/frontend/build
 
 # Run migrations
-RUN py manage.py makemigrations
-RUN py manage.py migrate
+RUN python manage.py makemigrations
+RUN python manage.py migrate
 
 # Collect static files
-RUN py manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 # Expose port
 EXPOSE 8000
