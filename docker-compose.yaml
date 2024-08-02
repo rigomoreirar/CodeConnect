@@ -1,7 +1,7 @@
 version: "3.8"
 services:
     backend:
-        image: rigomoreirar/code-connect-backend:4.2.1
+        image: rigomoreirar/code-connect-backend:4.2.2
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
@@ -12,7 +12,7 @@ services:
         networks:
             - code-connect-network
     sse-backend:
-        image: rigomoreirar/code-connect-backend:4.2.1
+        image: rigomoreirar/code-connect-backend:4.2.2
         environment:
             SECRET_KEY: ${SECRET_KEY}
         expose:
