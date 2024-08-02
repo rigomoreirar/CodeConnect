@@ -22,6 +22,11 @@ export const AppProvider = ({ children }) => {
                 })
                 .catch(err => {
                     console.error("Failed to fetch data:", err);
+                    if (err.response && err.response.status === 401 && err.response.data.detail === "Invalid token.") {
+                        localStorage.setItem("isLoggedIn", "false");
+                        localStorage.removeItem("token");
+                        window.location.reload();
+                    }
                 });
         }
     }, []);

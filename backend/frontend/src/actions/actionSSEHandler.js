@@ -1,5 +1,5 @@
-import axios from '../axios';
-import endpoints from '../endpoints';
+import axios from '../utils/axios';
+import endpoints from '../utils/endpoints';
 
 export const handleSSE = (setUser, setCategories, setPosts) => {
     const eventSource = new EventSource(endpoints.sse.sseEndpoint);
