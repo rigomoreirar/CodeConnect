@@ -6,7 +6,12 @@ const SSEHandler = () => {
     const { setUser, setCategories, setPosts } = useContext(AppContext);
 
     useEffect(() => {
-        handleSSE(setUser, setCategories, setPosts);
+        const eventSource = handleSSE(setUser, setCategories, setPosts);
+        return () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+        };
     }, [setUser, setCategories, setPosts]);
 
     return null;

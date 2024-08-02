@@ -37,4 +37,5 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Run the application
-CMD ["gunicorn", "forum.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "forum.wsgi:application", "--bind", "0.0.0.0:8000", "--worker-class", "uvicorn.workers.UvicornWorker"]
+
