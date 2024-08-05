@@ -1,4 +1,4 @@
-# settings.py
+# forum/settings.py
 
 import os
 from pathlib import Path
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'knox',
     'rest_framework',
     'corsheaders',
+    'sse'
 ]
 
 MIDDLEWARE = [
