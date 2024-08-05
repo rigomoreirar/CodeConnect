@@ -7,7 +7,6 @@ from knox import views as knox_views
 from . import views_get_data
 from . import views_post_data
 from . import views_post_email
-from ..forum import views_sse
 
 urlpatterns = [
     # Authentication and User Endpoints
@@ -48,5 +47,7 @@ urlpatterns = [
     # Profile Picture Endpoint
     path('change-profile-picture/', views_post_data.change_profile_picture, name='changeProfilePicture'),
     path('get_profile_picture/', views_get_data.get_profile_picture, name='getProfilePicture'),
+
+    
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
