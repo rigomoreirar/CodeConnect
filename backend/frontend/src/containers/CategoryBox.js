@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import CategoryPost from "../components/CategoryPost";
-import "../styles/CategoryBox.css";
+
+import styles from "../styles/CategoryBox.module.css";
+
 import { AppContext } from "../context/AppContext";
 
 const CategoryBox = ({ catArray, setCatArray }) => {
@@ -22,7 +24,7 @@ const CategoryBox = ({ catArray, setCatArray }) => {
     }, [categories, catArray, setCatArray, displayedCategories]);
 
     return (
-        <div className="category-box" style={{ margin: "10px" }}>
+        <div className={styles["category-box"]} >
             {displayedCategories.map((category) => (
                 <CategoryPost
                     catArray={catArray}

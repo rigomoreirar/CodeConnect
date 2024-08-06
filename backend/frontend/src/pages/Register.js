@@ -1,10 +1,13 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { AppContext } from "../context/AppContext";
+import { registerUser } from "../actions/actionRegister";
+
+import styles from "../styles/Register.module.css";
+
 import Logo from "../components/Logo";
 import RegisterProfilePicture from "../components/RegisterProfilePicture";
-import styles from "../styles/Register.module.css";
-import { registerUser } from "../actions/actionRegister";
 
 const FormField = ({ icon, label, type, value, setValue, id }) => {
     return (

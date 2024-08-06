@@ -1,6 +1,8 @@
 import React from "react";
+
+import styles from "../styles/CategoryFollow.module.css";
+
 import Following from "../components/Following";
-import "../styles/CategoryFollow.css";
 
 const CategoryFollow = ({
     categories,
@@ -15,7 +17,7 @@ const CategoryFollow = ({
 
     return (
         <div
-            className="category-follow-card card"
+            className={`category-follow-card card ${styles['category-follow-card']}`}
             style={{
                 width: "75vw",
                 maxWidth: "700px",

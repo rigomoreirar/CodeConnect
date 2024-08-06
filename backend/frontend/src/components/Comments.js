@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaTrashAlt } from "react-icons/fa";
+
 import { AppContext } from "../context/AppContext";
-import { addComment, deleteComment, fetchProfilePicture } from "../actions/actionComments";
+
+import styles from "../styles/Comments.module.css";
+
 import defaultPicture from "../assets/no-profile-picture.webp";
-import "../styles/Comments.css";
+
+import { addComment, deleteComment, fetchProfilePicture } from "../actions/actionComments";
 
 const Comments = ({ currentPost, setShowComments, currentUser, onCommentAdded, onCommentDeleted }) => {
     const { posts } = useContext(AppContext);
@@ -61,8 +65,8 @@ const Comments = ({ currentPost, setShowComments, currentUser, onCommentAdded, o
     };
 
     return (
-        <div className="comments-container">
-            <div className="comments-header pb-4">
+        <div className={styles["comments-container"]}>
+            <div className={styles["comment-header"]}>
                 <h5 className="modal-title mb-1" id="exampleModalLongTitle">Comments</h5>
                 <button onClick={() => setShowComments(false)} type="button" className="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -85,15 +89,21 @@ const Comments = ({ currentPost, setShowComments, currentUser, onCommentAdded, o
                     </div>
                 </form>
                 {comments.map((comment) => (
-                    <div key={comment.id} className="comment-item">
-                        <div className="comment-header">
-                            <img src={profilePictures[comment.profile] || defaultPicture} alt="Profile" className="profile-picture" />
-                            <h6 className="mb-0">{comment.profile}</h6>
+                    <div key={comment.id} className={styles["comment-item"]}>
+                        <div className={styles["comment-header"]}>
+                            <div className={styles["first-part-comment-header"]}>
+
+                            <img src={profilePictures[comment.profile] || defaultPicture} alt="Profile" className={styles["profile-picture"]} />
+                            
+                            <h6 className="mt-2">{comment.profile}</h6>
+                            </div>
+                            <div>
                             {comment.profile === currentUser.username && (
                                 <FaTrashAlt className="delete-icon" onClick={() => handleDelete(comment.id)} style={{ cursor: "pointer", color: "red" }} />
                             )}
+                            </div>
                         </div>
-                        <p className="mb-1 comment-content">{comment.content}</p>
+                        <p className={styles["comment-content"]}>{comment.content}</p>
                     </div>
                 ))}
             </div>
