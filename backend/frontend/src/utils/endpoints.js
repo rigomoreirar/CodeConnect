@@ -1,7 +1,9 @@
-const environment = "development"; // Change this as needed
+const environment = "production"; // Change this as needed
 
-const baseURL = environment === "development" ? "http://localhost:8000/api" : "/api";
-const baseURLSSE = environment === "development" ? "http://localhost:8000/sse" : "/sse";
+const baseURL =
+    environment === "development" ? "http://localhost:8000/api" : "/api";
+const baseURLSSE =
+    environment === "development" ? "http://localhost:8000/sse" : "/sse";
 
 const endpoints = {
     auth: {
@@ -17,7 +19,8 @@ const endpoints = {
     profile: {
         changeProfilePicture: `${baseURL}/change-profile-picture/`,
         getProfilePicture: (userId) => `${baseURL}/profile-picture/${userId}/`,
-        getProfilePictureByUsername: (username) => `${baseURL}/profile-picture-username/${username}/`,
+        getProfilePictureByUsername: (username) =>
+            `${baseURL}/profile-picture-username/${username}/`,
     },
     interactions: {
         createLike: `${baseURL}/create-like/`,
@@ -34,7 +37,8 @@ const endpoints = {
         deleteCategory: `${baseURL}/delete-category/`,
         followCategory: `${baseURL}/follow-category/`,
         unfollowCategory: `${baseURL}/unfollow-category/`,
-        getCategoriesByUser: (userId) => `${baseURL}/categories-by-user/${userId}/`,
+        getCategoriesByUser: (userId) =>
+            `${baseURL}/categories-by-user/${userId}/`,
     },
     emails: {
         sendTestEmail: `${baseURL}/send-test-email/`,
@@ -42,7 +46,7 @@ const endpoints = {
     },
     sse: {
         sseEndpoint: `${baseURLSSE}/sse/`,
-    }
+    },
 };
 
 export default endpoints;
