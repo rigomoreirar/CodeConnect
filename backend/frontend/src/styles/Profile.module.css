@@ -3,126 +3,51 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 12rem;
-}
-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    margin-top: 50px;
 }
 
-.bg-black {
-    background: #000;
+.profileBodyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+.profileBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 10px;
+    padding: 40px;
+
+    max-width: 90vw;
 }
 
-.skill-block-container {
+.skillBlockContainer {
     display: flex;
     flex-wrap: row;
     justify-content: center;
     color: white;
+    /* For some reason this border is not being applied correctly, lol */
+    border-radius: 30px;
+    padding: 3px;
 }
 
-.email-container-profile {
-    width: 28rem;
-    padding: 1.5rem;
-}
-.name-username-container {
-    display: flex; /* d-flex */
-    flex-direction: row; /* flex-row */
-    justify-content: space-between; /* justify-content-between */
-    align-items: center; /* align-items-center */
-    padding: 3rem; /* p-5 (5 * 0.5rem = 2.5rem) */
-    background-color: #343a40; /* bg-dark */
-    color: #ffffff; /* text-white */
+.skillBlock {
+    max-width: 30%;
+    width: auto;
+    text-align: center;
+    padding: 1rem;
 }
 
-/* Smallest big screen */
-.skill-block {
-    width: 30%;
-}
-.email-container-profile {
-    width: 100%;
-    background-color: #52575c;
+.textInnerContainer {
+    text-align: center;
+    margin-bottom: 10px;
 }
 
-/* Medium big screen */
-@media (min-width: 991px) and (max-width: 1200px) {
-    .skill-block {
-        padding: 32px;
-    }
-    .name-username-container {
-        width: 100%;
-    }
-    .email-container-profile {
-        width: 100%;
-    }
-}
-
-/* Big big screen */
-@media (min-width: 1200px) {
-    .skill-block {
-        padding: 56px;
-    }
-    .name-username-container {
-        width: 100%;
-    }
-    .email-container-profile {
-        width: 100%;
-    }
-}
-
-body {
-    background-color: #eeeeee;
-}
-
-.container {
-    margin-top: -8rem;
-}
-/* Small screens */
-@media (max-width: 768px) {
-    .container {
-        margin-top: 8rem;
-        width: 100%; /* Use full width */
-        padding: 1rem; /* Add padding */
-        margin-bottom: 10rem;
-        box-sizing: border-box; /* Include padding in the element's total width and height */
-    }
-
-    .skill-block {
-        width: 100%; /* Use full width */
-        padding: 1rem; /* Add padding */
-        box-sizing: border-box; /* Include padding in the element's total width and height */
-    }
-
-    .name-username-container {
-        padding-left: 5.2rem;
-        padding-right: 5.2rem;
-        width: calc(100% - 10.4rem); /* Adjust width to account for padding */
-        box-sizing: border-box; /* Include padding in the element's total width and height */
-    }
-
-    .email-container-profile {
-        padding-left: 13.5rem;
-        padding-right: 13.3rem;
-        width: calc(100% - 26.8rem); /* Adjust width to account for padding */
-        box-sizing: border-box; /* Include padding in the element's total width and height */
-    }
-}
-
-.ctg-following {
-    background-color: #343a40;
-    transition: background 0.2s ease;
-}
-
-.ctg-following:hover {
-    background-color: #575757;
-}
-
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-size: 24px;
-    font-weight: bold;
+.bg-gray {
+    background-color: rgb(83, 83, 83);
 }
