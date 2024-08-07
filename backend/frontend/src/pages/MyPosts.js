@@ -1,14 +1,16 @@
 import React, { useContext, useState, useEffect } from "react";
-import "../styles/Home.css";
-import "../styles/Create.css";
-import "../styles/Comments-legacy.css";
+
+import { AppContext } from "../context/AppContext";
+import { createPost, fetchUserPosts } from "../actions/actionMyPosts";
+import { fetchAllData } from "../actions/actionAppContext";
+
+import styles from "../styles/MyPosts.module.css";
+
 import Posts from "../components/Posts";
 import Comments from "../components/Comments";
 import CategoryBox from "../containers/CategoryBox";
 import Loader from "../components/Loader";
-import { AppContext } from "../context/AppContext";
-import { createPost, fetchUserPosts } from "../actions/actionMyPosts";
-import { fetchAllData } from "../actions/actionAppContext";
+import Filters from "../containers/Filters";
 
 const MyPosts = () => {
     const { user, posts, setPosts } = useContext(AppContext);
@@ -58,7 +60,7 @@ const MyPosts = () => {
             if (post.id === postId) {
                 return {
                     ...post,
-                    comments: post.comments.filter((comment) => comment.id !== commentId),
+                    comments: post.comments.filter(comment => comment.id !== commentId),
                 };
             }
             return post;
@@ -123,18 +125,24 @@ const MyPosts = () => {
 
     return (
         <>
-            <div className="filterContainer"></div>
-            <div className="home-container">
-                <div className="inner-main d-flex flex-column align-items-center">
+        {/* Sorry, I am too lazy to fix this stuff, I will just let it be, filters stay just for the black line in the top :3 */}
+            <Filters
+                activeFilter={true}
+                setActiveFilter={true}
+                neededCategories={false}
+            />
+            <div className={styles.filterContainer}></div>
+            <div className={styles.homeContainer}>
+                <div className={`${styles.innerMain} d-flex flex-column align-items-center`}>
                     <h1 className="mb-4 ml-3 mt-3 display-4">
                         Welcome back, {user.first_name}
                     </h1>
                     <form onSubmit={handleSubmit} id="tweet-form">
-                        <div id="tweetbox" className="wrapper mb-5">
-                            <div className="input-box">
+                        <div id="tweetbox" className={`${styles.wrapper} mb-5`}>
+                            <div className={styles.inputBox}>
                                 <h6>What's on your mind?</h6>
                                 <input
-                                    className="question mb-2"
+                                    className={`${styles.question} mb-2`}
                                     type="text"
                                     name="question"
                                 />
@@ -143,7 +151,7 @@ const MyPosts = () => {
                                     setCatArray={setCatArray}
                                 />
                                 <h6>Detail your post!</h6>
-                                <div className="tweet-area">
+                                <div className={styles.tweetArea}>
                                     <textarea
                                         id="content"
                                         required
@@ -153,8 +161,8 @@ const MyPosts = () => {
                                     ></textarea>
                                 </div>
                             </div>
-                            <div className="bottom">
-                                <div className="content">
+                            <div className={styles.bottom}>
+                                <div className={styles.content}>
                                     <input
                                         className="btn btn-primary btn-bg-modified"
                                         value="Post"
@@ -171,7 +179,7 @@ const MyPosts = () => {
                         <Loader />
                     ) : sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
-                            <div key={post.id} className="centered-items">
+                            <div key={post.id} className={styles.centeredItems}>
                                 <Posts
                                     post={post}
                                     currentUser={user}
@@ -201,11 +209,11 @@ const MyPosts = () => {
                             <h4>You have no posts.</h4>
                         </div>
                     )}
-                    <div className="post-counter">
+                    <div className={styles["post-counter"]}>
                         {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
                     {sortedPosts.length < filteredPosts.length && (
-                        <div className="load-more" onClick={handleLoadMore}>
+                        <div className={styles["load-more"]} onClick={handleLoadMore}>
                             Load more...
                         </div>
                     )}

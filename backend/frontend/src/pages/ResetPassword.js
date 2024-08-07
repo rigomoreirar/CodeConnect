@@ -1,10 +1,11 @@
-// pages/ResetPassword.js
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/Layout.css';
-import Logo from '../components/Logo';
+
 import { resetPassword } from '../actions/actionResetPassword';
+
+import styles from '../styles/ResetPassword.module.css';
+
+import Logo from '../components/Logo';
 
 const ResetPassword = () => {
     const [email, setEmail] = useState('');
@@ -26,8 +27,8 @@ const ResetPassword = () => {
 
     return (
         <>
-            <section className="main-container" style={{ backgroundColor: '#eee' }}>
-                <div className="resetingcard">
+            <section className={styles['main-container']} style={{ backgroundColor: '#eee' }}>
+                <div className={styles.resetingcard}>
                     <div className="d-flex row justify-content-center align-items-center">
                         <div className="col-md-4 d-flex justify-content-center mt-3">
                             <div className="start-0 m-3 d-flex row justify-content-start align-items-start">

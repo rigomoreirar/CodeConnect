@@ -14,3 +14,14 @@
     color: red;
     margin-bottom: 10px;
 }
+
+.like {
+    color: blue;
+}
+.dislike {
+    color: red;
+}
+
+.none {
+    color: grey;
+}

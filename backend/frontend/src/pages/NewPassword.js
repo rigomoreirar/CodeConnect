@@ -1,8 +1,10 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+
 import { AppContext } from "../context/AppContext";
 import { changeUserPassword } from "../actions/actionNewPassword";
-import "../styles/EditProfile.css";
+
+import styles from "../styles/EditProfileNewPassword.module.css";
 
 const NewPassword = () => {
     const { user } = useContext(AppContext);
@@ -32,10 +34,10 @@ const NewPassword = () => {
 
     return (
         <>
-        <div className="filterContainer"></div>
-        <div className="centering-div">
-            <div className="container-edit-profile">
-                <div className="back-start-container">
+        {/* <div className="filterContainer"></div> */}
+        <div className={styles["centering-div"]}>
+            <div className={styles["container-edit-profile"]}>
+                <div className={styles["back-start-container"]}>
                     <Link
                         to="/forum/profile"
                         className="back-start btn btn-secondary ml-2"

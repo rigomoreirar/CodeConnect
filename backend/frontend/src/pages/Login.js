@@ -1,9 +1,12 @@
 import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+
 import { AppContext } from "../context/AppContext";
-import Logo from "../components/Logo";
-import "../styles/Layout.css";
 import { loginUser } from "../actions/actionLogin";
+
+import styles from "../styles/Login.module.css";
+
+import Logo from "../components/Logo";
 
 const Login = () => {
     const { setUser, setCategories, setPosts } = useContext(AppContext);
@@ -31,15 +34,15 @@ const Login = () => {
     };
 
     return (
-        <section className="main-container vh-100" style={{ backgroundColor: "#eee" }}>
+        <section className={`${styles["main-container"]} vh-100`} style={{ backgroundColor: "#eee" }}>
             <div className="container h-100" style={{ marginTop: "2rem" }}>
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-lg-12 col-xl-11">
-                        <div className="card-login text-black" style={{ borderRadius: "25px" }}>
+                        <div className={`${styles["card-login"]} text-black`} style={{ borderRadius: "25px" }}>
                             <div className="card-body p-md-3">
                                 <div className="row justify-content-center">
                                     <div className="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
-                                        <div className="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4 d-flex align-items-center justify-content-center left-container-login">
+                                        <div className={`text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4 d-flex align-items-center justify-content-center ${styles["left-container-login"]}`}>
                                             <div>Login</div>
                                             <div className="navbar-brand ml-1 mt-2">
                                                 <Logo size="50px" />

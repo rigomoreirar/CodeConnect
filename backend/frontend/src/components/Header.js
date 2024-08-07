@@ -1,9 +1,12 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+
 import { AppContext } from "../context/AppContext";
 import { logoutUser } from "../actions/actionHeader";
+
+import styles from "../styles/Header.module.css";
+
 import Logo from "./Logo";
-import "../styles/Header.css";
 
 const Header = () => {
     const { setUser } = useContext(AppContext);
@@ -22,13 +25,13 @@ const Header = () => {
     };
 
     return (
-        <nav className="navbar navbar-expand-md navbar-dark bg-dark">
+        <nav className={`navbar navbar-expand-md navbar-dark bg-dark`}>
             <Link className="navbar-brand" to="/">
                 <Logo size="50px" />
                 &nbsp;&nbsp;&nbsp;CodeConnect
             </Link>
             <button
-                className="navbar-toggler"
+                className={`navbar-toggler ${styles["navbar-toggler"]}`}
                 type="button"
                 data-toggle="collapse"
                 data-target="#navbarNav"
@@ -38,37 +41,37 @@ const Header = () => {
             >
                 <span className="navbar-toggler-icon"></span>
             </button>
-            <div className="collapse navbar-collapse" id="navbarNav">
-                <ul className="navbar-nav ml-auto">
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/forum">
+            <div className={`collapse navbar-collapse ${styles["navbar-collapse"]}`} id="navbarNav">
+                <ul className={`navbar-nav ml-auto ${styles["navbar-nav"]}`}>
+                    <li className={`nav-item ${styles["nav-item"]}`}>
+                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum">
                             Home
                         </Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/forum/my-feed">
+                    <li className={`nav-item ${styles["nav-item"]}`}>
+                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/my-feed">
                             My Feed
                         </Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/forum/my-posts">
+                    <li className={`nav-item ${styles["nav-item"]}`}>
+                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/my-posts">
                             My Posts
                         </Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/forum/create-categories">
+                    <li className={`nav-item ${styles["nav-item"]}`}>
+                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/create-categories">
                             Create Categories
                         </Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/forum/profile">
+                    <li className={`nav-item ${styles["nav-item"]}`}>
+                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/profile">
                             My Profile
                         </Link>
                     </li>
-                    <li className="nav-item">
+                    <li className={`nav-item ${styles["nav-item"]}`}>
                         <button
                             onClick={handleLogout}
-                            className="btn btn-link nav-link"
+                            className={`btn btn-link nav-link ${styles["btn-link"]}`}
                             type="button"
                         >
                             Log out

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "../styles/Filters.css";
+
+import styles from "../styles/FiltersCategory.module.css";
 
 const Category = ({ category, activeFilter, setActiveFilter }) => {
     const [selected, setSelected] = useState(false);
@@ -19,14 +20,14 @@ const Category = ({ category, activeFilter, setActiveFilter }) => {
     return (
         <div
             onClick={handleSelect}
-            className={`category-item ml-2 hover ${selected ? "selected" : ""}`}
+            className={`${styles["category-item"]} ${styles["ml-2"]} ${styles["hover"]} ${selected ? styles["selected"] : ""}`}
             key={category.id}
         >
             <div
                 className={
                     selected
-                        ? "category-item-btn"
-                        : "category-item-btn-unselected"
+                        ? styles["category-item-btn"]
+                        : styles["category-item-btn-unselected"]
                 }
             >
                 {category.name}

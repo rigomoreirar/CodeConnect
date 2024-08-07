@@ -39,3 +39,28 @@
     align-items: center;
     flex-direction: column;
 }
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 24px;
+    font-weight: bold;
+}
+.post-counter {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 8rem;
+}
+.load-more {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+    font-weight: bold;
+    padding-bottom: 40px;
+}
+.load-more:hover {
+    color: darkblue;
+}

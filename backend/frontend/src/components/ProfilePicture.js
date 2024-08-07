@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import styles from "../styles/ProfilePicture.module.css";
-import { getProfilePicture, changeProfilePicture } from "../actions/actionProfilePicture";
+import {
+    getProfilePicture,
+    changeProfilePicture,
+} from "../actions/actionProfilePicture";
 
 const ProfilePicture = () => {
-    const { user, profilePictureUrl, setProfilePictureUrl } = useContext(AppContext);
+    const { user, profilePictureUrl, setProfilePictureUrl } =
+        useContext(AppContext);
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -31,7 +35,7 @@ const ProfilePicture = () => {
                 "image/heif",
                 "image/bmp",
                 "image/tiff",
-                "image/webp"
+                "image/webp",
             ];
             if (!validExtensions.includes(file.type)) {
                 setError(

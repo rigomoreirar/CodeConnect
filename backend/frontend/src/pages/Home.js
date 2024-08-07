@@ -1,6 +1,8 @@
 import { useState, useContext } from "react";
+
 import { AppContext } from "../context/AppContext";
-import "../styles/Home.css";
+
+import styles from "../styles/Home.module.css";
 
 import Posts from "../components/Posts";
 import Comments from "../components/Comments";
@@ -62,18 +64,18 @@ const Home = () => {
 
     return (
         <>
-            <div className="home-container">
+            <div className={styles["home-container"]}>
                 <Filters
                     categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     neededCategories={true}
                 />
-                <div className="inner-main d-flex flex-column align-items-center">
+                <div className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}>
                     <h1 className="ml-3 mt-3 display-4">Here's what's new!</h1>
                     {sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
-                            <div key={post.id} className="centered-items">
+                            <div key={post.id} className={styles["centered-items"]}>
                                 <Posts
                                     setPost={() => {}}
                                     showCommets={showCommentsPostId === post.id}
@@ -97,48 +99,21 @@ const Home = () => {
                             </div>
                         ))
                     ) : (
-                        <div className="ml-2 mt-5 centered-items">
+                        <div className={`ml-2 mt-5 ${styles["centered-items"]}`}>
                             <h1>Woops!</h1>
                             <h4>No posts found for this category!</h4>
                         </div>
                     )}
-                    <div className="post-counter">
+                    <div className={styles["post-counter"]}>
                         {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
                     {sortedPosts.length < filteredPosts.length && (
-                        <div className="load-more" onClick={handleLoadMore}>
+                        <div className={styles["load-more"]} onClick={handleLoadMore}>
                             Load more...
                         </div>
                     )}
                 </div>
             </div>
-            <style>
-                {`
-                .loading {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-                .post-counter {
-                    margin-top: 20px;
-                    font-size: 20px;
-                    font-weight: bold;
-                    padding-bottom: 8rem;
-                }
-                .load-more {
-                    cursor: pointer;
-                    color: blue;
-                    text-decoration: underline;
-                    font-weight: bold;
-                    padding-bottom: 40px;
-                }
-                .load-more:hover {
-                    color: darkblue;
-                }`}
-            </style>
         </>
     );
 };

@@ -1,10 +1,12 @@
 import { useContext, useState, useEffect } from "react";
-import "../styles/Home.css";
-import "../styles/Create.css";
-import "../styles/Comments-legacy.css";
-import Loader from "../components/Loader";
+
 import { AppContext } from "../context/AppContext";
 import { createCategory, deleteCategory, fetchCategoriesByUser } from "../actions/actionCreateCategories";
+
+import styles from "../styles/CreateCategory.module.css";
+
+import Loader from "../components/Loader";
+import Filters from "../containers/Filters";
 
 const CreateCategory = () => {
     const { user, categories, setCategories } = useContext(AppContext);
@@ -35,7 +37,7 @@ const CreateCategory = () => {
         try {
             const createdCategory = await createCategory(user.id, categoryName);
             const newCategory = {
-                id: createdCategory.id,  // Ensure the id is correctly passed
+                id: createdCategory.id, 
                 name: categoryName,
             };
             setCategories((prevCategories) => [...prevCategories, newCategory]);
@@ -62,9 +64,13 @@ const CreateCategory = () => {
 
     return (
         <>
-        <div className="filterContainer"></div>
-            <div className="home-container">
-                <div className="inner-main d-flex flex-column align-items-center">
+            <Filters
+                activeFilter={true}
+                setActiveFilter={true}
+                neededCategories={false}
+            />
+            <div className={styles.homeContainer}>
+                <div className={`${styles.innerMain} d-flex flex-column align-items-center`}>
                     <h1 className="mb-3 display-4">My Categories</h1>
                     {isLoading ? (
                         <Loader />

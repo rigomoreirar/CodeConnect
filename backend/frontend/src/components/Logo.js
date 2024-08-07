@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import Logo_ from '../assets/500-nbg-logo.png';
 
 const Logo = ({ size, link, isResponsive, phoneSize }) => {

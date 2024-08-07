@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp, FaTrashAlt } from "react-icons/fa";
-import "../styles/Posts.css";
+
 import { AppContext } from "../context/AppContext";
+
+import styles from "../styles/Posts.module.css";
+
 import { likePost, dislikePost, deletePost, fetchAllPosts } from "../actions/actionPosts";
 
 const Posts = ({
@@ -34,6 +37,7 @@ const Posts = ({
         setDislikeFill(userDisliked);
         setLikeCount(likes.length);
         setDislikeCount(dislikes.length);
+        console.log("likeFill:", userLiked);
     }, [likes, dislikes, currentUser.username]);
 
     const handleLike = async () => {
@@ -86,7 +90,7 @@ const Posts = ({
     return (
         <div
             style={{ maxWidth: "40rem" }}
-            id="post-container"
+            id={styles["post-container"]}
             className="inner-main-body p-2 p-sm-3 forum-content show"
         >
             <div className="card mb-2" style={{ maxWidth: "40rem" }}>
@@ -94,22 +98,17 @@ const Posts = ({
                     <div className="d-flex flex-column">
                         {deleteOption && (
                             <FaTrashAlt
-                                className="delete-icon"
+                                className={styles["delete-icon"]}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleDelete();
-                                }}
-                                style={{
-                                    alignSelf: "flex-end",
-                                    cursor: "pointer",
-                                    color: "red",
                                 }}
                             />
                         )}
                         <div className="media-body">
                             <div className="">
                                 <h6 className="text-body">{title}</h6>
-                                <section id="cats">
+                                <section id={styles["cats"]}>
                                     {getCategoryNames().map((categoryName, index) => (
                                         <div key={index}>
                                             <span className="badge badge-secondary mr-2">
@@ -127,9 +126,9 @@ const Posts = ({
                                 className="d-sm-inline-block"
                             >
                                 {likeFill ? (
-                                    <FaThumbsUp className="like" />
+                                    <FaThumbsUp className={styles.like} />
                                 ) : (
-                                    <FaThumbsUp className="none" />
+                                    <FaThumbsUp className={styles.none} />
                                 )}
                                 {likeCount}
                             </span>
@@ -138,9 +137,9 @@ const Posts = ({
                                 className="d-sm-inline-block ml-2"
                             >
                                 {dislikeFill ? (
-                                    <FaThumbsDown className="dislike" />
+                                    <FaThumbsDown className={styles.dislike} />
                                 ) : (
-                                    <FaThumbsDown className="none" />
+                                    <FaThumbsDown className={styles.none} />
                                 )}
                                 {dislikeCount}
                             </span>

@@ -3,17 +3,17 @@ import { useEffect, useState } from "react";
 import { AppProvider } from "../context/AppContext";
 import SSEHandler from "../utils/SSEHandler";
 
-import Layout from "../containers/Layout";
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
+import Layout from "../containers/Layout"; // CSS Ready
+import Home from "../pages/Home"; // CSS Ready
+import Login from "../pages/Login"; // CSS Ready
+import Register from "../pages/Register"; // CSS Ready
 import RedirectPage from "../pages/Redirect";
 import Profile from "../pages/Profile";
 import MyPosts from "../pages/MyPosts";
 import CreateCategory from "../pages/CreateCategories";
 import Feed from "../pages/Feed";
 import NotFound from "../pages/NotFound";
-import ResetPassword from "../pages/ResetPassword";
+import ResetPassword from "../pages/ResetPassword"; // CSS Ready
 import EditProfile from "../pages/EditProfile";
 import NewPassword from "../pages/NewPassword";
 

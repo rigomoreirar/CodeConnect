@@ -1,5 +1,7 @@
 import React from "react";
-import "../styles/Filters.css";
+
+import styles from "../styles/FiltersCategory.module.css";
+
 import Category from "../components/Category";
 
 const Filters = ({
@@ -8,14 +10,13 @@ const Filters = ({
     setActiveFilter,
     neededCategories,
 }) => {
-    // Ensure categories is always an array
     const categoryArray = Array.isArray(categories) ? categories : [];
 
     return (
         <>
-            <div className="filterContainer"></div>
+            <div className={styles.filterContainer}></div>
             {neededCategories && (
-                <div className="categories-container">
+                <div className={styles["categories-container"]}>
                     {categoryArray.map((category) => (
                         <Category
                             key={category.id}

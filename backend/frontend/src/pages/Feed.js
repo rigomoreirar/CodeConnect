@@ -1,9 +1,12 @@
 import { useContext, useState, useEffect } from "react";
-import "../styles/Home.css";
+
+import { AppContext } from "../context/AppContext";
+
+import styles from "../styles/Feed.module.css";
+
 import Posts from "../components/Posts";
 import Comments from "../components/Comments";
 import Filters from "../containers/Filters";
-import { AppContext } from "../context/AppContext";
 
 const Feed = () => {
     const { user, categories, posts: allPosts, setPosts } = useContext(AppContext);
@@ -90,18 +93,18 @@ const Feed = () => {
 
     return (
         <>
-            <div className="home-container">
+            <div className={styles["home-container"]}>
                 <Filters
                     categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                 />
-                <div className="inner-main d-flex flex-column align-items-center">
+                <div className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}>
                     <h1 className="mt-2 ml-3 display-4">My Feed</h1>
 
                     {sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
-                            <div key={post.id} className="centered-items">
+                            <div key={post.id} className={styles["centered-items"]}>
                                 <Posts
                                     setPost={() => {}}
                                     showCommets={showCommentsPostId === post.id}
@@ -125,10 +128,10 @@ const Feed = () => {
                             </div>
                         ))
                     ) : (
-                        <div className="ml-2 mt-5 text-holder-no-categories">
+                        <div className={`ml-2 mt-5 ${styles["text-holder-no-categories"]}`}>
                             <h1>Woops!</h1>
                             <h4>There are no posts for your feed!</h4>
-                            <div className="text-holder-no-categories-second">
+                            <div className={styles["text-holder-no-categories-second"]}>
                                 <p>
                                     Check{" "}
                                     <em>
@@ -147,42 +150,16 @@ const Feed = () => {
                             </div>
                         </div>
                     )}
-                    <div className="post-counter">
+                    <div className={styles["post-counter"]}>
                         {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
                     {sortedPosts.length < filteredPosts.length && (
-                        <div className="load-more" onClick={handleLoadMore}>
+                        <div className={styles["load-more"]} onClick={handleLoadMore}>
                             Load more...
                         </div>
                     )}
                 </div>
             </div>
-            <style>{`
-                .loading {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-                .post-counter {
-                    margin-top: 20px;
-                    font-size: 20px;
-                    font-weight: bold;
-                    padding-bottom: 20px;
-                    margin-bottom: 8rem;
-                }
-                .load-more {
-                    cursor: pointer;
-                    color: blue;
-                    text-decoration: underline;
-                    font-weight: bold;
-                    padding-bottom: 40px;
-                }
-                .load-more:hover {
-                    color: darkblue;
-                }`}</style>
         </>
     );
 };
