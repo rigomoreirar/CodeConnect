@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
-import styles from "../styles/ProfileLegacy.module.css";
 import newStyles from "../styles/Profile.module.css";
 
 import ProfilePicture from "../components/ProfilePicture";
@@ -19,8 +18,9 @@ const Profile = () => {
         setProfilePictureUrl,
         setUser,
     } = useContext(AppContext);
-    const [modal, setModal] = useState(false);
-    const [loading, setLoading] = useState(false);
+    // Check later
+    // const [modal, setModal] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const [totalLikes, setTotalLikes] = useState(0);
     const [totalDislikes, setTotalDislikes] = useState(0);
     const [totalComments, setTotalComments] = useState(0);
