@@ -108,3 +108,4 @@ def get_profile_picture_by_username(request, username):
     mime_type, _ = mimetypes.guess_type(default_picture_path)
     with open(default_picture_path, 'rb') as f:
         return HttpResponse(f.read(), content_type=mime_type)
+

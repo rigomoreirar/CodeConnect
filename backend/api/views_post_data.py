@@ -480,3 +480,59 @@ def change_profile_picture(request):
         return Response({'error': f'Image processing failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'message': 'Profile picture updated successfully'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_default_users(request):
+    try:
+        # Moderator data
+        moderator_data = {
+            'username': settings.MODERATOR_USERNAME,
+            'password': settings.MODERATOR_PASSWORD,
+            'email': settings.MODERATOR_EMAIL,
+            'first_name': settings.MODERATOR_FIRST_NAME,
+            'last_name': settings.MODERATOR_LAST_NAME
+        }
+
+        # User data
+        user_data = {
+            'username': settings.USER_USERNAME,
+            'password': settings.USER_PASSWORD,
+            'email': settings.USER_EMAIL,
+            'first_name': settings.USER_FIRST_NAME,
+            'last_name': settings.USER_LAST_NAME
+        }
+
+        # Create the moderator
+        moderator_serializer = RegisterSerializers(data=moderator_data)
+        if moderator_serializer.is_valid():
+            moderator = moderator_serializer.save()
+            moderator_profile_id = generate_unique_id(Profile)
+            moderator_profile = Profile(id=moderator_profile_id, user=moderator)
+            moderator_profile.save()
+            _, moderator_token = AuthToken.objects.create(moderator)
+            moderator_created = True
+        else:
+            moderator_created = False
+
+        # Create the regular user
+        user_serializer = RegisterSerializers(data=user_data)
+        if user_serializer.is_valid():
+            user = user_serializer.save()
+            user_profile_id = generate_unique_id(Profile)
+            user_profile = Profile(id=user_profile_id, user=user)
+            user_profile.save()
+            _, user_token = AuthToken.objects.create(user)
+            user_created = True
+        else:
+            user_created = False
+
+        return Response({
+            'message': 'Default users processed successfully',
+            'moderator_created': moderator_created,
+            'user_created': user_created,
+            'moderator_errors': moderator_serializer.errors if not moderator_created else None,
+            'user_errors': user_serializer.errors if not user_created else None,
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

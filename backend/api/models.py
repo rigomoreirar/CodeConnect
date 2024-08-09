@@ -3,6 +3,8 @@ from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.utils import timezone
+from datetime import timedelta
 
 class User(AbstractUser):
     groups = models.ManyToManyField(
@@ -99,3 +101,24 @@ class ProfileCtgFollowing(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
+
+
+# For proposals
+
+class CategoryProposal(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
+    created_by = models.CharField(max_length=255)  # Store creator's ID as a string
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def clean_old_proposals(self):
+        if self.created_at < timezone.now() - timedelta(hours=24):
+            self.delete()
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_all_proposals(cls):
+        return cls.objects.all()
