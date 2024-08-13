@@ -40,6 +40,12 @@ const endpoints = {
         getCategoriesByUser: (userId) =>
             `${baseURL}/categories-by-user/${userId}/`,
     },
+    proposals: {
+        createProposal: `${baseURL}/proposals/`, // Ensure this is correct
+        deleteProposal: (proposalId) =>
+            `${baseURL}/proposals/${proposalId}/delete/`,
+        likeProposal: `${baseURL}/proposals/vote/`,
+    },
     emails: {
         sendTestEmail: `${baseURL}/send-test-email/`,
         resetUserPasswordEmail: `${baseURL}/reset-user-password-email/`,

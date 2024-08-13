@@ -41,30 +41,56 @@ const Header = () => {
             >
                 <span className="navbar-toggler-icon"></span>
             </button>
-            <div className={`collapse navbar-collapse ${styles["navbar-collapse"]}`} id="navbarNav">
+            <div
+                className={`collapse navbar-collapse ${styles["navbar-collapse"]}`}
+                id="navbarNav"
+            >
                 <ul className={`navbar-nav ml-auto ${styles["navbar-nav"]}`}>
                     <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum">
+                        <Link
+                            className={`nav-link ${styles["nav-link"]}`}
+                            to="/forum"
+                        >
                             Home
                         </Link>
                     </li>
                     <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/my-feed">
+                        <Link
+                            className={`nav-link ${styles["nav-link"]}`}
+                            to="/forum/my-feed"
+                        >
                             My Feed
                         </Link>
                     </li>
                     <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/my-posts">
+                        <Link
+                            className={`nav-link ${styles["nav-link"]}`}
+                            to="/forum/my-posts"
+                        >
                             My Posts
                         </Link>
                     </li>
                     <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/create-categories">
+                        <Link
+                            className={`nav-link ${styles["nav-link"]}`}
+                            to="/forum/categories-proposal"
+                        >
+                            Categories
+                        </Link>
+                    </li>
+                    <li className={`nav-item ${styles["nav-item"]}`}>
+                        <Link
+                            className={`nav-link ${styles["nav-link"]}`}
+                            to="/forum/create-categories"
+                        >
                             Create Categories
                         </Link>
                     </li>
                     <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/profile">
+                        <Link
+                            className={`nav-link ${styles["nav-link"]}`}
+                            to="/forum/profile"
+                        >
                             My Profile
                         </Link>
                     </li>

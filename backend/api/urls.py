@@ -51,10 +51,8 @@ urlpatterns = [
 
     # Proposal Endpoints
     path('proposals/', views_proposals.create_proposal, name='create_proposal'),
-    path('proposals/<int:proposal_id>/like/', views_proposals.like_proposal, name='like_proposal'),
-    path('proposals/<int:proposal_id>/dislike/', views_proposals.dislike_proposal, name='dislike_proposal'),
+    path('proposals/vote/', views_proposals.vote, name='like_proposal'),
     path('proposals/<int:proposal_id>/delete/', views_proposals.delete_proposal, name='delete_proposal'),
-    path('proposals/all/', views_proposals.get_proposals, name='get_proposals'),
 
     # For creating default users
     path('create-default-users/', views_post_data.create_default_users, name='create_default_users'),

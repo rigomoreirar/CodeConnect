@@ -4,6 +4,9 @@ const categories = [];
 // Posts data
 const posts = [];
 
+// Proposals data
+const proposals = [];
+
 // User data
 const user = {
     id: null,
@@ -12,13 +15,13 @@ const user = {
     first_name: "",
     last_name: "",
     profile_data: {
-        ctg_following: []
+        ctg_following: [],
     },
     total_likes: 0,
     total_dislikes: 0,
     total_comments: 0,
     token: "",
-    isLoggedIn: false
+    isLoggedIn: false,
 };
 
-export { categories, posts, user };
+export { categories, posts, user, proposals };

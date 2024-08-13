@@ -60,7 +60,9 @@ const MyPosts = () => {
             if (post.id === postId) {
                 return {
                     ...post,
-                    comments: post.comments.filter(comment => comment.id !== commentId),
+                    comments: post.comments.filter(
+                        (comment) => comment.id !== commentId
+                    ),
                 };
             }
             return post;
@@ -70,7 +72,7 @@ const MyPosts = () => {
     };
 
     const handlePostDeleted = (postId) => {
-        const updatedPosts = posts.filter(post => post.id !== postId);
+        const updatedPosts = posts.filter((post) => post.id !== postId);
         setFilteredPosts(updatedPosts);
         setPosts(updatedPosts);
     };
@@ -82,9 +84,11 @@ const MyPosts = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        
-        const trimmedCatArray = catArray.map(category => ({ id: category.id }));
-    
+
+        const trimmedCatArray = catArray.map((category) => ({
+            id: category.id,
+        }));
+
         const newPost = {
             creator: { id: user.id },
             isStudent: true, // Adjust this value as needed
@@ -92,28 +96,36 @@ const MyPosts = () => {
             content: formData.get("content"),
             categories: trimmedCatArray,
         };
-    
-        if (!newPost.title || !newPost.content || newPost.categories.length === 0) {
-            alert("Please fill all the fields and select at least one category.");
+
+        if (
+            !newPost.title ||
+            !newPost.content ||
+            newPost.categories.length === 0
+        ) {
+            alert(
+                "Please fill all the fields and select at least one category."
+            );
             return;
         }
-    
+
         if (newPost.title.length > 99) {
-            alert("Please be more concise with your question (max 100 characters).");
+            alert(
+                "Please be more concise with your question (max 100 characters)."
+            );
             return;
         }
-    
+
         if (newPost.content.length > 999) {
             alert("The description limit is 1000 characters.");
             return;
         }
-    
+
         try {
             setIsLoading(true);
             await createPost(newPost);
             const token = localStorage.getItem("token");
             const allData = await fetchAllData(token);
-    
+
             setPosts(allData.posts);
             setFilteredPosts(allData.posts);
         } catch (error) {
@@ -125,7 +137,7 @@ const MyPosts = () => {
 
     return (
         <>
-        {/* Sorry, I am too lazy to fix this stuff, I will just let it be, filters stay just for the black line in the top :3 */}
+            {/* Sorry, I am too lazy to fix this stuff, I will just let it be, filters stay just for the black line in the top :3 */}
             <Filters
                 activeFilter={true}
                 setActiveFilter={true}
@@ -133,8 +145,12 @@ const MyPosts = () => {
             />
             <div className={styles.filterContainer}></div>
             <div className={styles.homeContainer}>
-                <div className={`${styles.innerMain} d-flex flex-column align-items-center`}>
-                    <h1 className="mb-4 ml-3 mt-3 display-4">
+                <div
+                    className={`${styles.innerMain} d-flex flex-column align-items-center`}
+                >
+                    <h1
+                        className={`mb-4 ml-3 mt-3 display-4 ${styles.alignTextCenter}`}
+                    >
                         Welcome back, {user.first_name}
                     </h1>
                     <form onSubmit={handleSubmit} id="tweet-form">
@@ -213,7 +229,10 @@ const MyPosts = () => {
                         {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
                     {sortedPosts.length < filteredPosts.length && (
-                        <div className={styles["load-more"]} onClick={handleLoadMore}>
+                        <div
+                            className={styles["load-more"]}
+                            onClick={handleLoadMore}
+                        >
                             Load more...
                         </div>
                     )}

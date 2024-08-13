@@ -8,6 +8,18 @@
     fill: grey;
 }
 
+.alignTextCenter {
+    text-align: center;
+}
+
+.homeContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
 .text-holder-no-categories {
     display: flex;
     justify-content: center;

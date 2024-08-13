@@ -6,8 +6,8 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .models import Post, Profile, Like, Dislike, Comment, User, Category
-from .serializers import PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, CategorySerializer
+from .models import CategoryProposal, Post, Profile, Like, Dislike, Comment, User, Category
+from .serializers import CategoryProposalSerializer, PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, CategorySerializer
 from django.views.decorators.csrf import csrf_exempt
 
 # Define the directory for profile pictures
@@ -26,6 +26,7 @@ def get_all_data(request):
     profile = Profile.objects.get(user=user)
     categories = Category.objects.all()
     posts = Post.objects.all()
+    proposals = CategoryProposal.objects.all()
 
     data = {
         'user': {
@@ -41,10 +42,12 @@ def get_all_data(request):
             'isLoggedIn': True,
         },
         'categories': CategorySerializer(categories, many=True).data,
-        'posts': PostSerializer(posts, many=True).data
+        'posts': PostSerializer(posts, many=True).data,
+        'proposals': CategoryProposalSerializer(proposals, many=True).data,  # Added proposals
     }
 
     return Response(data, status=status.HTTP_200_OK)
+
 
 @csrf_exempt
 @api_view(['GET'])

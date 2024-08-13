@@ -1,0 +1,125 @@
+.tableContainer {
+    width: 60rem;
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    border: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+th {
+    font-weight: bold;
+    border-bottom: 3px solid black;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid lightgray;
+}
+
+.voteButton {
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: rgb(93, 218, 93);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.voteButton:hover {
+    background-color: green;
+}
+
+.voteButton.unvote {
+    background-color: red;
+}
+.tableContainer {
+    width: 60rem;
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    border: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+th {
+    font-weight: bold;
+    border-bottom: 3px solid black;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid lightgray;
+}
+
+.voteButton {
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: rgb(93, 218, 93);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.voteButton:hover {
+    background-color: green;
+}
+
+.unvote {
+    background-color: red;
+}
+
+.unvote:hover {
+    background-color: darkred;
+}
+
+.deleteIcon {
+    cursor: pointer;
+    color: red;
+    transition: color 0.2s ease-in-out;
+}
+
+.deleteIcon:hover {
+    color: darkred;
+}
+
+.disabledButton {
+    cursor: not-allowed;
+    padding: 5px 10px;
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+.voteButton.unvote:hover {
+    background-color: darkred;
+}
+
+.deleteIcon {
+    cursor: pointer;
+    color: red;
+    transition: color 0.2s ease-in-out;
+}
+
+.deleteIcon:hover {
+    color: darkred;
+}

@@ -1,6 +1,6 @@
 import re
 from rest_framework import serializers, validators
-from .models import Post, Profile, Like, Dislike, Comment, User, Category, CategoryFollowers, PostCategories, ProfileCtgFollowing
+from .models import CategoryProposal, Post, Profile, Like, Dislike, Comment, User, Category, CategoryFollowers, PostCategories, ProfileCtgFollowing
 
 class RegisterSerializers(serializers.ModelSerializer):
     class Meta:
@@ -104,3 +104,7 @@ class CategorySerializer(serializers.ModelSerializer):
         followers = CategoryFollowers.objects.filter(category=obj).values_list('profile', flat=True)
         return list(followers)
 
+class CategoryProposalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryProposal
+        fields = ('id', 'name', 'votes', 'created_by', 'created_at')

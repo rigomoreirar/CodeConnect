@@ -107,8 +107,7 @@ class ProfileCtgFollowing(models.Model):
 
 class CategoryProposal(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    likes = models.IntegerField(default=0)
-    dislikes = models.IntegerField(default=0)
+    votes = models.JSONField(default=list)  # Array to hold usernames of voters
     created_by = models.CharField(max_length=255)  # Store creator's ID as a string
     created_at = models.DateTimeField(auto_now_add=True)
 
