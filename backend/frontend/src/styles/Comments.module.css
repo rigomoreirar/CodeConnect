@@ -14,11 +14,26 @@
     }
 }
 
+.commentForm {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
 .comment-item {
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0;
     border-bottom: 1px solid #e6e6e6;
+}
+
+.comment-item .commentProfileInfoContainer {
+    display: none;
+}
+
+.comment-item.active .commentProfileInfoContainer {
+    display: flex;
 }
 
 .comment-header {
@@ -28,6 +43,7 @@
     padding-bottom: 0.5rem;
     width: 100%;
 }
+
 .first-part-comment-header {
     display: flex;
     align-items: start;
@@ -41,6 +57,7 @@
     width: 40px;
     height: 40px;
     margin-right: 10px;
+    cursor: pointer; /* Indicate that it's clickable */
 }
 
 .comment-content {
@@ -51,4 +68,55 @@
 
 .delete-icon {
     margin-left: auto;
+}
+
+.formTextArea {
+    width: 100%;
+    height: 55px;
+    margin-bottom: 10px;
+}
+
+.commentProfileInfoContainer {
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+.commentProfileInfowraper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 50%;
+}
+.commentProfileInfoColumn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.commentProfileInfoColumnTitle {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.commentProfileInfoColumnContentLikes {
+    background-color: green;
+    color: white;
+    padding: 5px 13px;
+    border-radius: 50%;
+}
+.commentProfileInfoColumnContentDislikes {
+    background-color: red;
+    color: white;
+    padding: 5px 13px;
+    border-radius: 50%;
+}
+.commentProfileInfoColumnContentComments {
+    background-color: gray;
+    color: white;
+    padding: 5px 13px;
+    border-radius: 50%;
 }

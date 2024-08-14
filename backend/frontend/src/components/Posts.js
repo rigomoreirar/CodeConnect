@@ -5,7 +5,12 @@ import { AppContext } from "../context/AppContext";
 
 import styles from "../styles/Posts.module.css";
 
-import { likePost, dislikePost, deletePost, fetchAllPosts } from "../actions/actionPosts";
+import {
+    likePost,
+    dislikePost,
+    deletePost,
+    fetchAllPosts,
+} from "../actions/actionPosts";
 
 const Posts = ({
     post,
@@ -15,6 +20,8 @@ const Posts = ({
     deleteOption = false,
     onDelete,
     onCommentAdded,
+    user,
+    location, // Assuming location prop is passed to check the current route
 }) => {
     const { categories, setPosts } = useContext(AppContext);
     const {
@@ -30,14 +37,20 @@ const Posts = ({
     const [dislikeFill, setDislikeFill] = useState(false);
     const [dislikeCount, setDislikeCount] = useState(dislikes.length);
 
+    const isModerator = currentUser.username === "moderator";
+    const isMyPostsRoute = location === "/forum/my-posts"; // Check if the current route is /forum/my-posts
+
     useEffect(() => {
-        const userLiked = likes.some((like) => like.profile === currentUser.username);
-        const userDisliked = dislikes.some((dislike) => dislike.profile === currentUser.username);
+        const userLiked = likes.some(
+            (like) => like.profile === currentUser.username
+        );
+        const userDisliked = dislikes.some(
+            (dislike) => dislike.profile === currentUser.username
+        );
         setLikeFill(userLiked);
         setDislikeFill(userDisliked);
         setLikeCount(likes.length);
         setDislikeCount(dislikes.length);
-        console.log("likeFill:", userLiked);
     }, [likes, dislikes, currentUser.username]);
 
     const handleLike = async () => {
@@ -81,10 +94,9 @@ const Posts = ({
     };
 
     const formatContent = (content) => {
-        // Replace newlines with <br> tags and multiple spaces with &nbsp;
         return content
-            .replace(/\n/g, '<br/>')
-            .replace(/ {2,}/g, (spaces) => '&nbsp;'.repeat(spaces.length));
+            .replace(/\n/g, "<br/>")
+            .replace(/ {2,}/g, (spaces) => "&nbsp;".repeat(spaces.length));
     };
 
     return (
@@ -96,7 +108,10 @@ const Posts = ({
             <div className="card mb-2" style={{ maxWidth: "40rem" }}>
                 <div className="card-body p-2 p-sm-3">
                     <div className="d-flex flex-column">
-                        {deleteOption && (
+                        {/* Show delete icon if the user is the moderator or the creator in the /forum/my-posts route */}
+                        {(isModerator ||
+                            (isMyPostsRoute &&
+                                post.creator === currentUser.id)) && (
                             <FaTrashAlt
                                 className={styles["delete-icon"]}
                                 onClick={(e) => {
@@ -106,19 +121,25 @@ const Posts = ({
                             />
                         )}
                         <div className="media-body">
-                            <div className="">
+                            <div>
                                 <h6 className="text-body">{title}</h6>
                                 <section id={styles["cats"]}>
-                                    {getCategoryNames().map((categoryName, index) => (
-                                        <div key={index}>
-                                            <span className="badge badge-secondary mr-2">
-                                                {categoryName}
-                                            </span>
-                                        </div>
-                                    ))}
+                                    {getCategoryNames().map(
+                                        (categoryName, index) => (
+                                            <div key={index}>
+                                                <span className="badge badge-secondary mr-2">
+                                                    {categoryName}
+                                                </span>
+                                            </div>
+                                        )
+                                    )}
                                 </section>
                             </div>
-                            <div dangerouslySetInnerHTML={{ __html: formatContent(formatted_content) }} />
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: formatContent(formatted_content),
+                                }}
+                            />
                         </div>
                         <div className="text-muted small text-center align-self-center align-items-center">
                             <span

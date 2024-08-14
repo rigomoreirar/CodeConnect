@@ -6,8 +6,8 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .models import Post, Profile, Like, Dislike, Comment, User, Category
-from .serializers import PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, CategorySerializer
+from .models import CategoryProposal, Post, Profile, Like, Dislike, Comment, User, Category
+from .serializers import CategoryProposalSerializer, PostSerializer, ProfileSerializer, LikeSerializer, DislikeSerializer, CommentSerializer, CategorySerializer
 from django.views.decorators.csrf import csrf_exempt
 
 # Define the directory for profile pictures
@@ -26,6 +26,13 @@ def get_all_data(request):
     profile = Profile.objects.get(user=user)
     categories = Category.objects.all()
     posts = Post.objects.all()
+    proposals = CategoryProposal.objects.all()
+
+    # Calculate total likes, dislikes, and comments for each post by the profile
+    profile_posts = posts.filter(creator=profile)
+    total_likes = Like.objects.filter(post__in=profile_posts).count()
+    total_dislikes = Dislike.objects.filter(post__in=profile_posts).count()
+    total_comments = Comment.objects.filter(post__in=profile_posts).count()
 
     data = {
         'user': {
@@ -35,16 +42,19 @@ def get_all_data(request):
             'first_name': user.first_name,
             'last_name': user.last_name,
             'profile_data': ProfileSerializer(profile).data,
-            'total_likes': Like.objects.filter(profile=profile).count(),
-            'total_dislikes': Dislike.objects.filter(profile=profile).count(),
-            'total_comments': Comment.objects.filter(profile=profile).count(),
+            'total_likes': total_likes,
+            'total_dislikes': total_dislikes,
+            'total_comments': total_comments,
             'isLoggedIn': True,
         },
         'categories': CategorySerializer(categories, many=True).data,
-        'posts': PostSerializer(posts, many=True).data
+        'posts': PostSerializer(posts, many=True).data,
+        'proposals': CategoryProposalSerializer(proposals, many=True).data,
     }
 
     return Response(data, status=status.HTTP_200_OK)
+
+
 
 @csrf_exempt
 @api_view(['GET'])
@@ -108,3 +118,4 @@ def get_profile_picture_by_username(request, username):
     mime_type, _ = mimetypes.guess_type(default_picture_path)
     with open(default_picture_path, 'rb') as f:
         return HttpResponse(f.read(), content_type=mime_type)
+

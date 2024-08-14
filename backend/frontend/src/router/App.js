@@ -3,22 +3,25 @@ import { useEffect, useState } from "react";
 import { AppProvider } from "../context/AppContext";
 import SSEHandler from "../utils/SSEHandler";
 
-import Layout from "../containers/Layout"; // CSS Ready
-import Home from "../pages/Home"; // CSS Ready
-import Login from "../pages/Login"; // CSS Ready
-import Register from "../pages/Register"; // CSS Ready
+import Layout from "../containers/Layout";
+import Home from "../pages/Home";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 import RedirectPage from "../pages/Redirect";
 import Profile from "../pages/Profile";
 import MyPosts from "../pages/MyPosts";
+import CategoriesProposal from "../pages/CategoriesProposal";
 import CreateCategory from "../pages/CreateCategories";
 import Feed from "../pages/Feed";
 import NotFound from "../pages/NotFound";
-import ResetPassword from "../pages/ResetPassword"; // CSS Ready
+import ResetPassword from "../pages/ResetPassword";
 import EditProfile from "../pages/EditProfile";
 import NewPassword from "../pages/NewPassword";
 
 function AppContent() {
-    const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
+    const [isLoggedIn, setIsLoggedIn] = useState(
+        localStorage.getItem("isLoggedIn") === "true"
+    );
 
     useEffect(() => {
         setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
@@ -37,19 +40,35 @@ function AppContent() {
                 >
                     <Route index element={<Home />} />
                     <Route path="profile" element={<Profile />} />
+                    <Route path="profile" element={<Profile />} />
                     <Route path="my-posts" element={<MyPosts />} />
-                    <Route path="create-categories" element={<CreateCategory />} />
+                    <Route
+                        path="categories-proposal"
+                        element={<CategoriesProposal />}
+                    />
+                    <Route
+                        path="create-categories"
+                        element={<CreateCategory />}
+                    />
                     <Route path="my-feed" element={<Feed />} />
                     <Route path="edit-profile" element={<EditProfile />} />
                     <Route path="new-password" element={<NewPassword />} />
                 </Route>
                 <Route
                     path="/register"
-                    element={!isLoggedIn ? <Register /> : <Navigate to="/forum" />}
+                    element={
+                        !isLoggedIn ? <Register /> : <Navigate to="/forum" />
+                    }
                 />
                 <Route
                     path="/reset-password"
-                    element={!isLoggedIn ? <ResetPassword /> : <Navigate to="/forum" />}
+                    element={
+                        !isLoggedIn ? (
+                            <ResetPassword />
+                        ) : (
+                            <Navigate to="/forum" />
+                        )
+                    }
                 />
                 <Route path="/redirect" element={<RedirectPage />} />
                 <Route path="*" element={<NotFound />} />

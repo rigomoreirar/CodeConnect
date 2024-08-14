@@ -38,9 +38,7 @@ const ProfilePicture = () => {
                 "image/webp",
             ];
             if (!validExtensions.includes(file.type)) {
-                setError(
-                    "Invalid file type. Only PNG, JPG, and JPEG are allowed."
-                );
+                setError("Invalid file type.");
                 return;
             }
 
@@ -51,7 +49,7 @@ const ProfilePicture = () => {
                 setProfilePictureUrl(URL.createObjectURL(file));
             } catch (error) {
                 console.error("Error uploading profile picture:", error);
-                setError("Error uploading profile picture.");
+                setError("Error uploading profile picture. ", error);
             }
         }
     };

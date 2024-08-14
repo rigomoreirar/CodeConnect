@@ -7,6 +7,7 @@ from knox import views as knox_views
 from . import views_get_data
 from . import views_post_data
 from . import views_post_email
+from . import views_proposals
 
 urlpatterns = [
     # Authentication and User Endpoints
@@ -48,6 +49,13 @@ urlpatterns = [
     path('change-profile-picture/', views_post_data.change_profile_picture, name='changeProfilePicture'),
     path('get_profile_picture/', views_get_data.get_profile_picture, name='getProfilePicture'),
 
+    # Proposal Endpoints
+    path('proposals/', views_proposals.create_proposal, name='create_proposal'),
+    path('proposals/vote/', views_proposals.vote, name='like_proposal'),
+    path('proposals/<int:proposal_id>/delete/', views_proposals.delete_proposal, name='delete_proposal'),
+
+    # For creating default users
+    path('create-default-users/', views_post_data.create_default_users, name='create_default_users'),
     
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

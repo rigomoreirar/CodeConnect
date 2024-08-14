@@ -9,7 +9,7 @@ import styles from "../styles/Header.module.css";
 import Logo from "./Logo";
 
 const Header = () => {
-    const { setUser } = useContext(AppContext);
+    const { setUser, user } = useContext(AppContext);
 
     const handleLogout = async (e) => {
         e.preventDefault();
@@ -23,6 +23,8 @@ const Header = () => {
 
         window.location.reload();
     };
+
+    const isModerator = user.username === "moderator";
 
     return (
         <nav className={`navbar navbar-expand-md navbar-dark bg-dark`}>
@@ -41,33 +43,74 @@ const Header = () => {
             >
                 <span className="navbar-toggler-icon"></span>
             </button>
-            <div className={`collapse navbar-collapse ${styles["navbar-collapse"]}`} id="navbarNav">
+            <div
+                className={`collapse navbar-collapse ${styles["navbar-collapse"]}`}
+                id="navbarNav"
+            >
                 <ul className={`navbar-nav ml-auto ${styles["navbar-nav"]}`}>
                     <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum">
+                        <Link
+                            className={`nav-link ${styles["nav-link"]}`}
+                            to="/forum"
+                        >
                             Home
                         </Link>
                     </li>
-                    <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/my-feed">
-                            My Feed
-                        </Link>
-                    </li>
-                    <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/my-posts">
-                            My Posts
-                        </Link>
-                    </li>
-                    <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/create-categories">
-                            Create Categories
-                        </Link>
-                    </li>
-                    <li className={`nav-item ${styles["nav-item"]}`}>
-                        <Link className={`nav-link ${styles["nav-link"]}`} to="/forum/profile">
-                            My Profile
-                        </Link>
-                    </li>
+                    {isModerator ? (
+                        <>
+                            <li className={`nav-item ${styles["nav-item"]}`}>
+                                <Link
+                                    className={`nav-link ${styles["nav-link"]}`}
+                                    to="/forum/create-categories"
+                                >
+                                    Create Categories
+                                </Link>
+                            </li>
+                            <li className={`nav-item ${styles["nav-item"]}`}>
+                                <Link
+                                    className={`nav-link ${styles["nav-link"]}`}
+                                    to="/forum/profile"
+                                >
+                                    My Profile
+                                </Link>
+                            </li>
+                        </>
+                    ) : (
+                        <>
+                            <li className={`nav-item ${styles["nav-item"]}`}>
+                                <Link
+                                    className={`nav-link ${styles["nav-link"]}`}
+                                    to="/forum/my-feed"
+                                >
+                                    My Feed
+                                </Link>
+                            </li>
+                            <li className={`nav-item ${styles["nav-item"]}`}>
+                                <Link
+                                    className={`nav-link ${styles["nav-link"]}`}
+                                    to="/forum/my-posts"
+                                >
+                                    My Posts
+                                </Link>
+                            </li>
+                            <li className={`nav-item ${styles["nav-item"]}`}>
+                                <Link
+                                    className={`nav-link ${styles["nav-link"]}`}
+                                    to="/forum/categories-proposal"
+                                >
+                                    Categories
+                                </Link>
+                            </li>
+                            <li className={`nav-item ${styles["nav-item"]}`}>
+                                <Link
+                                    className={`nav-link ${styles["nav-link"]}`}
+                                    to="/forum/profile"
+                                >
+                                    My Profile
+                                </Link>
+                            </li>
+                        </>
+                    )}
                     <li className={`nav-item ${styles["nav-item"]}`}>
                         <button
                             onClick={handleLogout}

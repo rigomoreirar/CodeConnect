@@ -8,6 +8,10 @@
     fill: grey;
 }
 
+.textCenter {
+    text-align: center;
+}
+
 .text-holder-no-categories {
     display: flex;
     justify-content: center;

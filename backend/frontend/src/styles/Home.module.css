@@ -39,6 +39,9 @@
     align-items: center;
     flex-direction: column;
 }
+.textCenter {
+    text-align: center;
+}
 
 .loading {
     display: flex;

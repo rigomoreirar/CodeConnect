@@ -9,7 +9,12 @@ import Comments from "../components/Comments";
 import Filters from "../containers/Filters";
 
 const Feed = () => {
-    const { user, categories, posts: allPosts, setPosts } = useContext(AppContext);
+    const {
+        user,
+        categories,
+        posts: allPosts,
+        setPosts,
+    } = useContext(AppContext);
     const [visiblePostsCount, setVisiblePostsCount] = useState(15);
     const [activeFilter, setActiveFilter] = useState([]);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
@@ -19,7 +24,8 @@ const Feed = () => {
         const filtered = allPosts.filter((post) =>
             post.categories.some((category) =>
                 user.profile_data.ctg_following.some(
-                    (followedCategory) => followedCategory.name === category.name
+                    (followedCategory) =>
+                        followedCategory.name === category.name
                 )
             )
         );
@@ -31,7 +37,8 @@ const Feed = () => {
             const filtered = allPosts.filter((post) =>
                 post.categories.some((category) =>
                     user.profile_data.ctg_following.some(
-                        (followedCategory) => followedCategory.name === category.name
+                        (followedCategory) =>
+                            followedCategory.name === category.name
                     )
                 )
             );
@@ -44,7 +51,8 @@ const Feed = () => {
                     ) &&
                     post.categories.some((category) =>
                         user.profile_data.ctg_following.some(
-                            (followedCategory) => followedCategory.name === category.name
+                            (followedCategory) =>
+                                followedCategory.name === category.name
                         )
                     )
             );
@@ -74,7 +82,9 @@ const Feed = () => {
             if (post.id === postId) {
                 return {
                     ...post,
-                    comments: post.comments.filter((comment) => comment.id !== commentId),
+                    comments: post.comments.filter(
+                        (comment) => comment.id !== commentId
+                    ),
                 };
             }
             return post;
@@ -83,7 +93,7 @@ const Feed = () => {
     };
 
     const handlePostDeleted = (postId) => {
-        const updatedPosts = allPosts.filter(post => post.id !== postId);
+        const updatedPosts = allPosts.filter((post) => post.id !== postId);
         setPosts(updatedPosts);
     };
 
@@ -98,29 +108,42 @@ const Feed = () => {
                     categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
+                    neededCategories={true}
                 />
-                <div className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}>
-                    <h1 className="mt-2 ml-3 display-4">My Feed</h1>
+                <div
+                    className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}
+                >
+                    <h1 className={`ml-3 mt-3 display-4 ${styles.textCenter}`}>
+                        My Feed
+                    </h1>
 
                     {sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
-                            <div key={post.id} className={styles["centered-items"]}>
+                            <div
+                                key={post.id}
+                                className={styles["centered-items"]}
+                            >
                                 <Posts
                                     setPost={() => {}}
                                     showCommets={showCommentsPostId === post.id}
-                                    setShowComments={() => setShowCommentsPostId(post.id)}
+                                    setShowComments={() =>
+                                        setShowCommentsPostId(post.id)
+                                    }
                                     currentUser={user}
                                     post={post}
                                     onCommentAdded={handleCommentAdded}
                                     onCommentDeleted={handleCommentDeleted}
                                     deleteOption={post.user_id === user.id}
                                     onDelete={handlePostDeleted}
+                                    location="/forum/my-feed"
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
                                         currentUser={user}
                                         currentPost={post}
-                                        setShowComments={() => setShowCommentsPostId(null)}
+                                        setShowComments={() =>
+                                            setShowCommentsPostId(null)
+                                        }
                                         onCommentAdded={handleCommentAdded}
                                         onCommentDeleted={handleCommentDeleted}
                                     />
@@ -128,11 +151,19 @@ const Feed = () => {
                             </div>
                         ))
                     ) : (
-                        <div className={`ml-2 mt-5 ${styles["text-holder-no-categories"]}`}>
-                            <h1>Woops!</h1>
-                            <h4>There are no posts for your feed!</h4>
-                            <div className={styles["text-holder-no-categories-second"]}>
-                                <p>
+                        <div
+                            className={`ml-2 mt-5 ${styles["text-holder-no-categories"]}`}
+                        >
+                            <h1 className={styles.textCenter}>Woops!</h1>
+                            <h4 className={styles.textCenter}>
+                                There are no posts for your feed!
+                            </h4>
+                            <div
+                                className={
+                                    styles["text-holder-no-categories-second"]
+                                }
+                            >
+                                <p className={styles.textCenter}>
                                     Check{" "}
                                     <em>
                                         <b>Home</b>
@@ -150,11 +181,16 @@ const Feed = () => {
                             </div>
                         </div>
                     )}
-                    <div className={styles["post-counter"]}>
+                    <div
+                        className={` ${styles["post-counter"]} ${styles.textCenter}`}
+                    >
                         {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
                     {sortedPosts.length < filteredPosts.length && (
-                        <div className={styles["load-more"]} onClick={handleLoadMore}>
+                        <div
+                            className={styles["load-more"]}
+                            onClick={handleLoadMore}
+                        >
                             Load more...
                         </div>
                     )}

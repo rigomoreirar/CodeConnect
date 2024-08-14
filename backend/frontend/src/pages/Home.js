@@ -49,7 +49,9 @@ const Home = () => {
             if (post.id === postId) {
                 return {
                     ...post,
-                    comments: post.comments.filter((comment) => comment.id !== commentId),
+                    comments: post.comments.filter(
+                        (comment) => comment.id !== commentId
+                    ),
                 };
             }
             return post;
@@ -58,7 +60,7 @@ const Home = () => {
     };
 
     const handlePostDeleted = (postId) => {
-        const updatedPosts = posts.filter(post => post.id !== postId);
+        const updatedPosts = posts.filter((post) => post.id !== postId);
         setPosts(updatedPosts);
     };
 
@@ -71,27 +73,39 @@ const Home = () => {
                     setActiveFilter={setActiveFilter}
                     neededCategories={true}
                 />
-                <div className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}>
-                    <h1 className="ml-3 mt-3 display-4">Here's what's new!</h1>
+                <div
+                    className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}
+                >
+                    <h1 className={`ml-3 mt-3 display-4 ${styles.textCenter}`}>
+                        Here's what's new!
+                    </h1>
                     {sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
-                            <div key={post.id} className={styles["centered-items"]}>
+                            <div
+                                key={post.id}
+                                className={styles["centered-items"]}
+                            >
                                 <Posts
                                     setPost={() => {}}
                                     showCommets={showCommentsPostId === post.id}
-                                    setShowComments={() => setShowCommentsPostId(post.id)}
+                                    setShowComments={() =>
+                                        setShowCommentsPostId(post.id)
+                                    }
                                     currentUser={user}
                                     post={post}
                                     onDelete={handlePostDeleted}
                                     onCommentAdded={handleCommentAdded}
                                     onCommentDeleted={handleCommentDeleted}
+                                    location="/forum/home"
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
                                         key={post.id}
                                         currentUser={user}
                                         currentPost={post}
-                                        setShowComments={() => setShowCommentsPostId(null)}
+                                        setShowComments={() =>
+                                            setShowCommentsPostId(null)
+                                        }
                                         onCommentAdded={handleCommentAdded}
                                         onCommentDeleted={handleCommentDeleted}
                                     />
@@ -99,16 +113,23 @@ const Home = () => {
                             </div>
                         ))
                     ) : (
-                        <div className={`ml-2 mt-5 ${styles["centered-items"]}`}>
+                        <div
+                            className={`ml-2 mt-5 ${styles["centered-items"]}`}
+                        >
                             <h1>Woops!</h1>
-                            <h4>No posts found for this category!</h4>
+                            <h4 className={styles.textCenter}>
+                                No posts found for this category!
+                            </h4>
                         </div>
                     )}
                     <div className={styles["post-counter"]}>
                         {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
                     {sortedPosts.length < filteredPosts.length && (
-                        <div className={styles["load-more"]} onClick={handleLoadMore}>
+                        <div
+                            className={styles["load-more"]}
+                            onClick={handleLoadMore}
+                        >
                             Load more...
                         </div>
                     )}

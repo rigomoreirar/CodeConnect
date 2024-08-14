@@ -13,8 +13,7 @@ const FormField = ({ icon, label, type, value, setValue, id }) => {
     return (
         <div className="d-flex flex-row align-items-center mb-4">
             <div
-                className={`${styles.iconContainer} d-flex justify-content-center align-items-center me-3`}
-                style={{ marginTop: "1.8rem", marginRight: "0.5rem" }}
+                className={`${styles.iconContainer} d-flex justify-content-center align-items-center `}
             >
                 <i className={icon}></i>
             </div>
@@ -71,7 +70,10 @@ const Register = () => {
         };
 
         try {
-            const { user, categories, posts } = await registerUser(userData, profilePicture);
+            const { user, categories, posts } = await registerUser(
+                userData,
+                profilePicture
+            );
             setUser(user);
             setCategories(categories);
             setPosts(posts);
@@ -84,21 +86,34 @@ const Register = () => {
     };
 
     return (
-        <section className={styles.vh100} style={{ backgroundColor: "#eee" }}>
+        <section className={styles.vh100}>
             <div className="container h-100">
                 <div className="row d-flex justify-content-center align-items-center h-100">
-                    <div className="col-lg-12 col-xl-11">
+                    <div
+                        className={`col-lg-12 col-xl-11 ${styles.flexContainer}`}
+                    >
                         <div className={`card ${styles.card}`}>
-                            <div className="card-body p-md-5">
+                            <div className="card-body ">
+                                <div className={styles.backContainer}>
+                                    <Link to="/">
+                                        <button
+                                            type="button"
+                                            className={`btn btn-dark btn-lg ${styles.btnDark}`}
+                                        >
+                                            Back
+                                        </button>
+                                    </Link>
+                                </div>
                                 <div className="text-center h1 fw-bold mb-5 mx-md-4 mt-4">
                                     <Logo size="50px" />
                                     &nbsp;Register
                                 </div>
+
                                 <div className="row justify-content-center">
                                     <div
                                         className={`col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1 ${styles.formContainer}`}
                                     >
-                                        <form className="mx-1 mx-md-4">
+                                        <form className={styles.formContainer}>
                                             <FormField
                                                 icon="fas fa-user fa-lg fa-fw"
                                                 label="Name"
@@ -157,18 +172,9 @@ const Register = () => {
                                                 </button>
                                             </div>
                                             <div className="d-flex justify-content-center mx-1 mb-1 mb-lg-1">
-                                                <strong>Or...</strong>
+                                                {/* <strong>Or...</strong> */}
                                             </div>
-                                            <div className="d-flex justify-content-center mb-3 mb-lg-4">
-                                                <Link to="/">
-                                                    <button
-                                                        type="button"
-                                                        className={`btn btn-dark btn-lg ${styles.btnDark}`}
-                                                    >
-                                                        Back
-                                                    </button>
-                                                </Link>
-                                            </div>
+                                            <div className="d-flex justify-content-center mb-3 mb-lg-4"></div>
                                         </form>
                                     </div>
                                     <div

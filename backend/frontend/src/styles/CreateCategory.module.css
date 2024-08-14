@@ -8,6 +8,25 @@
     fill: grey;
 }
 
+.tableContainer {
+    width: 60rem;
+    max-width: 90%;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.firstTitle {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.alignTextCenter {
+    text-align: center;
+}
+
 .text-holder-no-categories {
     display: flex;
     justify-content: center;
