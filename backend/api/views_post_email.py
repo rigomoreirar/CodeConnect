@@ -1,5 +1,3 @@
-# views_post_email.py
-
 import smtplib
 import random
 import string

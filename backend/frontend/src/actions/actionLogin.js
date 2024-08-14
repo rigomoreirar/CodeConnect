@@ -1,19 +1,26 @@
-import axios from '../utils/axios';
-import endpoints from '../utils/endpoints';
+import axios from "../utils/axios";
+import endpoints from "../utils/endpoints";
 
 export const loginUser = async (username, password) => {
     try {
-        const response = await axios.post(endpoints.auth.login, { username, password });
+        const response = await axios.post(endpoints.auth.login, {
+            username: String(username),
+            password: String(password),
+        });
         const { user_info, token } = response.data;
-        const updatedUser = { ...user_info, isLoggedIn: true, token };
+        const updatedUser = {
+            ...user_info,
+            isLoggedIn: true,
+            token: String(token),
+        };
 
         // Store token in local storage
-        window.localStorage.setItem('token', token);
-        window.localStorage.setItem('isLoggedIn', 'true');
+        window.localStorage.setItem("token", String(token));
+        window.localStorage.setItem("isLoggedIn", "true");
 
         // Fetch all data
         const allDataResponse = await axios.get(endpoints.user.getAllData, {
-            headers: { Authorization: `Token ${token}` },
+            headers: { Authorization: `Token ${String(token)}` },
         });
 
         const { categories, posts } = allDataResponse.data;
@@ -24,6 +31,6 @@ export const loginUser = async (username, password) => {
             posts,
         };
     } catch (error) {
-        throw new Error('Login failed');
+        throw new Error("Login failed");
     }
 };

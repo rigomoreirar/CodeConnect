@@ -44,12 +44,17 @@ const ProfilePicture = () => {
 
             setError("");
             try {
+                // Upload the new profile picture
                 await changeProfilePicture(file);
-                // Update the profile picture URL locally
-                setProfilePictureUrl(URL.createObjectURL(file));
+
+                // Fetch the processed profile picture from the server
+                const updatedProfilePictureUrl = await getProfilePicture(
+                    user.id
+                );
+                setProfilePictureUrl(updatedProfilePictureUrl);
             } catch (error) {
                 console.error("Error uploading profile picture:", error);
-                setError("Error uploading profile picture. ", error);
+                setError("Error uploading profile picture.");
             }
         }
     };

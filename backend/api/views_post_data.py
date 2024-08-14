@@ -1,5 +1,5 @@
 import os
-from tkinter import Image
+from PIL import Image
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -11,7 +11,6 @@ from .models import Post, Profile, Like, Dislike, Comment, ProfileCtgFollowing, 
 from .serializers import LikeSerializer, DislikeSerializer, CommentSerializer, RegisterSerializers, CategorySerializer, PostSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, transaction
-from PIL import Image
 import io
 import json
 
@@ -35,7 +34,6 @@ def convert_image_to_webp(image):
     image.save(output, format='WEBP', quality=80)
     output.seek(0)
     return output
-
 
 
 @csrf_exempt
@@ -70,7 +68,7 @@ def register(request):
 
         return Response({
             'user_info': {
-                'id': user.id,
+                'id': str(user.id),
                 'username': user.username,
                 'email': user.email
             },
@@ -91,7 +89,7 @@ def login(request):
         token = AuthToken.objects.create(user)[1]
         return Response({
             'user_info': {
-                'id': user.id,
+                'id': str(user.id),
                 'username': user.username,
                 'email': user.email
             },
@@ -112,31 +110,11 @@ def logout(request):
 @csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
-def create_like(request):
-    data = request.data
-    unlike = data["unlike"]
-    post = Post.objects.get(id=data["post"]["id"])
-    user = User.objects.get(id=data["user"]["id"])
-    profile = Profile.objects.get(user=user)
-
-    if unlike:
-        Like.objects.filter(post=post, profile=profile).delete()
-    else:
-        if Dislike.objects.filter(post=post, profile=profile).exists():
-            Dislike.objects.filter(post=post, profile=profile).delete()
-        Like.objects.get_or_create(profile=profile, post=post)
-
-    return Response({"message": "Like action processed successfully."}, status=status.HTTP_200_OK)
-
-
-@csrf_exempt
-@api_view(["POST"])
-@transaction.atomic
 def create_dislike(request):
     data = request.data
-    undislike = data["undislike"]
-    post = Post.objects.get(id=data["post"]["id"])
-    user = User.objects.get(id=data["user"]["id"])
+    undislike = data.get("undislike", False)  # No need to convert, it's already a boolean
+    post = Post.objects.get(id=str(data.get("post", {}).get("id")))
+    user = User.objects.get(id=str(data.get("user", {}).get("id")))
     profile = Profile.objects.get(user=user)
 
     if undislike:
@@ -152,19 +130,40 @@ def create_dislike(request):
 @csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
+def create_like(request):
+    data = request.data
+    unlike = data.get("unlike", False)  # No need to convert, it's already a boolean
+    post = Post.objects.get(id=str(data.get("post", {}).get("id")))
+    user = User.objects.get(id=str(data.get("user", {}).get("id")))
+    profile = Profile.objects.get(user=user)
+
+    if unlike:
+        Like.objects.filter(post=post, profile=profile).delete()
+    else:
+        if Dislike.objects.filter(post=post, profile=profile).exists():
+            Dislike.objects.filter(post=post, profile=profile).delete()
+        Like.objects.get_or_create(profile=profile, post=post)
+
+    return Response({"message": "Like action processed successfully."}, status=status.HTTP_200_OK)
+
+
+
+@csrf_exempt
+@api_view(["POST"])
+@transaction.atomic
 def add_comment(request):
     data = request.data
-    post = Post.objects.get(id=data["post"])
-    user = User.objects.get(id=data["profile"])
+    post = Post.objects.get(id=str(data.get("post")))
+    user = User.objects.get(id=str(data.get("profile")))
     profile = Profile.objects.get(user=user)
 
     comment_id = generate_unique_id(Comment)
-    comment = Comment.objects.create(id=comment_id, profile=profile, post=post, content=data["content"])
+    comment = Comment.objects.create(id=comment_id, profile=profile, post=post, content=data.get("content"))
 
     return Response({
-        'id': comment.id,
+        'id': str(comment.id),
         'profile': profile.user.username,
-        'post': post.id,
+        'post': str(post.id),
         'content': comment.content,
         'timestamp': comment.timestamp
     })
@@ -175,37 +174,24 @@ def add_comment(request):
 @transaction.atomic
 def delete_comment(request):
     data = request.data
-    comment_id = data.get("comment_id")
-    user_id = data.get("user_id")
+    comment_id = str(data.get("comment_id"))
+    user_id = str(data.get("user_id"))
 
     try:
-        # Fetch the comment and user
         comment = Comment.objects.get(id=comment_id)
         user = User.objects.get(id=user_id)
         profile = Profile.objects.get(user=user)
 
-        # Ensure IDs are integers
-        user_id_from_request = int(user.id)
-        moderator_id_from_settings = int(settings.MODERATOR_HASHED_ID)
+        user_id_from_request = str(user.id)
+        moderator_id_from_settings = str(settings.MODERATOR_HASHED_ID)
 
-        # Debugging: Log the IDs to ensure they're correct
-        print(f"User ID from request: {user_id_from_request}")
-        print(f"MODERATOR_HASHED_ID from settings: {moderator_id_from_settings}")
-
-        # Check if the user is the moderator or the creator of the comment
         if user_id_from_request == moderator_id_from_settings or comment.profile == profile:
-            print("User is authorized to delete the comment.")
-
-            # Proceed with deletion
             comment.delete()
-
-            # Notify through SSE
             with open('sse_notifications.txt', 'w') as f:
                 f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
 
             return Response({"message": "Comment deleted successfully"}, status=status.HTTP_200_OK)
         else:
-            print("User is not authorized to delete this comment.")
             return Response({"error": "You are not authorized to delete this comment"}, status=status.HTTP_403_FORBIDDEN)
 
     except Comment.DoesNotExist:
@@ -213,8 +199,8 @@ def delete_comment(request):
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(f"Unexpected error: {e}")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @csrf_exempt
 @api_view(["POST"])
@@ -223,7 +209,7 @@ def create_post(request):
     data = request.data
 
     try:
-        user = User.objects.get(id=data["creator"]["id"])
+        user = User.objects.get(id=str(data.get("creator", {}).get("id")))
         profile = Profile.objects.get(user=user)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -233,23 +219,22 @@ def create_post(request):
     post_id = generate_unique_id(Post)
     new_post = Post.objects.create(
         id=post_id,
-        isStudent=data["isStudent"],
+        isStudent=data.get("isStudent"),
         creator=profile,
-        title=data["title"],
-        content=data["content"]
+        title=data.get("title"),
+        content=data.get("content")
     )
 
     categories_added = []
-    for category in data["categories"]:
+    for category in data.get("categories", []):
         try:
-            db_category = Category.objects.get(pk=category["id"])
+            db_category = Category.objects.get(pk=str(category.get("id")))
             PostCategories.objects.create(post=new_post, category=db_category)
             categories_added.append(db_category.id)
         except Category.DoesNotExist:
-            return Response({'error': f'Category with id {category["id"]} not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': f'Category with id {category.get("id")} not found'}, status=status.HTTP_404_NOT_FOUND)
 
     post_serializer = PostSerializer(new_post)
-
 
     return Response({
         'message': 'Post created successfully',
@@ -258,53 +243,31 @@ def create_post(request):
     }, status=status.HTTP_201_CREATED)
 
 
-
-
-from django.conf import settings
-import json
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from django.db import transaction
-from api.models import Post, Like, Dislike, Comment, User
-
 @api_view(["POST"])
 @transaction.atomic
 def delete_post(request):
     data = request.data
-    post_id = data.get("post_id")
-    user_id = data.get("user_id")
+    post_id = str(data.get("post_id"))
+    user_id = str(data.get("user_id"))
 
     try:
-        # Fetch the post and user
         post = Post.objects.get(id=post_id)
         user = User.objects.get(id=user_id)
 
-        # Ensure IDs are integers
-        user_id_from_request = int(user.id)
-        moderator_id_from_settings = int(settings.MODERATOR_HASHED_ID)
+        user_id_from_request = str(user.id)
+        moderator_id_from_settings = str(settings.MODERATOR_HASHED_ID)
 
-        # Debugging: Log the IDs to ensure they're correct
-        print(f"User ID from request: {user_id_from_request}")
-        print(f"MODERATOR_HASHED_ID from settings: {moderator_id_from_settings}")
-
-        # Check if the user is the moderator or the creator of the post
-        if user_id_from_request == moderator_id_from_settings or post.creator.user.id == user_id_from_request:
-            print("User is authorized to delete the post.")
-
-            # Proceed with deletion
+        if user_id_from_request == moderator_id_from_settings or str(post.creator.user.id) == user_id_from_request:
             Like.objects.filter(post=post).delete()
             Dislike.objects.filter(post=post).delete()
             Comment.objects.filter(post=post).delete()
             post.delete()
 
-            # Notify through SSE
             with open('sse_notifications.txt', 'w') as f:
                 f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
 
             return Response({"message": "Post and associated comments deleted successfully"}, status=status.HTTP_200_OK)
         else:
-            print("User is not authorized to delete this post.")
             return Response({"error": "You are not authorized to delete this post"}, status=status.HTTP_403_FORBIDDEN)
 
     except Post.DoesNotExist:
@@ -312,9 +275,7 @@ def delete_post(request):
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        print(f"Unexpected error: {e}")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @csrf_exempt
@@ -323,16 +284,15 @@ def delete_post(request):
 def follow_category(request):
     data = request.data
     try:
-        category_id = data.get("id")
-        user_id = data.get("user", {}).get("id")
-        if category_id is None or user_id is None:
+        category_id = str(data.get("id"))
+        user_id = str(data.get("user", {}).get("id"))
+        if not category_id or not user_id:
             return Response({'error': 'Missing category id or user id'}, status=status.HTTP_400_BAD_REQUEST)
         
         db_category = Category.objects.get(pk=category_id)
         user = User.objects.get(id=user_id)
         profile = Profile.objects.get(user=user)
 
-        # Check if the relationship already exists
         if not ProfileCtgFollowing.objects.filter(profile=profile, category=db_category).exists():
             ProfileCtgFollowing.objects.create(profile=profile, category=db_category)
 
@@ -343,23 +303,21 @@ def follow_category(request):
         logger.error(f"Error following category: {str(e)}")
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 @csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
 def unfollow_category(request):
     data = request.data
     try:
-        category_id = data.get("id")
-        user_id = data.get("user", {}).get("id")
-        if category_id is None or user_id is None:
+        category_id = str(data.get("id"))
+        user_id = str(data.get("user", {}).get("id"))
+        if not category_id or not user_id:
             return Response({'error': 'Missing category id or user id'}, status=status.HTTP_400_BAD_REQUEST)
         
         db_category = Category.objects.get(pk=category_id)
         user = User.objects.get(id=user_id)
         profile = Profile.objects.get(user=user)
 
-        # Check if the relationship exists and delete it
         ProfileCtgFollowing.objects.filter(profile=profile, category=db_category).delete()
 
         updated_category = Category.objects.get(pk=db_category.pk)
@@ -371,13 +329,11 @@ def unfollow_category(request):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
 @csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
 def create_category(request):
-    user_id = request.data.get('user_id')
+    user_id = str(request.data.get('user_id'))
     name = request.data.get('name')
     if not name:
         return Response({'error': 'Category name is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -398,12 +354,11 @@ def create_category(request):
 @api_view(["POST"])
 @transaction.atomic
 def delete_category(request):
-    category_id = request.data.get('id')
+    category_id = str(request.data.get('id'))
     try:
         category = Category.objects.get(id=category_id)
         posts = Post.objects.filter(categories=category)
         
-        # Delete likes, dislikes, and comments associated with the posts
         for post in posts:
             Like.objects.filter(post=post).delete()
             Dislike.objects.filter(post=post).delete()
@@ -437,10 +392,10 @@ def edit_user_info(request):
     new_last_name = data.get('last_name')
 
     try:
-        if new_username and User.objects.filter(username=new_username).exclude(id=user.id).exists():
+        if new_username and User.objects.filter(username=new_username).exclude(id=str(user.id)).exists():
             return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if new_email and User.objects.filter(email=new_email).exclude(id=user.id).exists():
+        if new_email and User.objects.filter(email=new_email).exclude(id=str(user.id)).exists():
             return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
         if new_username:
@@ -484,7 +439,6 @@ def change_user_password(request):
         return Response({'error': 'New password is required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @csrf_exempt
 @api_view(["POST"])
 def change_profile_picture(request):
@@ -502,14 +456,12 @@ def change_profile_picture(request):
     if file_ext not in ['png', 'jpg', 'jpeg', 'heic', 'heif', 'bmp', 'tiff', 'webp']:
         return Response({'error': 'Invalid file extension. Only png, jpg, jpeg, heic, heif, bmp, webp, and tiff are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Delete existing profile picture
     possible_extensions = ['jpg', 'jpeg', 'png', 'webp']
     for ext in possible_extensions:
         existing_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user.id}.{ext}")
         if os.path.exists(existing_picture_path):
             os.remove(existing_picture_path)
 
-    # Save new profile picture
     try:
         image = Image.open(profile_picture)
         image = resize_image(image)
@@ -522,58 +474,59 @@ def change_profile_picture(request):
 
     return Response({'message': 'Profile picture updated successfully'}, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-def create_default_users(request):
-    try:
-        # Moderator data
-        moderator_data = {
-            'username': settings.MODERATOR_USERNAME,
-            'password': settings.MODERATOR_PASSWORD,
-            'email': settings.MODERATOR_EMAIL,
-            'first_name': settings.MODERATOR_FIRST_NAME,
-            'last_name': settings.MODERATOR_LAST_NAME
-        }
 
-        # User data
-        user_data = {
-            'username': settings.USER_USERNAME,
-            'password': settings.USER_PASSWORD,
-            'email': settings.USER_EMAIL,
-            'first_name': settings.USER_FIRST_NAME,
-            'last_name': settings.USER_LAST_NAME
-        }
+# @api_view(['POST'])
+# def create_default_users(request):
+#     try:
+#         # Moderator data
+#         moderator_data = {
+#             'username': settings.MODERATOR_USERNAME,
+#             'password': settings.MODERATOR_PASSWORD,
+#             'email': settings.MODERATOR_EMAIL,
+#             'first_name': settings.MODERATOR_FIRST_NAME,
+#             'last_name': settings.MODERATOR_LAST_NAME
+#         }
 
-        # Create the moderator
-        moderator_serializer = RegisterSerializers(data=moderator_data)
-        if moderator_serializer.is_valid():
-            moderator = moderator_serializer.save()
-            moderator_profile_id = generate_unique_id(Profile)
-            moderator_profile = Profile(id=moderator_profile_id, user=moderator)
-            moderator_profile.save()
-            _, moderator_token = AuthToken.objects.create(moderator)
-            moderator_created = True
-        else:
-            moderator_created = False
+#         # User data
+#         user_data = {
+#             'username': settings.USER_USERNAME,
+#             'password': settings.USER_PASSWORD,
+#             'email': settings.USER_EMAIL,
+#             'first_name': settings.USER_FIRST_NAME,
+#             'last_name': settings.USER_LAST_NAME
+#         }
 
-        # Create the regular user
-        user_serializer = RegisterSerializers(data=user_data)
-        if user_serializer.is_valid():
-            user = user_serializer.save()
-            user_profile_id = generate_unique_id(Profile)
-            user_profile = Profile(id=user_profile_id, user=user)
-            user_profile.save()
-            _, user_token = AuthToken.objects.create(user)
-            user_created = True
-        else:
-            user_created = False
+#         # Create the moderator
+#         moderator_serializer = RegisterSerializers(data=moderator_data)
+#         if moderator_serializer.is_valid():
+#             moderator = moderator_serializer.save()
+#             moderator_profile_id = generate_unique_id(Profile)
+#             moderator_profile = Profile(id=moderator_profile_id, user=moderator)
+#             moderator_profile.save()
+#             _, moderator_token = AuthToken.objects.create(moderator)
+#             moderator_created = True
+#         else:
+#             moderator_created = False
 
-        return Response({
-            'message': 'Default users processed successfully',
-            'moderator_created': moderator_created,
-            'user_created': user_created,
-            'moderator_errors': moderator_serializer.errors if not moderator_created else None,
-            'user_errors': user_serializer.errors if not user_created else None,
-        }, status=status.HTTP_201_CREATED)
+#         # Create the regular user
+#         user_serializer = RegisterSerializers(data=user_data)
+#         if user_serializer.is_valid():
+#             user = user_serializer.save()
+#             user_profile_id = generate_unique_id(Profile)
+#             user_profile = Profile(id=user_profile_id, user=user)
+#             user_profile.save()
+#             _, user_token = AuthToken.objects.create(user)
+#             user_created = True
+#         else:
+#             user_created = False
 
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+#         return Response({
+#             'message': 'Default users processed successfully',
+#             'moderator_created': moderator_created,
+#             'user_created': user_created,
+#             'moderator_errors': moderator_serializer.errors if not moderator_created else None,
+#             'user_errors': user_serializer.errors if not user_created else None,
+#         }, status=status.HTTP_201_CREATED)
+
+#     except Exception as e:
+#         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

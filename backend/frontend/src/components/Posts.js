@@ -111,7 +111,7 @@ const Posts = ({
                         {/* Show delete icon if the user is the moderator or the creator in the /forum/my-posts route */}
                         {(isModerator ||
                             (isMyPostsRoute &&
-                                post.creator === currentUser.id)) && (
+                                post.creator == currentUser.id)) && (
                             <FaTrashAlt
                                 className={styles["delete-icon"]}
                                 onClick={(e) => {

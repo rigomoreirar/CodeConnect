@@ -3,9 +3,9 @@ import endpoints from "../utils/endpoints";
 
 export const addComment = async (postId, profileId, content) => {
     const response = await axios.post(endpoints.interactions.addComment, {
-        post: postId,
-        profile: profileId,
-        content,
+        post: String(postId),
+        profile: String(profileId),
+        content: String(content),
     });
     return response.data;
 };
@@ -20,7 +20,7 @@ export const deleteComment = async (commentId, userId) => {
 
 export const fetchProfilePicture = async (username) => {
     const response = await axios.get(
-        endpoints.profile.getProfilePictureByUsername(username),
+        endpoints.profile.getProfilePictureByUsername(String(username)),
         {
             responseType: "blob",
         }

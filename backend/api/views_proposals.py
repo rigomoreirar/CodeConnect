@@ -8,7 +8,7 @@ from api.models import CategoryProposal
 @api_view(['POST'])
 def create_proposal(request):
     name = request.data.get('name')
-    created_by = request.data.get('created_by')  # Update to read from request.data
+    created_by = request.data.get('created_by')  # Reading directly from request.data
 
     if CategoryProposal.objects.filter(name=name).exists():
         return Response({'message': 'Proposal with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
@@ -16,7 +16,6 @@ def create_proposal(request):
     proposal = CategoryProposal.objects.create(name=name, created_by=created_by)
     
     return Response({'message': 'Proposal created', 'id': proposal.id}, status=status.HTTP_201_CREATED)
-
 
 @api_view(['POST'])
 def vote(request):
@@ -45,11 +44,13 @@ def vote(request):
 @api_view(['DELETE'])
 def delete_proposal(request, proposal_id):
     proposal = get_object_or_404(CategoryProposal, id=proposal_id)
-    user_id = request.headers.get('user_id') == settings.MODERATOR_USERNAME
+    
+    user_id = request.headers.get('user_id')
     creator_id = request.headers.get('creator_id')
 
-    if not user_id or proposal.created_by == creator_id:
+    # Check if the user is the moderator or the creator of the proposal
+    if user_id == settings.MODERATOR_USERNAME or proposal.created_by == creator_id:
         proposal.delete()
         return Response({'message': 'Proposal deleted'}, status=status.HTTP_200_OK)
+    
     return Response({'message': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
-

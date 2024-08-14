@@ -20,7 +20,9 @@ const MyPosts = () => {
 
     useEffect(() => {
         // Filter posts based on the current user's ID
-        const userPosts = posts.filter((post) => post.creator === user.id);
+        const userPosts = posts.filter(
+            (post) => String(post.creator) === String(user.id)
+        );
         setFilteredPosts(userPosts);
     }, [posts, user.id]);
 
@@ -109,8 +111,9 @@ const MyPosts = () => {
 
         try {
             setIsLoading(true);
-            await createPost(newPost);
-            // The new post will be added to the context automatically via SSE or context update
+            const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
+            await createPost(newPost, setPosts, token);
+            setVisiblePostsCount(visiblePostsCount + 1); // Adjust post count after creation
         } catch (error) {
             console.error("Error creating post:", error);
         } finally {

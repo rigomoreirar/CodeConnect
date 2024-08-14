@@ -26,7 +26,7 @@ const refetchAllData = async (
     if (token) {
         try {
             const response = await axios.get(endpoints.user.getAllData, {
-                headers: { Authorization: `Token ${token}` },
+                headers: { Authorization: `Token ${String(token)}` },
             });
             const { user, categories, posts, proposals } = response.data;
             setUser(user);

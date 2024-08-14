@@ -55,7 +55,7 @@ urlpatterns = [
     path('proposals/<int:proposal_id>/delete/', views_proposals.delete_proposal, name='delete_proposal'),
 
     # For creating default users
-    path('create-default-users/', views_post_data.create_default_users, name='create_default_users'),
+    # path('create-default-users/', views_post_data.create_default_users, name='create_default_users'),
     
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
