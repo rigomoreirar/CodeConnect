@@ -41,10 +41,11 @@ const endpoints = {
             `${baseURL}/categories-by-user/${userId}/`,
     },
     proposals: {
-        createProposal: `${baseURL}/proposals/`, // Ensure this is correct
+        createProposal: `${baseURL}/proposals/`,
         deleteProposal: (proposalId) =>
-            `${baseURL}/proposals/${proposalId}/delete/`,
-        likeProposal: `${baseURL}/proposals/vote/`,
+            `${baseURL}/remove-proposals/${proposalId}/`,
+        voteProposal: `${baseURL}/proposals/vote/`,
+        unvoteProposal: `${baseURL}/proposals/unvote/`,
     },
     emails: {
         sendTestEmail: `${baseURL}/send-test-email/`,

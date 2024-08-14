@@ -114,18 +114,9 @@ class CategoryProposal(models.Model):
     created_by = models.CharField(max_length=255)  # Store creator's ID as a string
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def clean_old_proposals(self):
-        cutoff_time = timezone.now() - timedelta(seconds=10)  # Change to 24 hours for production
-        CategoryProposal.objects.filter(created_at__lt=cutoff_time).delete()
-
     def __str__(self):
         return self.name
 
     @classmethod
     def get_all_proposals(cls):
         return cls.objects.all()
-
-# Signal to trigger the cleanup process after each save
-@receiver(post_save, sender=CategoryProposal)
-def clean_up_proposals(sender, instance, **kwargs):
-    instance.clean_old_proposals()

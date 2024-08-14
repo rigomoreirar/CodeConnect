@@ -1,50 +1,96 @@
 import axios from "../utils/axios";
 import endpoints from "../utils/endpoints";
-import { fetchAllData } from "./actionAppContext";
 
-export const deleteProposal = async (token, proposalId, setProposals) => {
+export const deleteProposal = async (
+    token,
+    proposalId,
+    userId,
+    creatorUsername,
+    setProposals
+) => {
     try {
-        // Send the delete request to the backend
-        await axios.delete(endpoints.proposals.deleteProposal(proposalId), {
-            headers: {
-                Authorization: `Token ${token}`,
+        await axios.post(
+            endpoints.proposals.deleteProposal(String(proposalId)),
+            {
+                user_id: String(userId),
+                creator_id: String(creatorUsername),
             },
-        });
-
-        // Refetch all data after deleting the proposal
-        const allData = await fetchAllData(token);
-        setProposals(allData.proposals);
+            {
+                headers: {
+                    Authorization: `Token ${String(token)}`,
+                },
+            }
+        );
+        setProposals((prevProposals) =>
+            prevProposals.filter((proposal) => proposal.id !== proposalId)
+        );
     } catch (error) {
         console.error("Failed to delete proposal:", error);
     }
 };
 
-export const toggleVote = async (
+export const voteProposal = async (
     token,
     username,
     proposalName,
     setProposals
 ) => {
     try {
-        // Send the vote/unvote request to the backend
-        await axios.post(
-            endpoints.proposals.likeProposal,
+        const response = await axios.post(
+            endpoints.proposals.voteProposal,
             {
-                username,
-                proposal_name: proposalName,
+                username: String(username),
+                proposal_name: String(proposalName),
             },
             {
                 headers: {
-                    Authorization: `Token ${token}`,
+                    Authorization: `Token ${String(token)}`,
                     "Content-Type": "application/json",
                 },
             }
         );
 
-        // Refetch all data after voting/unvoting
-        const allData = await fetchAllData(token);
-        setProposals(allData.proposals);
+        setProposals((prevProposals) =>
+            prevProposals.map((proposal) =>
+                proposal.name === proposalName
+                    ? { ...proposal, votes: response.data.votes }
+                    : proposal
+            )
+        );
     } catch (error) {
         console.error("Failed to vote on proposal:", error);
+    }
+};
+
+export const unvoteProposal = async (
+    token,
+    username,
+    proposalName,
+    setProposals
+) => {
+    try {
+        const response = await axios.post(
+            endpoints.proposals.unvoteProposal,
+            {
+                username: String(username),
+                proposal_name: String(proposalName),
+            },
+            {
+                headers: {
+                    Authorization: `Token ${String(token)}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        setProposals((prevProposals) =>
+            prevProposals.map((proposal) =>
+                proposal.name === proposalName
+                    ? { ...proposal, votes: response.data.votes }
+                    : proposal
+            )
+        );
+    } catch (error) {
+        console.error("Failed to unvote on proposal:", error);
     }
 };

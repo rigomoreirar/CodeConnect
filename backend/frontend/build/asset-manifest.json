@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.97b999f9.css",
-    "main.js": "/static/js/main.3bd685d8.js",
+    "main.css": "/static/css/main.0262ed15.css",
+    "main.js": "/static/js/main.030bef2b.js",
     "static/media/500-nbg-logo.png": "/static/media/500-nbg-logo.6b3190bf02e764f7e14f.png",
     "static/media/no-profile-picture.webp": "/static/media/no-profile-picture.efadb13dba95b5bc918b.webp",
     "index.html": "/index.html",
-    "main.97b999f9.css.map": "/static/css/main.97b999f9.css.map",
-    "main.3bd685d8.js.map": "/static/js/main.3bd685d8.js.map"
+    "main.0262ed15.css.map": "/static/css/main.0262ed15.css.map",
+    "main.030bef2b.js.map": "/static/js/main.030bef2b.js.map"
   },
   "entrypoints": [
-    "static/css/main.97b999f9.css",
-    "static/js/main.3bd685d8.js"
+    "static/css/main.0262ed15.css",
+    "static/js/main.030bef2b.js"
   ]
 }

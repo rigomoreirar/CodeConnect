@@ -28,7 +28,6 @@ def get_all_data(request):
     posts = Post.objects.all()
     proposals = CategoryProposal.objects.all()
 
-    # Calculate total likes, dislikes, and comments for each post by the profile
     profile_posts = posts.filter(creator=profile)
     total_likes = Like.objects.filter(post__in=profile_posts).count()
     total_dislikes = Dislike.objects.filter(post__in=profile_posts).count()
@@ -36,7 +35,7 @@ def get_all_data(request):
 
     data = {
         'user': {
-            'id': user.id,
+            'id': str(user.id),
             'username': user.username,
             'email': user.email,
             'first_name': user.first_name,
@@ -55,26 +54,25 @@ def get_all_data(request):
     return Response(data, status=status.HTTP_200_OK)
 
 
-
 @csrf_exempt
 @api_view(['GET'])
 def get_profile_picture(request, user_id):
     logger.info(f"Received request for user ID: {user_id}")
     possible_extensions = ['png', 'jpg', 'jpeg', 'heic', 'heif', 'bmp', 'tiff', 'webp']
     for ext in possible_extensions:
-        profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{user_id}.{ext}")
+        profile_picture_path = os.path.join(PROFILE_PICTURE_DIR, f"{str(user_id)}.{ext}")
         if os.path.exists(profile_picture_path):
             logger.info(f"Serving profile picture for user ID: {user_id}")
             mime_type, _ = mimetypes.guess_type(profile_picture_path)
             with open(profile_picture_path, 'rb') as f:
                 return HttpResponse(f.read(), content_type=mime_type)
     
-    # Serve default profile picture if no specific one exists
     default_picture_path = os.path.join(PROFILE_PICTURE_DIR, 'no-profile-picture.webp')
     logger.info(f"Serving default profile picture for user ID: {user_id}")
     mime_type, _ = mimetypes.guess_type(default_picture_path)
     with open(default_picture_path, 'rb') as f:
         return HttpResponse(f.read(), content_type=mime_type)
+
 
 @csrf_exempt
 @api_view(['GET'])
@@ -82,7 +80,7 @@ def get_categories_by_user(request, user_id):
     logger.info(f"Received request for categories by user ID: {user_id}")
     
     try:
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(id=str(user_id))
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -92,6 +90,7 @@ def get_categories_by_user(request, user_id):
     return Response(serialized_categories, status=status.HTTP_200_OK)
 
 
+
 @csrf_exempt
 @api_view(['GET'])
 def get_profile_picture_by_username(request, username):
@@ -99,7 +98,7 @@ def get_profile_picture_by_username(request, username):
     
     try:
         user = User.objects.get(username=username)
-        user_id = user.id
+        user_id = str(user.id)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -112,10 +111,8 @@ def get_profile_picture_by_username(request, username):
             with open(profile_picture_path, 'rb') as f:
                 return HttpResponse(f.read(), content_type=mime_type)
     
-    # Serve default profile picture if no specific one exists
     default_picture_path = os.path.join(PROFILE_PICTURE_DIR, 'no-profile-picture.webp')
     logger.info(f"Serving default profile picture for user ID: {user_id}")
     mime_type, _ = mimetypes.guess_type(default_picture_path)
     with open(default_picture_path, 'rb') as f:
         return HttpResponse(f.read(), content_type=mime_type)
-

@@ -51,11 +51,12 @@ urlpatterns = [
 
     # Proposal Endpoints
     path('proposals/', views_proposals.create_proposal, name='create_proposal'),
-    path('proposals/vote/', views_proposals.vote, name='like_proposal'),
-    path('proposals/<int:proposal_id>/delete/', views_proposals.delete_proposal, name='delete_proposal'),
+    path('proposals/vote/', views_proposals.vote, name='vote_proposal'),
+    path('proposals/unvote/', views_proposals.unvote, name='unvote_proposal'),
+    path('remove-proposals/<int:proposal_id>/', views_proposals.delete_proposal, name='remove_proposal'),
 
     # For creating default users
-    path('create-default-users/', views_post_data.create_default_users, name='create_default_users'),
+    # path('create-default-users/', views_post_data.create_default_users, name='create_default_users'),
     
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

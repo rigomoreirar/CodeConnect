@@ -1,18 +1,20 @@
 .profile-picture-container {
     text-align: center;
+    margin-top: 20px;
 }
 
 .profile-picture {
     position: relative;
-    width: 25rem;
-    max-width: 90vw;
+    width: 18rem;
+    height: 18rem;
     border-radius: 50%;
-    height: auto;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: auto;
+    background-color: #f0f0f0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .profile-picture img {
@@ -35,12 +37,9 @@
     margin: 0 auto;
     width: fit-content;
 }
+
 .upload-button:hover {
     background-color: rgba(19, 19, 19, 0.5);
-}
-
-.upload-button input {
-    display: none;
 }
 
 .error-message {
