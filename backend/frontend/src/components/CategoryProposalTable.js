@@ -1,11 +1,13 @@
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import { FaTrashAlt } from "react-icons/fa";
-import styles from "../styles/CategoryProposalTable.module.css";
+
 import {
     deleteProposal,
     toggleVote,
-} from "../actions/actionCategoryProposalTable"; // Import the actions
+} from "../actions/actionCategoryProposalTable";
+
+import styles from "../styles/CategoryProposalTable.module.css";
 
 const CategoryProposalTable = () => {
     const { user, proposals, setProposals } = useContext(AppContext);
@@ -36,15 +38,8 @@ const CategoryProposalTable = () => {
                             <tr key={proposal.id}>
                                 <td>{proposal.name}</td>
                                 <td>
-                                    {isModerator ? (
-                                        <button
-                                            className={styles.disabledButton}
-                                            disabled
-                                        >
-                                            Disabled
-                                        </button>
-                                    ) : proposal.created_by ===
-                                      user.username ? (
+                                    {isModerator ||
+                                    proposal.created_by === user.username ? (
                                         <FaTrashAlt
                                             className={styles.deleteIcon}
                                             onClick={() =>

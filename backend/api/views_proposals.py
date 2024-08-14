@@ -45,7 +45,7 @@ def vote(request):
 @api_view(['DELETE'])
 def delete_proposal(request, proposal_id):
     proposal = get_object_or_404(CategoryProposal, id=proposal_id)
-    user_id = request.headers.get('user_id') == settings.MODERATOR_HASHED_ID
+    user_id = request.headers.get('user_id') == settings.MODERATOR_USERNAME
     creator_id = request.headers.get('creator_id')
 
     if not user_id or proposal.created_by == creator_id:

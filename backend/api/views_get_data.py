@@ -28,6 +28,12 @@ def get_all_data(request):
     posts = Post.objects.all()
     proposals = CategoryProposal.objects.all()
 
+    # Calculate total likes, dislikes, and comments for each post by the profile
+    profile_posts = posts.filter(creator=profile)
+    total_likes = Like.objects.filter(post__in=profile_posts).count()
+    total_dislikes = Dislike.objects.filter(post__in=profile_posts).count()
+    total_comments = Comment.objects.filter(post__in=profile_posts).count()
+
     data = {
         'user': {
             'id': user.id,
@@ -36,17 +42,18 @@ def get_all_data(request):
             'first_name': user.first_name,
             'last_name': user.last_name,
             'profile_data': ProfileSerializer(profile).data,
-            'total_likes': Like.objects.filter(profile=profile).count(),
-            'total_dislikes': Dislike.objects.filter(profile=profile).count(),
-            'total_comments': Comment.objects.filter(profile=profile).count(),
+            'total_likes': total_likes,
+            'total_dislikes': total_dislikes,
+            'total_comments': total_comments,
             'isLoggedIn': True,
         },
         'categories': CategorySerializer(categories, many=True).data,
         'posts': PostSerializer(posts, many=True).data,
-        'proposals': CategoryProposalSerializer(proposals, many=True).data,  # Added proposals
+        'proposals': CategoryProposalSerializer(proposals, many=True).data,
     }
 
     return Response(data, status=status.HTTP_200_OK)
+
 
 
 @csrf_exempt

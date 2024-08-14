@@ -29,39 +29,41 @@ const ResetPassword = () => {
     };
 
     return (
-        <section className={styles.mainContainer}>
-            <div className={`card ${styles.resetCard}`}>
-                <Link
-                    to="/"
-                    className={`btn btn-dark btn-sm ${styles.backButton}`}
-                >
-                    Back
-                </Link>
-                <Logo size="150px" />
-                <h1 className={styles.title}>Reset Password</h1>
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    <label htmlFor="userEmail" className={styles.formLabel}>
-                        Enter your email:
-                    </label>
-                    <input
-                        onChange={(e) => setEmail(e.target.value)}
-                        type="email"
-                        id="userEmail"
-                        value={email}
-                        className={styles.inputField}
-                        required
-                    />
-                    {errorMessage && (
-                        <div className={styles.errorMessage}>
-                            {errorMessage}
-                        </div>
-                    )}
-                    <button type="submit" className={styles.submitButton}>
-                        Submit
-                    </button>
-                </form>
-            </div>
-        </section>
+        <>
+            <section className={styles.mainContainer}>
+                <div className={`card ${styles.resetCard}`}>
+                    <Link
+                        to="/"
+                        className={`btn btn-dark btn-sm ${styles.backButton}`}
+                    >
+                        Back
+                    </Link>
+                    <Logo size="150px" />
+                    <h1 className={styles.title}>Reset Password</h1>
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <label htmlFor="userEmail" className={styles.formLabel}>
+                            Enter your email:
+                        </label>
+                        <input
+                            onChange={(e) => setEmail(e.target.value)}
+                            type="email"
+                            id="userEmail"
+                            value={email}
+                            className={styles.inputField}
+                            required
+                        />
+                        {errorMessage && (
+                            <div className={styles.errorMessage}>
+                                {errorMessage}
+                            </div>
+                        )}
+                        <button type="submit" className={styles.submitButton}>
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </>
     );
 };
 

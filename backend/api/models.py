@@ -103,7 +103,10 @@ class ProfileCtgFollowing(models.Model):
 
 
 
-# For proposals
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
+from datetime import timedelta
 
 class CategoryProposal(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -112,8 +115,8 @@ class CategoryProposal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def clean_old_proposals(self):
-        if self.created_at < timezone.now() - timedelta(hours=24):
-            self.delete()
+        cutoff_time = timezone.now() - timedelta(seconds=10)  # Change to 24 hours for production
+        CategoryProposal.objects.filter(created_at__lt=cutoff_time).delete()
 
     def __str__(self):
         return self.name
@@ -121,3 +124,8 @@ class CategoryProposal(models.Model):
     @classmethod
     def get_all_proposals(cls):
         return cls.objects.all()
+
+# Signal to trigger the cleanup process after each save
+@receiver(post_save, sender=CategoryProposal)
+def clean_up_proposals(sender, instance, **kwargs):
+    instance.clean_old_proposals()

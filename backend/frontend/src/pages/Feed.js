@@ -108,11 +108,14 @@ const Feed = () => {
                     categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
+                    neededCategories={true}
                 />
                 <div
                     className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}
                 >
-                    <h1 className="ml-3 mt-3 display-4">My Feed</h1>
+                    <h1 className={`ml-3 mt-3 display-4 ${styles.textCenter}`}>
+                        My Feed
+                    </h1>
 
                     {sortedPosts.length > 0 ? (
                         sortedPosts.map((post) => (
@@ -132,6 +135,7 @@ const Feed = () => {
                                     onCommentDeleted={handleCommentDeleted}
                                     deleteOption={post.user_id === user.id}
                                     onDelete={handlePostDeleted}
+                                    location="/forum/my-feed"
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments
@@ -150,14 +154,16 @@ const Feed = () => {
                         <div
                             className={`ml-2 mt-5 ${styles["text-holder-no-categories"]}`}
                         >
-                            <h1>Woops!</h1>
-                            <h4>There are no posts for your feed!</h4>
+                            <h1 className={styles.textCenter}>Woops!</h1>
+                            <h4 className={styles.textCenter}>
+                                There are no posts for your feed!
+                            </h4>
                             <div
                                 className={
                                     styles["text-holder-no-categories-second"]
                                 }
                             >
-                                <p>
+                                <p className={styles.textCenter}>
                                     Check{" "}
                                     <em>
                                         <b>Home</b>
@@ -175,7 +181,9 @@ const Feed = () => {
                             </div>
                         </div>
                     )}
-                    <div className={styles["post-counter"]}>
+                    <div
+                        className={` ${styles["post-counter"]} ${styles.textCenter}`}
+                    >
                         {sortedPosts.length}/{filteredPosts.length} posts shown
                     </div>
                     {sortedPosts.length < filteredPosts.length && (

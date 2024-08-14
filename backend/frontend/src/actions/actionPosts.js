@@ -1,6 +1,6 @@
-import axios from '../utils/axios';
-import endpoints from '../utils/endpoints';
-import { fetchAllData } from './actionAppContext';
+import axios from "../utils/axios";
+import endpoints from "../utils/endpoints";
+import { fetchAllData } from "./actionAppContext";
 
 export const likePost = async (postId, userId, unlike) => {
     const response = await axios.post(endpoints.interactions.createLike, {

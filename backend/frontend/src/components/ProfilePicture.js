@@ -49,7 +49,7 @@ const ProfilePicture = () => {
                 setProfilePictureUrl(URL.createObjectURL(file));
             } catch (error) {
                 console.error("Error uploading profile picture:", error);
-                setError("Error uploading profile picture.");
+                setError("Error uploading profile picture. ", error);
             }
         }
     };

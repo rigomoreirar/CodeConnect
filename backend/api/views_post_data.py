@@ -179,18 +179,33 @@ def delete_comment(request):
     user_id = data.get("user_id")
 
     try:
+        # Fetch the comment and user
         comment = Comment.objects.get(id=comment_id)
         user = User.objects.get(id=user_id)
         profile = Profile.objects.get(user=user)
 
-        if comment.profile == profile:
+        # Ensure IDs are integers
+        user_id_from_request = int(user.id)
+        moderator_id_from_settings = int(settings.MODERATOR_HASHED_ID)
+
+        # Debugging: Log the IDs to ensure they're correct
+        print(f"User ID from request: {user_id_from_request}")
+        print(f"MODERATOR_HASHED_ID from settings: {moderator_id_from_settings}")
+
+        # Check if the user is the moderator or the creator of the comment
+        if user_id_from_request == moderator_id_from_settings or comment.profile == profile:
+            print("User is authorized to delete the comment.")
+
+            # Proceed with deletion
             comment.delete()
 
+            # Notify through SSE
             with open('sse_notifications.txt', 'w') as f:
                 f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
 
             return Response({"message": "Comment deleted successfully"}, status=status.HTTP_200_OK)
         else:
+            print("User is not authorized to delete this comment.")
             return Response({"error": "You are not authorized to delete this comment"}, status=status.HTTP_403_FORBIDDEN)
 
     except Comment.DoesNotExist:
@@ -198,8 +213,8 @@ def delete_comment(request):
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
+        print(f"Unexpected error: {e}")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @csrf_exempt
 @api_view(["POST"])
@@ -245,6 +260,14 @@ def create_post(request):
 
 
 
+from django.conf import settings
+import json
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.db import transaction
+from api.models import Post, Like, Dislike, Comment, User
+
 @api_view(["POST"])
 @transaction.atomic
 def delete_post(request):
@@ -253,19 +276,35 @@ def delete_post(request):
     user_id = data.get("user_id")
 
     try:
+        # Fetch the post and user
         post = Post.objects.get(id=post_id)
         user = User.objects.get(id=user_id)
 
-        if post.creator.user.id == user.id:
+        # Ensure IDs are integers
+        user_id_from_request = int(user.id)
+        moderator_id_from_settings = int(settings.MODERATOR_HASHED_ID)
+
+        # Debugging: Log the IDs to ensure they're correct
+        print(f"User ID from request: {user_id_from_request}")
+        print(f"MODERATOR_HASHED_ID from settings: {moderator_id_from_settings}")
+
+        # Check if the user is the moderator or the creator of the post
+        if user_id_from_request == moderator_id_from_settings or post.creator.user.id == user_id_from_request:
+            print("User is authorized to delete the post.")
+
+            # Proceed with deletion
             Like.objects.filter(post=post).delete()
             Dislike.objects.filter(post=post).delete()
             Comment.objects.filter(post=post).delete()
-
             post.delete()
+
+            # Notify through SSE
             with open('sse_notifications.txt', 'w') as f:
                 f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
+
             return Response({"message": "Post and associated comments deleted successfully"}, status=status.HTTP_200_OK)
         else:
+            print("User is not authorized to delete this post.")
             return Response({"error": "You are not authorized to delete this post"}, status=status.HTTP_403_FORBIDDEN)
 
     except Post.DoesNotExist:
@@ -273,7 +312,9 @@ def delete_post(request):
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
+        print(f"Unexpected error: {e}")
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 @csrf_exempt

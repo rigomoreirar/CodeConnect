@@ -88,10 +88,25 @@ class DislikeSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     profile = serializers.ReadOnlyField(source='profile.user.username')
+    total_likes = serializers.SerializerMethodField()
+    total_dislikes = serializers.SerializerMethodField()
+    total_comments = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('id', 'timestamp', 'profile', 'post', 'content')
+        fields = ('id', 'timestamp', 'profile', 'post', 'content', 'total_likes', 'total_dislikes', 'total_comments')
+
+    def get_total_likes(self, obj):
+        profile_posts = Post.objects.filter(creator=obj.profile)
+        return Like.objects.filter(post__in=profile_posts).count()
+
+    def get_total_dislikes(self, obj):
+        profile_posts = Post.objects.filter(creator=obj.profile)
+        return Dislike.objects.filter(post__in=profile_posts).count()
+
+    def get_total_comments(self, obj):
+        profile_posts = Post.objects.filter(creator=obj.profile)
+        return Comment.objects.filter(post__in=profile_posts).count()
 
 class CategorySerializer(serializers.ModelSerializer):
     followers = serializers.SerializerMethodField()

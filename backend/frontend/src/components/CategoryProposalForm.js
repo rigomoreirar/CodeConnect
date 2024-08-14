@@ -1,6 +1,8 @@
 import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
+
 import styles from "../styles/CategoryProposalForm.module.css";
+
 import { submitCategoryProposal } from "../actions/actionCategoryProposalForm";
 
 const CategoryProposalForm = () => {

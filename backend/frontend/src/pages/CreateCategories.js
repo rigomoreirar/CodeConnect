@@ -102,6 +102,9 @@ const CreateCategory = () => {
                     <div className={styles.tableContainer}>
                         <CategoryProposalsTable />
                     </div>
+                    <h2 className={`mb-3 display-5 ${styles.alignTextCenter}`}>
+                        Add a Category
+                    </h2>
                     <div className={styles.tableContainer}>
                         {isLoading ? (
                             <Loader />
@@ -134,6 +137,7 @@ const CreateCategory = () => {
                                 </tbody>
                             </table>
                         )}
+
                         <form onSubmit={handleCategorySubmit}>
                             <div className="input-group">
                                 <input

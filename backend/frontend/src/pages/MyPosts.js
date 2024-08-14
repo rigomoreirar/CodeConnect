@@ -1,8 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-
 import { AppContext } from "../context/AppContext";
-import { createPost, fetchUserPosts } from "../actions/actionMyPosts";
-import { fetchAllData } from "../actions/actionAppContext";
 
 import styles from "../styles/MyPosts.module.css";
 
@@ -11,6 +8,7 @@ import Comments from "../components/Comments";
 import CategoryBox from "../containers/CategoryBox";
 import Loader from "../components/Loader";
 import Filters from "../containers/Filters";
+import { createPost } from "../actions/actionMyPosts";
 
 const MyPosts = () => {
     const { user, posts, setPosts } = useContext(AppContext);
@@ -21,21 +19,10 @@ const MyPosts = () => {
     const [catArray, setCatArray] = useState([]);
 
     useEffect(() => {
-        const fetchPosts = async () => {
-            setIsLoading(true);
-            try {
-                const userPosts = await fetchUserPosts(user.id);
-                setFilteredPosts(userPosts);
-                setPosts(userPosts);
-            } catch (error) {
-                console.error("Error fetching user posts:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchPosts();
-    }, [user.id, setPosts]);
+        // Filter posts based on the current user's ID
+        const userPosts = posts.filter((post) => post.creator === user.id);
+        setFilteredPosts(userPosts);
+    }, [posts, user.id]);
 
     const handleLoadMore = () => {
         setVisiblePostsCount((prevCount) => prevCount + 3);
@@ -123,11 +110,7 @@ const MyPosts = () => {
         try {
             setIsLoading(true);
             await createPost(newPost);
-            const token = localStorage.getItem("token");
-            const allData = await fetchAllData(token);
-
-            setPosts(allData.posts);
-            setFilteredPosts(allData.posts);
+            // The new post will be added to the context automatically via SSE or context update
         } catch (error) {
             console.error("Error creating post:", error);
         } finally {
@@ -137,7 +120,6 @@ const MyPosts = () => {
 
     return (
         <>
-            {/* Sorry, I am too lazy to fix this stuff, I will just let it be, filters stay just for the black line in the top :3 */}
             <Filters
                 activeFilter={true}
                 setActiveFilter={true}
@@ -206,6 +188,7 @@ const MyPosts = () => {
                                     deleteOption={true}
                                     onDelete={handlePostDeleted}
                                     onCommentAdded={handleCommentAdded}
+                                    location="/forum/my-posts"
                                 />
                                 {showCommentsPostId === post.id && (
                                     <Comments

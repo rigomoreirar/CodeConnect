@@ -18,9 +18,7 @@ const Profile = () => {
         setProfilePictureUrl,
         setUser,
     } = useContext(AppContext);
-    // Check later
-    // const [modal, setModal] = useState(false);
-    // const [loading, setLoading] = useState(false);
+
     const [totalLikes, setTotalLikes] = useState(0);
     const [totalDislikes, setTotalDislikes] = useState(0);
     const [totalComments, setTotalComments] = useState(0);
@@ -137,39 +135,45 @@ const Profile = () => {
                                 </Link>
                             </div>
                         </div>
-                        <div className={newStyles.skillBlockContainer}>
-                            <InfoBlock
-                                color="bg-success"
-                                title="Likes"
-                                count={totalLikes}
-                            />
-                            <InfoBlock
-                                color="bg-secondary"
-                                title="Comments"
-                                count={totalComments}
-                            />
-                            <InfoBlock
-                                color="bg-danger"
-                                title="Dislikes"
-                                count={totalDislikes}
-                            />
-                            <InfoBlock
-                                color={newStyles["bg-gray"]}
-                                title="Following"
-                                count={ctgFollowingLength}
-                            />
-                        </div>
+                        {/* Conditionally render skillBlockContainer */}
+                        {user.username !== "moderator" && (
+                            <div className={newStyles.skillBlockContainer}>
+                                <InfoBlock
+                                    color="bg-success"
+                                    title="Likes"
+                                    count={totalLikes}
+                                />
+                                <InfoBlock
+                                    color="bg-secondary"
+                                    title="Comments"
+                                    count={totalComments}
+                                />
+                                <InfoBlock
+                                    color="bg-danger"
+                                    title="Dislikes"
+                                    count={totalDislikes}
+                                />
+                                <InfoBlock
+                                    color={newStyles["bg-gray"]}
+                                    title="Following"
+                                    count={ctgFollowingLength}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
-                <CategoryFollow
-                    setLength={setCtgFollowingLength}
-                    length={ctgFollowingLength}
-                    categories={categories}
-                    currentUser={user}
-                    refreshUserData={refreshUserData}
-                    onFollow={handleFollowCategory}
-                    onUnfollow={handleUnfollowCategory}
-                />
+                {/* Conditionally render CategoryFollow */}
+                {user.username !== "moderator" && (
+                    <CategoryFollow
+                        setLength={setCtgFollowingLength}
+                        length={ctgFollowingLength}
+                        categories={categories}
+                        currentUser={user}
+                        refreshUserData={refreshUserData}
+                        onFollow={handleFollowCategory}
+                        onUnfollow={handleUnfollowCategory}
+                    />
+                )}
             </div>
         </>
     );
