@@ -194,15 +194,19 @@ const MyPosts = () => {
                                     location="/forum/my-posts"
                                 />
                                 {showCommentsPostId === post.id && (
-                                    <Comments
-                                        currentUser={user}
-                                        currentPost={post}
-                                        setShowComments={() =>
-                                            setShowCommentsPostId(null)
-                                        }
-                                        onCommentAdded={handleCommentAdded}
-                                        onCommentDeleted={handleCommentDeleted}
-                                    />
+                                    <div className={styles.commentsContainer}>
+                                        <Comments
+                                            currentUser={user}
+                                            currentPost={post}
+                                            setShowComments={() =>
+                                                setShowCommentsPostId(null)
+                                            }
+                                            onCommentAdded={handleCommentAdded}
+                                            onCommentDeleted={
+                                                handleCommentDeleted
+                                            }
+                                        />
+                                    </div>
                                 )}
                             </div>
                         ))

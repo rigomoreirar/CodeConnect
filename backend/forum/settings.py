@@ -116,6 +116,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     'X-CSRFToken',
 ]
 
+
 # Ensure this block only includes TokenAuthentication for views that require it
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
