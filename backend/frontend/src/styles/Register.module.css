@@ -4,17 +4,10 @@
 
 .card {
     border-radius: 25px;
-    margin-top: 170px;
+    margin-top: 30px;
     margin-bottom: 50px;
     width: 90vw;
-    max-width: 60rem;
-}
-
-@media (max-width: 768px) {
-    .card {
-        margin-top: -30px;
-        width: 90vw;
-    }
+    max-width: 90%;
 }
 
 .formLabel {
@@ -24,7 +17,12 @@
 .iconContainer i {
     font-size: 1.5rem;
 }
-
+.flexContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 .btnDark {
     background-color: #343a40;
     border: none;
@@ -45,11 +43,4 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-}
-
-@media (max-width: 768px) {
-    .profilePictureContainer {
-        order: -1;
-        margin-bottom: 2rem;
-    }
 }
