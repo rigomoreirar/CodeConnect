@@ -115,7 +115,7 @@ const CreateCategory = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {userCategories.map((category) => (
+                                    {categories.map((category) => (
                                         <tr key={category.id}>
                                             <td>{category.name}</td>
                                             <td>
