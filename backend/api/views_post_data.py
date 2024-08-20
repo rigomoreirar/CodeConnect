@@ -182,10 +182,8 @@ def delete_comment(request):
         user = User.objects.get(id=user_id)
         profile = Profile.objects.get(user=user)
 
-        user_id_from_request = str(user.id)
-        moderator_id_from_settings = str(settings.MODERATOR_HASHED_ID)
-
-        if user_id_from_request == moderator_id_from_settings or comment.profile == profile:
+        # Allow deletion if user_id is '1' (moderator) or if the user is the owner of the comment
+        if user_id == "1" or comment.profile == profile:
             comment.delete()
             with open('sse_notifications.txt', 'w') as f:
                 f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
@@ -243,6 +241,7 @@ def create_post(request):
     }, status=status.HTTP_201_CREATED)
 
 
+@csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
 def delete_post(request):
