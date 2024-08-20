@@ -93,10 +93,14 @@ const Posts = ({
         });
     };
 
-    const formatContent = (content) => {
-        return content
+    const formatContent = (content, isModeratorPost) => {
+        const formattedContent = content
             .replace(/\n/g, "<br/>")
             .replace(/ {2,}/g, (spaces) => "&nbsp;".repeat(spaces.length));
+
+        return isModeratorPost
+            ? `<strong>${formattedContent}</strong>`
+            : formattedContent;
     };
 
     return (
@@ -111,7 +115,7 @@ const Posts = ({
                         {/* Show delete icon if the user is the moderator or the creator in the /forum/my-posts route */}
                         {(isModerator ||
                             (isMyPostsRoute &&
-                                post.creator == currentUser.id)) && (
+                                post.creator === Number(currentUser.id))) && (
                             <FaTrashAlt
                                 className={styles["delete-icon"]}
                                 onClick={(e) => {
@@ -137,7 +141,10 @@ const Posts = ({
                             </div>
                             <div
                                 dangerouslySetInnerHTML={{
-                                    __html: formatContent(formatted_content),
+                                    __html: formatContent(
+                                        formatted_content,
+                                        post.creator === 1
+                                    ),
                                 }}
                             />
                         </div>
@@ -169,7 +176,7 @@ const Posts = ({
                                     type="button"
                                     data-toggle="modal"
                                     data-target="#exampleModalLong"
-                                    style={{ border: "none" }}
+                                    className={styles.commentButton}
                                 >
                                     <i className="far fa-comment ml-2"></i>
                                     {comments.length}

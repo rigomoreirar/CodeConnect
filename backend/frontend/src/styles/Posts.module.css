@@ -17,11 +17,23 @@
 
 .like {
     color: blue;
+    cursor: pointer;
 }
 .dislike {
     color: red;
+    cursor: pointer;
 }
 
 .none {
     color: grey;
+    cursor: pointer;
+}
+
+.commentButton {
+    border: none;
+    cursor: pointer;
+}
+
+.boldContent {
+    font-weight: bold;
 }

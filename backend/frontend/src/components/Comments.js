@@ -79,7 +79,6 @@ const Comments = ({
     const isModerator = currentUser.username === "moderator";
 
     const toggleProfileInfo = (commentId) => {
-        console.log("Toggling comment ID:", commentId); // Add console log for debugging
         setActiveCommentId((prev) => (prev === commentId ? null : commentId));
     };
 
@@ -221,7 +220,13 @@ const Comments = ({
                                 </div>
                             </div>
                         </div>
-                        <p className={styles["comment-content"]}>
+                        <p
+                            className={`${styles["comment-content"]} ${
+                                comment.profile === "moderator"
+                                    ? styles.bold
+                                    : ""
+                            }`}
+                        >
                             {comment.content}
                         </p>
                     </div>

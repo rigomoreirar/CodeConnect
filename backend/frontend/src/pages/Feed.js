@@ -108,7 +108,7 @@ const Feed = () => {
                     categories={Array.isArray(categories) ? categories : []}
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
-                    neededCategories={true}
+                    neededCategories={false}
                 />
                 <div
                     className={`inner-main d-flex flex-column align-items-center ${styles["centered-items"]}`}

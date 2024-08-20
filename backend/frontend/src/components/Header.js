@@ -69,6 +69,14 @@ const Header = () => {
                             <li className={`nav-item ${styles["nav-item"]}`}>
                                 <Link
                                     className={`nav-link ${styles["nav-link"]}`}
+                                    to="/forum/my-posts"
+                                >
+                                    Moderator Posts
+                                </Link>
+                            </li>
+                            <li className={`nav-item ${styles["nav-item"]}`}>
+                                <Link
+                                    className={`nav-link ${styles["nav-link"]}`}
                                     to="/forum/profile"
                                 >
                                     My Profile

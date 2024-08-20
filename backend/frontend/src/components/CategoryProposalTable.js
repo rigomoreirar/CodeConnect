@@ -108,7 +108,7 @@ const CategoryProposalTable = () => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="3">No proposals available</td>
+                            <td colSpan="3">No categories suggested</td>
                         </tr>
                     )}
                 </tbody>
