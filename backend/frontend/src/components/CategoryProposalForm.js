@@ -52,8 +52,8 @@ const CategoryProposalForm = () => {
             {isFormDisabled && (
                 <p className={styles.disabledMessage}>
                     {proposals.length >= 10
-                        ? "Maximum of 10 proposals reached."
-                        : "You have already submitted a proposal."}
+                        ? "Maximum of 10 suggestions reached."
+                        : "You have already submitted a suggestion."}
                 </p>
             )}
             <form onSubmit={handleSubmit}>

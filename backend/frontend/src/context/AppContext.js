@@ -42,8 +42,6 @@ export const AppProvider = ({ children }) => {
         }
     }, []);
 
-    // console.log(`appContext: ${JSON.stringify(proposals)}`); // Pretty-print the JSON data
-
     return (
         <AppContext.Provider
             value={{

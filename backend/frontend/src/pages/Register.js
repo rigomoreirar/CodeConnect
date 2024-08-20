@@ -9,25 +9,50 @@ import styles from "../styles/Register.module.css";
 import Logo from "../components/Logo";
 import RegisterProfilePicture from "../components/RegisterProfilePicture";
 
-const FormField = ({ icon, label, type, value, setValue, id }) => {
+const FormField = ({
+    icon,
+    label,
+    type,
+    value,
+    setValue,
+    id,
+    showPasswordToggle,
+    showPassword,
+    setShowPassword,
+}) => {
     return (
         <div className="d-flex flex-row align-items-center mb-4">
             <div
                 className={`${styles.iconContainer} d-flex justify-content-center align-items-center `}
             >
-                <i className={icon}></i>
+                <i className={`${icon} ${styles.icon}`}></i>
             </div>
             <div className="form-outline flex-fill mb-0">
                 <label className={styles.formLabel} htmlFor={id}>
                     {label}
                 </label>
-                <input
-                    onChange={(e) => setValue(e.target.value)}
-                    value={value}
-                    type={type}
-                    id={id}
-                    className="form-control"
-                />
+                <div className="input-group">
+                    <input
+                        onChange={(e) => setValue(e.target.value)}
+                        value={value}
+                        type={
+                            showPasswordToggle && showPassword ? "text" : type
+                        }
+                        id={id}
+                        className="form-control"
+                    />
+                    {showPasswordToggle && (
+                        <div className="input-group-append">
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -43,6 +68,9 @@ const Register = () => {
     const [password, setPassword] = useState("");
     const [confirmation, setConfirmation] = useState("");
     const [profilePicture, setProfilePicture] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmationPassword, setShowConfirmationPassword] =
+        useState(false);
 
     const handleRegister = async () => {
         if (
@@ -153,6 +181,11 @@ const Register = () => {
                                                 value={password}
                                                 setValue={setPassword}
                                                 id="password"
+                                                showPasswordToggle={true}
+                                                showPassword={showPassword}
+                                                setShowPassword={
+                                                    setShowPassword
+                                                }
                                             />
                                             <FormField
                                                 icon="fas fa-lock fa-lg fa-fw"
@@ -161,6 +194,13 @@ const Register = () => {
                                                 value={confirmation}
                                                 setValue={setConfirmation}
                                                 id="confirmation"
+                                                showPasswordToggle={true}
+                                                showPassword={
+                                                    showConfirmationPassword
+                                                }
+                                                setShowPassword={
+                                                    setShowConfirmationPassword
+                                                }
                                             />
                                             <div className="d-flex justify-content-center mx-4 mb-1 mb-lg-1">
                                                 <button

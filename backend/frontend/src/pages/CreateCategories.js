@@ -55,7 +55,6 @@ const CreateCategory = () => {
                 ...prevUserCategories,
                 newCategory,
             ]);
-            console.log("Category created:", newCategory);
         } catch (error) {
             console.error("Error creating category:", error);
         }
@@ -73,7 +72,6 @@ const CreateCategory = () => {
 
             setCategories(updatedCategories);
             setUserCategories(updatedUserCategories);
-            console.log(`Category deleted: ${categoryId}`);
         } catch (error) {
             console.error("Error deleting category:", error);
         }
@@ -96,7 +94,7 @@ const CreateCategory = () => {
                         Add New Categories!
                     </h1>
                     <h2 className={`mb-3 display-5 ${styles.alignTextCenter}`}>
-                        Proposals from users
+                        Suggestions from users
                     </h2>
 
                     <div className={styles.tableContainer}>

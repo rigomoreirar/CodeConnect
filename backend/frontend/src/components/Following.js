@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
+
+import styles from "../styles/Following.module.css";
+
 import { AppContext } from "../context/AppContext";
 
-const Following = ({ category, ctg_following, setLength, refreshUserData, onFollow, onUnfollow }) => {
+const Following = ({
+    category,
+    ctg_following,
+    setLength,
+    refreshUserData,
+    onFollow,
+    onUnfollow,
+}) => {
     const { user, setUser } = useContext(AppContext);
     const [isFollowing, setIsFollowing] = useState(
         ctg_following.some((catId) => catId === category.id)
@@ -22,8 +32,10 @@ const Following = ({ category, ctg_following, setLength, refreshUserData, onFoll
                     ...user,
                     profile_data: {
                         ...user.profile_data,
-                        ctg_following: user.profile_data.ctg_following.filter(catId => catId !== category.id)
-                    }
+                        ctg_following: user.profile_data.ctg_following.filter(
+                            (catId) => catId !== category.id
+                        ),
+                    },
                 };
                 setUser(updatedUser);
             } else {
@@ -34,8 +46,11 @@ const Following = ({ category, ctg_following, setLength, refreshUserData, onFoll
                     ...user,
                     profile_data: {
                         ...user.profile_data,
-                        ctg_following: [...user.profile_data.ctg_following, category.id]
-                    }
+                        ctg_following: [
+                            ...user.profile_data.ctg_following,
+                            category.id,
+                        ],
+                    },
                 };
                 setUser(updatedUser);
             }
@@ -48,9 +63,8 @@ const Following = ({ category, ctg_following, setLength, refreshUserData, onFoll
     return (
         <div
             onClick={handleCat}
-            className="hover justify-content-center"
+            className={`hover justify-content-center ${styles.pointerButton}`}
             key={category.id}
-            style={{ padding: "1em", border: "solid" }}
         >
             {category.name}
             <AiFillCheckCircle

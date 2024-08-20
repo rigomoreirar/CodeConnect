@@ -23,7 +23,7 @@ const EditProfile = () => {
             setLastName(user.last_name);
             setFirstName(user.first_name);
         }
-    }, [user]);
+    }, []);
 
     const handleSave = async () => {
         try {
@@ -50,8 +50,7 @@ const EditProfile = () => {
                 throw new Error(response.error || "Error updating profile");
             }
         } catch (error) {
-            setError("Error updating profile: " + error.message);
-            alert("Error updating profile: " + error.message);
+            setError("Error updating profile");
         }
     };
 

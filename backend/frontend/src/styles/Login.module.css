@@ -22,7 +22,7 @@
 
 @media (max-width: 768px) {
     .btn-sm {
-        margin-top: -5rem;
+        /* margin-top: -5rem; */
         margin-left: -8rem;
     }
 
@@ -33,7 +33,7 @@
 }
 
 .resetingcard {
-    margin-top: 5rem;
+    /* margin-top: 5rem; */
     height: 23rem;
     width: 50rem;
     background-color: white;
@@ -48,7 +48,7 @@
 }
 
 .card-login {
-    margin-top: 3rem;
+    /* margin-top: 3rem; */
     background-color: #fff; /* White background */
     border: 1px solid rgba(0, 0, 0, 0.125); /* Gray border */
     border-radius: 0.25rem; /* Rounded corners */

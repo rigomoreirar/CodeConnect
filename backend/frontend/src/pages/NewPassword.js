@@ -12,6 +12,8 @@ const NewPassword = () => {
     const [error, setError] = useState("");
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
 
     const handleSave = async () => {
         if (!currentPassword || !newPassword) {
@@ -31,8 +33,7 @@ const NewPassword = () => {
                 throw new Error(response.error || "Error updating password");
             }
         } catch (error) {
-            setError("Error updating password: " + error.message);
-            alert("Error updating password: " + error.message);
+            setError("Error updating password");
         }
     };
 
@@ -53,21 +54,51 @@ const NewPassword = () => {
                     {error && <div className="alert alert-danger">{error}</div>}
                     <div className="form-group">
                         <label>Current Password</label>
-                        <input
-                            type="password"
-                            className="form-control"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                        />
+                        <div className="input-group">
+                            <input
+                                type={showCurrentPassword ? "text" : "password"}
+                                className="form-control"
+                                value={currentPassword}
+                                onChange={(e) =>
+                                    setCurrentPassword(e.target.value)
+                                }
+                            />
+                            <div className="input-group-append">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary"
+                                    onClick={() =>
+                                        setShowCurrentPassword(
+                                            !showCurrentPassword
+                                        )
+                                    }
+                                >
+                                    {showCurrentPassword ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div className="form-group">
                         <label>New Password</label>
-                        <input
-                            type="password"
-                            className="form-control"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                        />
+                        <div className="input-group">
+                            <input
+                                type={showNewPassword ? "text" : "password"}
+                                className="form-control"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                            <div className="input-group-append">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary"
+                                    onClick={() =>
+                                        setShowNewPassword(!showNewPassword)
+                                    }
+                                >
+                                    {showNewPassword ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <button onClick={handleSave} className="btn btn-primary">
                         Save

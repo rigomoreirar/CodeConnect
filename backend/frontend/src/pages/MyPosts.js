@@ -16,6 +16,8 @@ const MyPosts = () => {
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [showCommentsPostId, setShowCommentsPostId] = useState(null);
     const [visiblePostsCount, setVisiblePostsCount] = useState(3);
+    const [question, setQuestion] = useState("");
+    const [content, setContent] = useState("");
     const [catArray, setCatArray] = useState([]);
 
     useEffect(() => {
@@ -114,6 +116,9 @@ const MyPosts = () => {
             const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
             await createPost(newPost, setPosts, token);
             setVisiblePostsCount(visiblePostsCount + 1); // Adjust post count after creation
+            setQuestion("");
+            setContent("");
+            setCatArray([]);
         } catch (error) {
             console.error("Error creating post:", error);
         } finally {
@@ -146,6 +151,10 @@ const MyPosts = () => {
                                     className={`${styles.question} mb-2`}
                                     type="text"
                                     name="question"
+                                    value={question}
+                                    onChange={(e) =>
+                                        setQuestion(e.target.value)
+                                    }
                                 />
                                 <CategoryBox
                                     catArray={catArray}
@@ -159,6 +168,10 @@ const MyPosts = () => {
                                         name="content"
                                         cols="30"
                                         rows="10"
+                                        value={content}
+                                        onChange={(e) =>
+                                            setContent(e.target.value)
+                                        }
                                     ></textarea>
                                 </div>
                             </div>

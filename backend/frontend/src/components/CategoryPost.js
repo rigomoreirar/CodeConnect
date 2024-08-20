@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import styles from "../styles/CategoryPost.module.css";
 
 const CategoryPost = ({ category, catArray, setCatArray }) => {
     const [select, setSelect] = useState(false);
@@ -12,7 +13,7 @@ const CategoryPost = ({ category, catArray, setCatArray }) => {
     };
 
     useEffect(() => {
-        if (catArray.some(cat => cat.id === category.id)) {
+        if (catArray.some((cat) => cat.id === category.id)) {
             setSelect(true);
         } else {
             setSelect(false);
@@ -20,7 +21,11 @@ const CategoryPost = ({ category, catArray, setCatArray }) => {
     }, [catArray, category]);
 
     return (
-        <div onClick={handleSelect} className="ml-2 hover" key={category.name}>
+        <div
+            onClick={handleSelect}
+            className={`ml-2 hover ${styles.pointerButton}`}
+            key={category.name}
+        >
             <span
                 className={
                     select

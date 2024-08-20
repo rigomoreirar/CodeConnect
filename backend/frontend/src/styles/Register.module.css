@@ -17,6 +17,10 @@
 .iconContainer i {
     font-size: 1.5rem;
 }
+
+.icon {
+    margin-right: 0.8rem;
+}
 .flexContainer {
     display: flex;
     justify-content: center;

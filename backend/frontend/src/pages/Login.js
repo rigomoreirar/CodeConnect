@@ -12,6 +12,7 @@ const Login = () => {
     const { setUser, setCategories, setPosts } = useContext(AppContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -38,7 +39,7 @@ const Login = () => {
             className={`${styles["main-container"]} vh-100`}
             style={{ backgroundColor: "#eee" }}
         >
-            <div className="container h-100" style={{ marginTop: "2rem" }}>
+            <div className="container h-100">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-lg-12 col-xl-11">
                         <div
@@ -90,18 +91,39 @@ const Login = () => {
                                                 <div className="d-flex flex-row align-items-center mb-4">
                                                     <i className="fas fa-lock fa-lg me-3 fa-fw mb-4"></i>
                                                     <div className="form-outline flex-fill mb-0">
-                                                        <input
-                                                            onChange={(e) =>
-                                                                setPassword(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            type="password"
-                                                            id="form3Example4c"
-                                                            value={password}
-                                                            className="form-control"
-                                                        />
+                                                        <div className="input-group">
+                                                            <input
+                                                                onChange={(e) =>
+                                                                    setPassword(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                type={
+                                                                    showPassword
+                                                                        ? "text"
+                                                                        : "password"
+                                                                }
+                                                                id="form3Example4c"
+                                                                value={password}
+                                                                className="form-control"
+                                                            />
+                                                            <div className="input-group-append">
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-outline-secondary"
+                                                                    onClick={() =>
+                                                                        setShowPassword(
+                                                                            !showPassword
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {showPassword
+                                                                        ? "Hide"
+                                                                        : "Show"}
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         <strong>
                                                             <label
                                                                 className="form-label"
