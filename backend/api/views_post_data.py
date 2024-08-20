@@ -182,10 +182,8 @@ def delete_comment(request):
         user = User.objects.get(id=user_id)
         profile = Profile.objects.get(user=user)
 
-        user_id_from_request = str(user.id)
-        moderator_id_from_settings = str(settings.MODERATOR_HASHED_ID)
-
-        if user_id_from_request == moderator_id_from_settings or comment.profile == profile:
+        # Allow deletion if user_id is '1' (moderator) or if the user is the owner of the comment
+        if user_id == "1" or comment.profile == profile:
             comment.delete()
             with open('sse_notifications.txt', 'w') as f:
                 f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
@@ -202,45 +200,37 @@ def delete_comment(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@csrf_exempt
 @api_view(["POST"])
 @transaction.atomic
-def create_post(request):
+def delete_post(request):
     data = request.data
+    post_id = str(data.get("post_id"))
+    user_id = str(data.get("user_id"))
 
     try:
-        user = User.objects.get(id=str(data.get("creator", {}).get("id")))
-        profile = Profile.objects.get(user=user)
+        post = Post.objects.get(id=post_id)
+        user = User.objects.get(id=user_id)
+
+        # Allow deletion if user_id is '1' (moderator) or if the user is the creator of the post
+        if user_id == "1" or str(post.creator.user.id) == user_id:
+            Like.objects.filter(post=post).delete()
+            Dislike.objects.filter(post=post).delete()
+            Comment.objects.filter(post=post).delete()
+            post.delete()
+
+            with open('sse_notifications.txt', 'w') as f:
+                f.write(json.dumps({'message': 'refetch', 'route': 'get-all-data'}))
+
+            return Response({"message": "Post and associated comments deleted successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "You are not authorized to delete this post"}, status=status.HTTP_403_FORBIDDEN)
+
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
     except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-    except Profile.DoesNotExist:
-        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    post_id = generate_unique_id(Post)
-    new_post = Post.objects.create(
-        id=post_id,
-        isStudent=data.get("isStudent"),
-        creator=profile,
-        title=data.get("title"),
-        content=data.get("content")
-    )
-
-    categories_added = []
-    for category in data.get("categories", []):
-        try:
-            db_category = Category.objects.get(pk=str(category.get("id")))
-            PostCategories.objects.create(post=new_post, category=db_category)
-            categories_added.append(db_category.id)
-        except Category.DoesNotExist:
-            return Response({'error': f'Category with id {category.get("id")} not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    post_serializer = PostSerializer(new_post)
-
-    return Response({
-        'message': 'Post created successfully',
-        'post': post_serializer.data,
-        'categories_added': categories_added
-    }, status=status.HTTP_201_CREATED)
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(["POST"])
